@@ -14,12 +14,13 @@ render it into static HTML at build time.
 
 | Page | What it is | Link |
 |---|---|---|
-| **Playbook prototype** | The interactive site — the spine, phases, activities, use cases, techniques, About | https://dudgeon.github.io/product-practice-playbook/ |
-| **Master PRD** | The product requirements doc (final two‑entity model) | https://dudgeon.github.io/product-practice-playbook/prd/ |
-| **IA Proposal** | The information‑architecture proposal & open decisions | https://dudgeon.github.io/product-practice-playbook/ia/ |
-| **Template gallery** | Component/design‑system reference | https://dudgeon.github.io/product-practice-playbook/gallery/ |
+| **Playbook prototype** | The interactive site — the spine, phases, activities, use cases, techniques, About | https://dudgeon.org/product-practice-playbook/ |
+| **Master PRD** | The product requirements doc (final two‑entity model) | https://dudgeon.org/product-practice-playbook/prd/ |
+| **IA Proposal** | The information‑architecture proposal & open decisions | https://dudgeon.org/product-practice-playbook/ia/ |
+| **Template gallery** | Component/design‑system reference | https://dudgeon.org/product-practice-playbook/gallery/ |
 
-> Links go live once the site is published. See [Deployment](#deployment).
+> Published via GitHub Actions to GitHub Pages (custom domain `dudgeon.org`). The
+> `dudgeon.github.io/product-practice-playbook/` URL redirects here.
 
 ## What's here
 
@@ -110,13 +111,10 @@ What changed (optional).
 ## Deployment
 
 GitHub Actions builds and publishes to **GitHub Pages** on every push to `main`
-(see [`.github/workflows/pages.yml`](.github/workflows/pages.yml)). Because links
-are relative, no base‑path configuration is needed.
-
-**First‑time setup:** in the repo's **Settings → Pages**, set the source to
-**GitHub Actions**. The workflow attempts to enable this automatically; once a
-run on `main` finishes, the links above are live. Pull requests run the build as
-a check but do not deploy.
+(see [`.github/workflows/pages.yml`](.github/workflows/pages.yml)). Pages source
+is set to **GitHub Actions**; the site serves from the custom domain `dudgeon.org`.
+Because links are relative, no base‑path configuration is needed. Pull requests
+run the build as a check but do not deploy.
 
 ## Credits
 

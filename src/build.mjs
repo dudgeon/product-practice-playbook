@@ -27,7 +27,7 @@ const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const DIST = path.join(ROOT, 'dist');
 const CONTENT = path.join(ROOT, 'content');
 
-const PROD_HOME = 'https://dudgeon.github.io/product-practice-playbook/';
+const PROD_HOME = 'https://dudgeon.org/product-practice-playbook/';
 
 let pageCount = 0;
 function emit(relPath, html) {
