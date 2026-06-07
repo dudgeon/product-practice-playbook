@@ -31,9 +31,8 @@ jobs:
         run: npm ci
 
       - name: Build static site
-        env:
-          # Project site lives under /<repo>/ on github.io
-          BASE_URL: /product-practice-playbook/
+        # Links are relative, so no base path is needed — the same dist/ works
+        # on Pages, any local server, and opened directly off disk.
         run: npm run build
 
       # Pages setup + artifact only on real deploys (keeps PR checks side-effect free)
