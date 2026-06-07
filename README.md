@@ -43,12 +43,14 @@ A small zero‑framework static‑site generator (plain Node ESM):
 ```
 content/                 ← the source of truth (edit these)
   site.json                site config + home copy
-  lifecycle.json           the notional spine: stages + key activities (+ canon/editor)
+  lifecycle.json           the spine SKELETON: stages + key activities (ids, names, order, hue, tagline)
+  phases/*.md              per-phase editorial prose: canon + the editor's note (merged into the spine)
   techniques.json          the horizontal technique tags
+  techniques/*.md          optional: a technique's long-form explanation (overrides the tag)
   usecases/*.md            one use case per file: YAML frontmatter + prose
   about/*.md               the three About pages
   pages/*.html             self-contained ancillary docs (Master PRD, IA Proposal)
-  phases.json              GENERATED from lifecycle.json (git-ignored snapshot)
+  phases.json              GENERATED from lifecycle.json + phases/*.md (git-ignored snapshot)
 src/
   lib/                     content loader, lifecycle compiler, markdown, links, html
   components.mjs           the design system as reusable template functions
@@ -70,6 +72,63 @@ HTML, and everything is written to `dist/` as real directories (one
 `index.html` per route) so it deploys anywhere. The **template gallery** renders
 straight from `src/components.mjs`, so it stays an honest reference.
 
+## The data layer: structured vs Markdown
+
+There's no database — the **build is the database**: the content files are the
+tables, `id`s are the keys, `loadContent()` is the query engine, and
+`build-content` is the constraint layer. One rule decides where any given piece
+of content lives:
+
+> **Structured if you'd query it; Markdown if you'd read it.** A field is
+> structured data (JSON or frontmatter) when the build or UI needs to **filter,
+> sort, join, count, validate, or link** on it — ids, foreign keys, flags, tags,
+> ordering, colors. It's Markdown prose when a human writes it in sentences and
+> it renders as rich text — goals, approaches, canon lines, editor's notes, bios.
+> Frontmatter is the hinge that lets one file carry both.
+
+That resolves into three tiers:
+
+| Tier | Lives in | Examples |
+|---|---|---|
+| **Config** | JSON | `site.json` — title, repo, home copy |
+| **Taxonomy / skeleton** | JSON, id‑keyed | `lifecycle.json` (the spine), `techniques.json` (tags) |
+| **Prose entities** | Markdown + frontmatter | `usecases/*.md`, `about/*.md`, `phases/*.md`, optional `techniques/*.md` |
+
+So the spine's **structure** (ids, order, hue) is JSON in `lifecycle.json`, while
+its **prose** (canon + the editor's note) is Markdown in `content/phases/<id>.md`
+and merged back into the compiled spine at load time — the same frontmatter‑plus‑
+body shape use cases already use. Full reasoning + the decision record:
+[`docs/data-layer-prd.md`](docs/data-layer-prd.md) and
+[`docs/data-layer-decision.html`](docs/data-layer-decision.html).
+
+### Editing phase prose
+
+A phase's `content/phases/<id>.md` carries the editorial voice; short
+activity‑level canon/editor lines ride in its frontmatter, keyed by activity id:
+
+```markdown
+---
+id: discover
+activities:
+  d-research:
+    canon: "Talk to a named customer before writing a line of spec."
+    editor: "The highest-leverage place to point an agent."
+---
+## Canon
+
+No solution may proceed without a named customer and a written problem.
+
+## Editor's note
+
+A leading line, then a paragraph of body.
+
+- **A bold point.** Followed by the rest of the point.
+```
+
+A **technique** stays a one‑line tag in `techniques.json` until it needs real
+explanation; then add `content/techniques/<id>.md` — its frontmatter overrides
+the tag's fields and its Markdown body renders as the technique's detail.
+
 ## The lifecycle is data — changing the stages
 
 The product‑development lifecycle (the **stages** and their **key activities**)
@@ -77,15 +136,18 @@ is notional and lives entirely in **`content/lifecycle.json`** — the single
 source of truth for the spine. When the stages or activities change, you don't
 touch templates or CSS:
 
-1. Edit `content/lifecycle.json` (add / rename / reorder / recolor phases and
-   activities). Keep `id`s stable — use cases reference them — or omit `id` on a
-   new entry to auto‑slug it from the name. `hue` is optional (auto‑assigned),
-   and phase numbers + soft tints are derived.
+1. Edit `content/lifecycle.json` for **structure** (add / rename / reorder /
+   recolor phases and activities), and `content/phases/<id>.md` for the
+   **prose** (canon + the editor's note). Keep `id`s stable — use cases and the
+   phase prose files reference them — or omit `id` on a new entry to auto‑slug it
+   from the name. `hue` is optional (auto‑assigned); phase numbers + soft tints
+   are derived. A new phase needs a matching `content/phases/<id>.md`.
 2. Run **`npm run build-content`** (or the **`/build-content`** skill). It
-   compiles the spine, writes the generated `content/phases.json` snapshot, and
-   **validates** the rest of the content store — catching any use case that
-   points at a renamed/removed stage or an unknown technique tag — then prints a
-   coverage report.
+   compiles the spine, merges the per‑phase prose, writes the generated
+   `content/phases.json` snapshot, and **validates** the content store —
+   catching a use case that points at a renamed/removed stage, an unknown
+   technique tag, a duplicate or under‑specified use case, or a phase missing
+   its prose file — then prints a coverage report.
 3. Run **`npm run build`** (or the **`/build-site`** skill) to render. The build
    also generates the phase‑keyed CSS (hue tokens, the featured‑card tints, and
    the spine‑rail gradient) from the lifecycle, so new stages render correctly
