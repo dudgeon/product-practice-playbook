@@ -257,6 +257,7 @@ export function techniquePage(db, t) {
     `<span class="kicker-mono" style="text-transform:none;letter-spacing:0">spans ${plural(phases.size, 'phase')}</span>` +
     `<span style="flex:1"></span>${addLink({ label: t.name, scopeField: 'techniques', children: '+ I used this — add your use case' })}` +
     `</div></div>` +
+    when(t.detail, () => `<div class="tech-detail pb-prose">${md(t.detail)}</div>`) +
     `<div class="pb-rail-label">Use cases applying this technique</div>` +
     (ucs.length
       ? ucGrid(ucs)

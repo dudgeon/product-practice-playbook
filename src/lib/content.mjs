@@ -56,7 +56,17 @@ export function loadContent() {
   const { phases } = compileLifecycle(readJSON('lifecycle.json'));
   const phaseProse = loadPhaseProse();
   mergePhaseProse(phases, phaseProse);
-  const techniques = readJSON('techniques.json');
+
+  // Techniques are a lean JSON tag list; a technique graduates to its own
+  // Markdown file (content/techniques/<id>.md) when it needs real explanation —
+  // frontmatter overrides scalar fields, the body becomes rich `detail`.
+  const techniques = readJSON('techniques.json').map((t) => {
+    const file = path.join(CONTENT, 'techniques', `${t.id}.md`);
+    if (!fs.existsSync(file)) return t;
+    const { data, content } = matter(fs.readFileSync(file, 'utf8'));
+    const detail = content.trim();
+    return { ...t, ...data, ...(detail ? { detail } : {}) };
+  });
 
   const usecases = readDir('usecases').map((file) => {
     const { data, content } = matter(fs.readFileSync(file, 'utf8'));
