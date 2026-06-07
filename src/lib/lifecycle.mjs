@@ -77,6 +77,113 @@ export function compileLifecycle(raw) {
   return { phases };
 }
 
+// ---- Per-phase editorial prose (lives in content/phases/<id>.md) ----------
+//
+// The spine *skeleton* (ids, names, order, hue, tagline) stays in lifecycle.json;
+// the editorial *prose* (canon + the editor's note) is authored as Markdown and
+// merged back into the compiled snapshot here, so the renderers — which expect
+// canon as a plain string and editor as { lead, body, points } — are unchanged.
+
+/** Split a Markdown body into `## Heading` sections, in order. */
+export function splitSections(body) {
+  const parts = String(body).split(/^##[ \t]+(.+)$/m);
+  const out = [];
+  for (let i = 1; i < parts.length; i += 2) {
+    out.push({ heading: parts[i].trim(), body: (parts[i + 1] || '').trim() });
+  }
+  return out;
+}
+
+/**
+ * Parse an editor's-note Markdown block into the { lead, body, points } shape
+ * the editorNote component renders: leading paragraphs map to lead then body,
+ * and a bullet list maps to points (raw text, **bold** preserved for renderBold).
+ */
+export function parseEditorNote(text = '') {
+  const blocks = String(text)
+    .split(/\n\s*\n/)
+    .map((b) => b.trim())
+    .filter(Boolean);
+  const paras = [];
+  const points = [];
+  for (const block of blocks) {
+    const lines = block.split('\n').map((l) => l.trim());
+    if (lines.length && lines.every((l) => /^-\s+/.test(l))) {
+      for (const l of lines) points.push(l.replace(/^-\s+/, ''));
+    } else {
+      paras.push(block.replace(/\n+/g, ' ').trim());
+    }
+  }
+  const out = {};
+  if (paras[0]) out.lead = paras[0];
+  if (paras.length > 1) out.body = paras.slice(1).join(' ');
+  if (points.length) out.points = points;
+  return Object.keys(out).length ? out : null;
+}
+
+/** Parse a per-phase Markdown body into { canon, editor }. */
+export function parseSpineProse(content = '') {
+  const sections = splitSections(content);
+  const find = (h) => sections.find((s) => s.heading.toLowerCase() === h)?.body || '';
+  const canonText = find('canon');
+  return {
+    canon: canonText || null,
+    editor: parseEditorNote(find("editor's note")),
+  };
+}
+
+/**
+ * Merge per-phase prose (keyed by phase id) into the compiled spine in place.
+ * `prose[id] = { canon, editor, activities: { <activityId>: { canon, editor } } }`.
+ */
+export function mergePhaseProse(phases, proseById = {}) {
+  for (const p of phases) {
+    const prose = proseById[p.id];
+    if (!prose) continue;
+    if (prose.canon != null) p.canon = prose.canon;
+    if (prose.editor) p.editor = prose.editor;
+    const acts = prose.activities || {};
+    for (const a of p.activities) {
+      const ap = acts[a.id];
+      if (!ap) continue;
+      if (ap.canon != null) a.canon = ap.canon;
+      if (ap.editor) a.editor = ap.editor;
+    }
+  }
+  return phases;
+}
+
+/**
+ * Validate that every phase has its prose file, every prose file matches a phase,
+ * and every activity key in a prose file is a real activity in that phase.
+ */
+export function validatePhaseProse(phases, proseById = {}) {
+  const errors = [];
+  const phaseById = new Map(phases.map((p) => [p.id, p]));
+  for (const p of phases) {
+    if (!proseById[p.id]) {
+      errors.push(`phase "${p.id}": no prose file (expected content/phases/${p.id}.md).`);
+      continue;
+    }
+    if (!p.canon) errors.push(`phase "${p.id}": prose file has no "## Canon" section.`);
+    if (!p.editor) errors.push(`phase "${p.id}": prose file has no "## Editor's note" section.`);
+  }
+  for (const [id, prose] of Object.entries(proseById)) {
+    const p = phaseById.get(id);
+    if (!p) {
+      errors.push(`content/phases/${id}.md: no phase "${id}" in lifecycle.json.`);
+      continue;
+    }
+    const activityIds = new Set(p.activities.map((a) => a.id));
+    for (const aid of Object.keys(prose.activities || {})) {
+      if (!activityIds.has(aid)) {
+        errors.push(`content/phases/${id}.md: activity "${aid}" is not in phase "${id}".`);
+      }
+    }
+  }
+  return errors;
+}
+
 /**
  * Validate the content store against the compiled spine. Returns hard `errors`
  * (broken placements / unknown tags — these would crash the render) and softer
