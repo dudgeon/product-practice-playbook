@@ -1,0 +1,55 @@
+name: New use case
+description: Share a problem your team solved with AI-augmented product craft.
+title: "[Use case]: "
+labels: ["use-case"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for contributing to the **AI PDLC Playbook**. The editor reviews each
+        submission, places it on the spine (a phase + activity), adds technique tags,
+        and writes the editor's note. Keep it specific: a real problem, a real approach.
+  - type: input
+    id: title
+    attributes:
+      label: Title
+      description: One line — the problem solved, specifically.
+      placeholder: "PR reviewer agent that focuses humans on what matters"
+    validations:
+      required: true
+  - type: textarea
+    id: problem
+    attributes:
+      label: Goal · the problem
+      description: What problem, for whom? What did it cost before?
+    validations:
+      required: true
+  - type: textarea
+    id: approach
+    attributes:
+      label: Approach · the how
+      description: The instructions you used — prose, any prompt/code block, and resource links (label + URL).
+    validations:
+      required: true
+  - type: textarea
+    id: impact
+    attributes:
+      label: Impact (optional)
+      description: What changed? Include a headline metric if you have one.
+  - type: input
+    id: placement
+    attributes:
+      label: Lifecycle placement
+      description: Phase › activity, if you know where it belongs. The editor will finalize.
+      placeholder: "Build · Code review & QA"
+  - type: input
+    id: techniques
+    attributes:
+      label: Techniques
+      description: Comma-separated cross-cutting tags.
+      placeholder: "Subagents, Evals"
+  - type: input
+    id: tools
+    attributes:
+      label: Tools
+      placeholder: "Claude Code, GitHub, MCP"

@@ -1,0 +1,35 @@
+/* Static-site behavior + responsive tweaks layered on top of the design CSS. */
+
+/* Submit modal: hidden until opened by assets/js/app.js (progressive
+   enhancement — without JS the trigger links go straight to GitHub). */
+#submit-modal { display: none; }
+#submit-modal.open { display: flex; }
+
+.pb-search { cursor: default; user-select: none; }
+
+/* Footer second row (project docs) */
+.pb-foot .pb-foot-2 { margin-top: 14px; }
+.pb-foot .pb-foot-2 .kicker-mono { color: var(--ink-4); }
+
+/* Use-case grids (activity + technique pages) */
+.uc-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+
+code { font-family: var(--mono); }
+.pb-lede code { font-size: 0.86em; background: var(--muted-tint); padding: 1px 5px; border-radius: 4px; }
+
+/* ---- Responsive ---- */
+@media (max-width: 920px) {
+  .leaf { grid-template-columns: 1fr; gap: 24px; }
+  .feat-row { grid-template-columns: 1fr; }
+  .uc-grid { grid-template-columns: 1fr; }
+  .spine { grid-template-columns: 1fr; gap: 26px; }
+  .spine-rail { display: none; }
+}
+@media (max-width: 760px) {
+  .pb-head { gap: 14px; flex-wrap: wrap; height: auto; padding: 12px 20px; }
+  .pb-search { display: none; }
+  .pb-main, .pb-app-main { width: 100%; }
+  .wrap-wide, .wrap-narrow { padding: 0 22px; }
+  .phase-hero h1 { font-size: 36px; }
+  .home-hero .pb-h1 { font-size: 34px; }
+}

@@ -1,0 +1,72 @@
+/* Template gallery scaffolding — only the chrome around the showcased
+   components; the components themselves are styled by the design CSS. */
+
+.gx-h2 {
+  font-family: var(--serif);
+  font-weight: 500;
+  font-size: 24px;
+  letter-spacing: -0.015em;
+  margin: 46px 0 6px;
+  padding-top: 20px;
+  border-top: 1px solid var(--rule);
+}
+.gx-block { margin: 16px 0 8px; }
+.gx-meta { display: flex; align-items: baseline; gap: 12px; margin-bottom: 10px; flex-wrap: wrap; }
+.gx-name {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--accent-2);
+  background: var(--accent-soft);
+  border: 1px solid var(--accent-tint);
+  padding: 2px 8px;
+  border-radius: 6px;
+}
+.gx-note { font-size: 12.5px; color: var(--ink-3); }
+.gx-stage {
+  background: var(--bg-card);
+  border: 1px solid var(--rule);
+  border-radius: 14px;
+  padding: 26px;
+}
+
+/* color swatches */
+.gx-swgroup { margin-bottom: 22px; }
+.gx-swgroup:last-child { margin-bottom: 0; }
+.gx-swtitle {
+  font-family: var(--mono);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--ink-3);
+  margin-bottom: 12px;
+}
+.gx-swatches { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 16px; }
+.gx-swatch { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.gx-chip { width: 34px; height: 34px; border-radius: 8px; border: 1px solid rgba(0, 0, 0, 0.08); flex-shrink: 0; }
+.gx-swatch code { font-family: var(--mono); font-size: 12px; color: var(--ink); }
+.gx-hex { font-family: var(--mono); font-size: 11px; color: var(--ink-4); }
+.gx-use { font-size: 11px; color: var(--ink-3); flex-basis: 100%; padding-left: 44px; margin-top: -4px; }
+
+/* type specimens */
+.gx-type { padding: 14px 0; border-bottom: 1px dashed var(--rule); }
+.gx-type:last-child { border-bottom: 0; padding-bottom: 0; }
+.gx-type:first-child { padding-top: 0; }
+.gx-tlabel {
+  display: block;
+  font-family: var(--mono);
+  font-size: 10.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--ink-4);
+  margin-bottom: 8px;
+}
+
+/* inline submit-sheet preview */
+.gx-sheet-stage {
+  display: flex;
+  justify-content: center;
+  background: repeating-linear-gradient(45deg, var(--bg) 0 12px, var(--bg-elev) 12px 24px);
+  padding: 26px;
+  border-radius: 10px;
+}
+.gx-sheet-stage .sheet { position: relative; box-shadow: 0 14px 44px -18px rgba(0, 0, 0, 0.3); }
