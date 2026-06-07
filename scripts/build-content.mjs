@@ -14,7 +14,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { loadContent } from '../src/lib/content.mjs';
-import { compileLifecycle, validateContent } from '../src/lib/lifecycle.mjs';
+import { validateContent, validatePhaseProse } from '../src/lib/lifecycle.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const CONTENT = path.join(ROOT, 'content');
@@ -31,25 +31,36 @@ const c = {
 
 console.log(c.bold('AI PDLC Playbook — build content from lifecycle.json') + '\n');
 
-// 1. Compile the lifecycle; fail clearly on structural problems.
-let phases;
+// 1. Load the content store: compiles the lifecycle skeleton and merges the
+//    per-phase Markdown prose. Fail clearly on structural problems.
+let db;
 try {
-  ({ phases } = compileLifecycle(JSON.parse(fs.readFileSync(path.join(CONTENT, 'lifecycle.json'), 'utf8'))));
+  db = loadContent();
 } catch (err) {
-  console.error(c.red('✗ lifecycle.json is invalid: ') + err.message);
+  console.error(c.red('✗ content store is invalid: ') + err.message);
   process.exit(1);
 }
+const { phases, phaseProse } = db;
 const activityCount = phases.reduce((a, p) => a + p.activities.length, 0);
 
-// 2. Materialize the compiled spine snapshot.
+// 1b. Validate the per-phase prose (every phase has its file; no stray files or
+//     unknown activity keys) — these would render as silent/blank otherwise.
+const proseErrors = validatePhaseProse(phases, phaseProse);
+if (proseErrors.length) {
+  console.error(c.red(`✗ phase prose — ${proseErrors.length} error(s):`));
+  proseErrors.forEach((e) => console.error('  ' + c.red('✗ ') + e));
+  process.exit(1);
+}
+
+// 2. Materialize the compiled + merged spine snapshot.
 fs.writeFileSync(path.join(CONTENT, 'phases.json'), JSON.stringify(phases, null, 2) + '\n');
 console.log(
-  `Compiled spine: ${c.bold(phases.length + ' phases')}, ${c.bold(activityCount + ' activities')} ` +
+  `Compiled spine: ${c.bold(phases.length + ' phases')}, ${c.bold(activityCount + ' activities')}, ` +
+    `${c.bold(Object.keys(phaseProse).length + ' prose files')} ` +
     `→ wrote content/phases.json ${c.dim('(generated snapshot)')}\n`
 );
 
-// 3. Load the rest of the content and validate placements + tags.
-const db = loadContent();
+// 3. Validate placements + technique tags.
 const { errors, warnings } = validateContent(db);
 
 if (errors.length) {

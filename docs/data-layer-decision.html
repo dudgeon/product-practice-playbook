@@ -1,0 +1,569 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>AI PDLC Playbook — Data Layer Decision</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400;1,6..72,500&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#f7f5f0; --bg-elev:#fbfaf6; --bg-card:#fff;
+    --ink:#1a1a1a; --ink-2:#3a3a3a; --ink-3:#6b6b66; --ink-4:#9a9a93;
+    --rule:#e6e3da; --rule-2:#d4d1c7; --muted:#ece9e0;
+    --discover:#2d6a6a; --discover-soft:#ecf2ef;
+    --build:#4a5a8a; --build-soft:#e7e9f1;
+    --grow:#3a7a4a; --grow-soft:#e3ede1;
+    --seal:#9a7b3f; --seal-2:#7c6231; --seal-soft:#f3ecdb; --seal-line:#e4d7b6; --canon-bg:#faf7ef;
+    --warn:#9a3f3f; --warn-soft:#f6e9e6; --warn-line:#e7c9c2;
+    --accent:#2d6a6a; --accent-2:#1f4d4d;
+    --serif:'Newsreader',Georgia,serif; --sans:'IBM Plex Sans',system-ui,sans-serif; --mono:'IBM Plex Mono',ui-monospace,monospace;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:15px;line-height:1.6;-webkit-font-smoothing:antialiased}
+  a{color:var(--accent)}
+  h1,h2,h3,h4{margin:0;font-weight:500;letter-spacing:-.02em;font-family:var(--serif)}
+  p{margin:0 0 14px;max-width:74ch}
+  .mono{font-family:var(--mono)}
+  .eyebrow{font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.14em;color:var(--ink-3)}
+  .dim{color:var(--ink-3)} .b{font-weight:600;color:var(--ink)}
+  code{font-family:var(--mono);font-size:.88em;background:var(--muted);padding:1px 5px;border-radius:4px}
+
+  .wrap{max-width:980px;margin:0 auto;padding:0 clamp(20px,4vw,40px)}
+  section{padding:48px 0;border-bottom:1px solid var(--rule)}
+  section:last-of-type{border-bottom:0}
+  .rail{display:flex;align-items:baseline;gap:12px;margin-bottom:10px}
+  .rail .num{font-family:var(--mono);font-size:12px;color:#fff;background:var(--ink);border-radius:6px;padding:3px 9px}
+  .rail .lab{font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.12em;color:var(--ink-3)}
+  h2.sec{font-size:clamp(24px,3vw,32px);margin:6px 0 14px;letter-spacing:-.025em}
+  h3.sub{font-size:19px;margin:28px 0 10px}
+  .lede{font-size:18px;line-height:1.55;color:var(--ink-2);max-width:70ch}
+
+  /* masthead */
+  .masthead{padding:64px 0 36px;border-bottom:1px solid var(--rule)}
+  .masthead .kick{font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.16em;color:var(--seal-2);margin-bottom:16px}
+  .masthead h1{font-size:clamp(36px,6vw,60px);line-height:1.03;letter-spacing:-.03em}
+  .masthead .tag{font-size:19px;color:var(--ink-2);margin-top:18px;max-width:62ch}
+  .statline{display:flex;flex-wrap:wrap;gap:0;margin-top:30px;border:1px solid var(--rule);border-radius:12px;overflow:hidden;background:var(--bg-card)}
+  .statline .s{flex:1;min-width:130px;padding:15px 18px;border-right:1px solid var(--rule)}
+  .statline .s:last-child{border-right:0}
+  .statline .v{font-family:var(--serif);font-size:24px;line-height:1.1}
+  .statline .l{font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--ink-3);margin-top:7px}
+
+  .callout{border:1px solid var(--rule);background:var(--bg-card);border-radius:12px;padding:18px 20px;margin:18px 0}
+  .callout.rec{background:var(--seal-soft);border-color:var(--seal-line)}
+  .callout.warn{background:var(--warn-soft);border-color:var(--warn-line)}
+  .callout .h{font-family:var(--mono);font-size:10.5px;text-transform:uppercase;letter-spacing:.1em;color:var(--ink-3);margin-bottom:8px}
+  .callout.rec .h{color:var(--seal-2)} .callout.warn .h{color:var(--warn)}
+  .callout p:last-child{margin-bottom:0}
+
+  /* generic cards / grids */
+  .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+  @media(max-width:760px){.grid3{grid-template-columns:1fr}}
+  .card{background:var(--bg-card);border:1px solid var(--rule);border-radius:12px;padding:18px}
+  .card h4{font-family:var(--sans);font-weight:600;font-size:14px;letter-spacing:0;margin-bottom:6px}
+  .card .d{font-size:13px;color:var(--ink-3);line-height:1.5}
+  .pill{display:inline-flex;align-items:center;gap:6px;font-family:var(--mono);font-size:11px;border:1px solid var(--rule-2);background:var(--bg-elev);border-radius:999px;padding:3px 10px;color:var(--ink-2)}
+  .endorsed{display:inline-flex;align-items:center;gap:6px;font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--seal-2);background:var(--seal-soft);border:1px solid var(--seal-line);padding:3px 9px;border-radius:999px}
+
+  /* ---- workflow diagrams ---- */
+  .diagram{background:var(--bg-card);border:1px solid var(--rule);border-radius:14px;padding:22px 20px;margin:18px 0;overflow-x:auto}
+  .diagram .cap{font-family:var(--mono);font-size:10.5px;text-transform:uppercase;letter-spacing:.1em;color:var(--ink-3);margin-bottom:16px}
+  svg{display:block;max-width:100%;height:auto;font-family:var(--mono)}
+  svg text{fill:var(--ink-2)}
+  svg .t-title{font-family:var(--sans);font-weight:600;fill:var(--ink)}
+  svg .t-sub{fill:var(--ink-3);font-size:11px}
+  svg .t-mono{font-family:var(--mono);font-size:11px}
+
+  /* ---- decision cards ---- */
+  .decision{background:var(--bg-card);border:1px solid var(--rule);border-radius:14px;padding:22px;margin:18px 0}
+  .decision > .q{display:flex;align-items:baseline;gap:10px;margin-bottom:4px}
+  .decision .qn{font-family:var(--mono);font-size:12px;color:#fff;background:var(--accent);border-radius:6px;padding:2px 8px;flex-shrink:0}
+  .decision .qt{font-family:var(--serif);font-size:20px;letter-spacing:-.02em}
+  .decision .qd{font-size:13.5px;color:var(--ink-3);margin:2px 0 16px}
+  .opts{display:grid;gap:10px}
+  .opt{display:flex;gap:12px;align-items:flex-start;border:1px solid var(--rule);border-radius:10px;padding:13px 15px;cursor:pointer;transition:border-color .12s,background .12s}
+  .opt:hover{border-color:var(--rule-2);background:var(--bg-elev)}
+  .opt input{margin-top:3px;accent-color:var(--accent);width:16px;height:16px;flex-shrink:0;cursor:pointer}
+  .opt .ol{font-weight:600;font-size:14px}
+  .opt .od{font-size:13px;color:var(--ink-3);line-height:1.5;margin-top:2px}
+  .opt:has(input:checked){border-color:var(--accent);background:var(--discover-soft);box-shadow:inset 0 0 0 1px var(--accent)}
+  .opt .rectag{font-family:var(--mono);font-size:9.5px;text-transform:uppercase;letter-spacing:.08em;color:var(--seal-2);background:var(--seal-soft);border:1px solid var(--seal-line);padding:1px 7px;border-radius:999px;margin-left:8px;vertical-align:middle}
+  .notes-label{display:block;font-family:var(--mono);font-size:10.5px;text-transform:uppercase;letter-spacing:.1em;color:var(--ink-3);margin:16px 0 6px}
+  textarea{width:100%;font-family:var(--sans);font-size:14px;line-height:1.55;color:var(--ink);background:var(--bg);border:1px solid var(--rule-2);border-radius:9px;padding:11px 13px;resize:vertical;min-height:52px}
+  textarea:focus{outline:none;border-color:var(--accent);background:var(--bg-card)}
+
+  /* ---- lock / copy ---- */
+  .lockbar{position:sticky;bottom:0;z-index:50;background:var(--bg-elev);border-top:1px solid var(--rule);box-shadow:0 -6px 20px rgba(0,0,0,.04)}
+  .lockbar .inner{max-width:980px;margin:0 auto;padding:14px clamp(20px,4vw,40px);display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+  .lockbar .msg{font-size:13px;color:var(--ink-3);flex:1;min-width:200px}
+  .btn{display:inline-flex;align-items:center;gap:9px;font-family:var(--sans);font-weight:600;font-size:14px;border:0;border-radius:9px;padding:11px 20px;cursor:pointer;text-decoration:none;transition:transform .08s,background .12s}
+  .btn:active{transform:translateY(1px)}
+  .btn-primary{background:var(--accent);color:#fff}
+  .btn-primary:hover{background:var(--accent-2)}
+  .btn-ghost{background:transparent;color:var(--ink-2);border:1px solid var(--rule-2)}
+  .btn-ghost:hover{background:var(--muted)}
+  .btn svg{width:15px;height:15px;display:block}
+
+  .preview-wrap{margin-top:18px}
+  .preview-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:8px}
+  pre.preview{background:#1a1a1a;color:#e8e6df;font-family:var(--mono);font-size:12px;line-height:1.6;border-radius:12px;padding:18px 18px;overflow:auto;max-height:420px;margin:0;white-space:pre-wrap;word-break:break-word}
+  .toast{position:fixed;left:50%;bottom:84px;transform:translateX(-50%) translateY(20px);background:var(--ink);color:#fff;font-size:13px;font-family:var(--mono);padding:10px 18px;border-radius:999px;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;z-index:100}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+  .footnote{font-size:12.5px;color:var(--ink-4);margin-top:8px}
+  ul.tight{margin:0 0 14px;padding-left:20px} ul.tight li{margin:4px 0;max-width:72ch}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+  <!-- MASTHEAD -->
+  <header class="masthead">
+    <div class="kick">AI PDLC Playbook · Architecture decision · 2026-06-07</div>
+    <h1>The data layer, before there's a database</h1>
+    <p class="tag">Where should content live — Markdown or a structured format — when the whole site is files and a build step? Work through the options, mark your calls, and lock the decision for Claude.</p>
+    <div class="statline">
+      <div class="s"><div class="v">0</div><div class="l">Databases</div></div>
+      <div class="s"><div class="v">3 tiers</div><div class="l">Proposed model</div></div>
+      <div class="s"><div class="v">4</div><div class="l">Decisions for you</div></div>
+      <div class="s"><div class="v">#4 ✓</div><div class="l">Validation landed</div></div>
+    </div>
+    <div class="callout" style="margin-top:24px">
+      <div class="h">Reconciled against PR #4</div>
+      <p style="margin-bottom:0"><span class="b">PR #4 ("Abstract the lifecycle to JSON") changed two premises.</span> The spine now lives in <code>content/lifecycle.json</code> (the editable source of truth); <code>content/phases.json</code> is a <span class="b">generated, git-ignored snapshot</span>. And a <span class="b">validation gate now exists</span> — <code>build-content</code> fails on broken placements or unknown tags. What #4 left untouched: editorial prose still sits as JSON strings (now in <code>lifecycle.json</code>). That's the remaining wound, and the focus of D1.</p>
+    </div>
+    <div class="callout" style="margin-top:14px">
+      <div class="h">How to use this page</div>
+      <p style="margin-bottom:0">Read sections 1–4 for the reasoning (the full write-up is in <code>docs/data-layer-prd.md</code>). In section 5, each decision is pre-set to the recommendation (D1 reflects your call: <span class="b">lift all spine prose to Markdown</span>) — change anything you disagree with and add notes. When you're happy, hit <span class="b">Copy decision to Claude</span> at the bottom and paste it back into chat to lock it.</p>
+    </div>
+  </header>
+
+  <!-- 1 — THE PROBLEM -->
+  <section id="problem">
+    <div class="rail"><span class="num">01</span><span class="lab">The problem</span></div>
+    <h2 class="sec">The data layer already exists — it just wasn't decided</h2>
+    <p class="lede">Content is split across JSON and Markdown today, but by accident of how it grew, not by a rule. That's fine where it landed well, and painful where it didn't.</p>
+
+    <div class="diagram">
+      <div class="cap">Today (post-#4) — source → compile + validate → snapshot → query layer → site</div>
+      <svg viewBox="0 0 960 250" role="img" aria-label="Current build pipeline diagram">
+        <!-- content stores -->
+        <g>
+          <rect x="10" y="20" width="190" height="210" rx="10" fill="#fbfaf6" stroke="#d4d1c7"/>
+          <text x="22" y="44" class="t-mono" font-size="10" fill="#6b6b66">content/  (source)</text>
+
+          <rect x="22" y="56" width="166" height="30" rx="7" fill="#e7e9f1" stroke="#c8cee0"/>
+          <text x="32" y="75" class="t-mono" font-size="11">site.json · config</text>
+
+          <rect x="22" y="94" width="166" height="46" rx="7" fill="#f6e9e6" stroke="#e7c9c2"/>
+          <text x="32" y="113" class="t-mono" font-size="11">lifecycle.json</text>
+          <text x="32" y="130" class="t-mono" font-size="9.5" fill="#9a3f3f">prose still in JSON ⚠</text>
+
+          <rect x="22" y="148" width="166" height="30" rx="7" fill="#ecf2ef" stroke="#cfe0db"/>
+          <text x="32" y="167" class="t-mono" font-size="11">techniques.json · tags</text>
+
+          <rect x="22" y="186" width="166" height="34" rx="7" fill="#e3ede1" stroke="#cfe0db"/>
+          <text x="32" y="207" class="t-mono" font-size="11">usecases/*.md ✓</text>
+        </g>
+
+        <path d="M200 125 L 246 125" stroke="#9a9a93" stroke-width="1.5" marker-end="url(#ar)"/>
+
+        <!-- build-content: compile + validate (added in #4) -->
+        <g>
+          <rect x="250" y="84" width="130" height="92" rx="10" fill="#f3ecdb" stroke="#e4d7b6"/>
+          <text x="315" y="116" text-anchor="middle" class="t-mono" font-size="11.5" fill="#7c6231">build-content</text>
+          <text x="315" y="136" text-anchor="middle" class="t-mono" font-size="9.5" fill="#9a7b3f">compile spine ✓</text>
+          <text x="315" y="152" text-anchor="middle" class="t-mono" font-size="9.5" fill="#9a7b3f">validate refs ✓</text>
+          <text x="315" y="166" text-anchor="middle" class="t-mono" font-size="8.5" fill="#9a7b3f">(new in #4)</text>
+        </g>
+
+        <path d="M380 125 L 424 125" stroke="#9a9a93" stroke-width="1.5" marker-end="url(#ar)"/>
+
+        <!-- generated snapshot -->
+        <g>
+          <rect x="428" y="90" width="120" height="80" rx="10" fill="#fbfaf6" stroke="#d4d1c7" stroke-dasharray="4 3"/>
+          <text x="488" y="120" text-anchor="middle" class="t-mono" font-size="11" fill="#3a3a3a">phases.json</text>
+          <text x="488" y="138" text-anchor="middle" class="t-mono" font-size="9" fill="#6b6b66">generated</text>
+          <text x="488" y="152" text-anchor="middle" class="t-mono" font-size="9" fill="#6b6b66">git-ignored</text>
+        </g>
+
+        <path d="M548 125 L 592 125" stroke="#9a9a93" stroke-width="1.5" marker-end="url(#ar)"/>
+
+        <!-- loader -->
+        <g>
+          <rect x="596" y="90" width="140" height="80" rx="10" fill="#1a1a1a"/>
+          <text x="666" y="120" text-anchor="middle" class="t-mono" font-size="12" fill="#fff">loadContent()</text>
+          <text x="666" y="140" text-anchor="middle" class="t-mono" font-size="9.5" fill="#bdbab2">query layer ·</text>
+          <text x="666" y="154" text-anchor="middle" class="t-mono" font-size="9.5" fill="#bdbab2">reverse indexes</text>
+        </g>
+
+        <path d="M736 125 L 780 125" stroke="#9a9a93" stroke-width="1.5" marker-end="url(#ar)"/>
+
+        <!-- build + dist -->
+        <g>
+          <rect x="784" y="90" width="166" height="80" rx="10" fill="#ecf2ef" stroke="#cfe0db"/>
+          <text x="867" y="120" text-anchor="middle" class="t-mono" font-size="11.5" fill="#1a4d4d">build.mjs → dist/</text>
+          <text x="867" y="140" text-anchor="middle" class="t-mono" font-size="9" fill="#2d6a6a">portable static</text>
+          <text x="867" y="154" text-anchor="middle" class="t-mono" font-size="9" fill="#2d6a6a">Pages · local · file://</text>
+        </g>
+
+        <defs>
+          <marker id="ar" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto">
+            <path d="M0 0 L9 4.5 L0 9 z" fill="#9a9a93"/>
+          </marker>
+        </defs>
+      </svg>
+    </div>
+
+    <h3 class="sub">What works — and what hurts</h3>
+    <div class="grid3">
+      <div class="card">
+        <span class="endorsed">✓ keep</span>
+        <h4 style="margin-top:8px">Use-case frontmatter</h4>
+        <div class="d">Structured handles on top (<code>id</code>, <code>phase</code>, <code>techniques[]</code>, <code>metric</code>), three-voice prose in the body. This is the model to generalize.</div>
+      </div>
+      <div class="card">
+        <span class="endorsed">✓ keep</span>
+        <h4 style="margin-top:8px"><code>loadContent()</code></h4>
+        <div class="d">Already a query layer — lookups, reverse indexes, rollups. Downstream code never touches the file layout. The de-facto database engine.</div>
+      </div>
+      <div class="card" style="border-color:var(--warn-line);background:var(--warn-soft)">
+        <span class="pill" style="color:var(--warn);border-color:var(--warn-line);background:#fff">⚠ the wound</span>
+        <h4 style="margin-top:8px">Prose still inside JSON</h4>
+        <div class="d"><code>lifecycle.json</code> stuffs canon + editor's notes — with <code>**bold**</code> — into JSON strings. Hard to edit, no rich-text render, escaping pain. <span class="b">Foreign-key checks now exist (#4)</span> — but the prose wound doesn't. That's D1.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2 — THE PRINCIPLE -->
+  <section id="principle">
+    <div class="rail"><span class="num">02</span><span class="lab">The principle</span></div>
+    <h2 class="sec">One rule draws the line</h2>
+    <div class="callout rec">
+      <div class="h">The rule</div>
+      <p style="font-family:var(--serif);font-size:21px;line-height:1.4;color:var(--ink);margin-bottom:10px">Structured if you'd <em>query</em> it. Markdown if you'd <em>read</em> it.</p>
+      <p style="margin-bottom:0">A field goes in <span class="b">structured data</span> (JSON/YAML or frontmatter) when the build or UI needs to <span class="b">filter, sort, join, count, validate, or link</span> on it — ids, foreign keys, flags, tags, metrics, ordering, colors. A field goes in <span class="b">Markdown prose</span> when a human writes it in sentences and it renders as rich text — goals, approaches, editor's notes, canon lines, bios. <span class="b">Frontmatter is the hinge</span> that lets one file carry both.</p>
+    </div>
+  </section>
+
+  <!-- 3 — THE MODEL -->
+  <section id="model">
+    <div class="rail"><span class="num">03</span><span class="lab">The proposed model</span></div>
+    <h2 class="sec">Three tiers, by what a field is for</h2>
+    <p class="lede">Apply the rule and the layer resolves into three clean tiers — config, the structured skeleton, and prose entities — all feeding the same loader.</p>
+
+    <div class="diagram">
+      <div class="cap">Proposed — three tiers feed one query layer</div>
+      <svg viewBox="0 0 900 300" role="img" aria-label="Three-tier model diagram">
+        <!-- tier 1 -->
+        <rect x="10" y="20" width="250" height="70" rx="10" fill="#e7e9f1" stroke="#c8cee0"/>
+        <text x="26" y="44" class="t-title" font-size="13">Tier 1 · Config</text>
+        <text x="26" y="64" class="t-mono" font-size="10.5" fill="#3a3a3a">JSON — site.json</text>
+        <text x="26" y="80" class="t-mono" font-size="9.5" fill="#6b6b66">key/value, never joined on</text>
+
+        <!-- tier 2 -->
+        <rect x="10" y="105" width="250" height="86" rx="10" fill="#f3ecdb" stroke="#e4d7b6"/>
+        <text x="26" y="129" class="t-title" font-size="13">Tier 2 · Taxonomy / skeleton</text>
+        <text x="26" y="149" class="t-mono" font-size="10.5" fill="#3a3a3a">JSON (id-keyed) — the spine</text>
+        <text x="26" y="165" class="t-mono" font-size="9.5" fill="#6b6b66">phases · activities · technique tags</text>
+        <text x="26" y="181" class="t-mono" font-size="9.5" fill="#7c6231">ordering · hue · flags · relationships</text>
+
+        <!-- tier 3 -->
+        <rect x="10" y="206" width="250" height="86" rx="10" fill="#e3ede1" stroke="#cfe0db"/>
+        <text x="26" y="230" class="t-title" font-size="13">Tier 3 · Prose entities</text>
+        <text x="26" y="250" class="t-mono" font-size="10.5" fill="#3a3a3a">Markdown + frontmatter</text>
+        <text x="26" y="266" class="t-mono" font-size="9.5" fill="#6b6b66">use cases · about · phase notes</text>
+        <text x="26" y="282" class="t-mono" font-size="9.5" fill="#3a7a4a">+ technique long-form (when it grows)</text>
+
+        <!-- joins -->
+        <path d="M264 55 C 330 55, 330 150, 392 150" fill="none" stroke="#9a9a93" stroke-width="1.5" marker-end="url(#ar2)"/>
+        <path d="M264 148 L 392 150" fill="none" stroke="#9a9a93" stroke-width="1.5" marker-end="url(#ar2)"/>
+        <path d="M264 249 C 330 249, 330 150, 392 150" fill="none" stroke="#9a9a93" stroke-width="1.5" marker-end="url(#ar2)"/>
+        <text x="300" y="120" class="t-mono" font-size="9" fill="#9a9a93">join by id</text>
+
+        <!-- loader -->
+        <rect x="396" y="108" width="170" height="84" rx="10" fill="#1a1a1a"/>
+        <text x="481" y="142" text-anchor="middle" class="t-mono" font-size="12" fill="#fff">loadContent()</text>
+        <text x="481" y="162" text-anchor="middle" class="t-mono" font-size="9.5" fill="#bdbab2">resolves refs · indexes</text>
+        <text x="481" y="178" text-anchor="middle" class="t-mono" font-size="9.5" fill="#bdbab2">unchanged API</text>
+
+        <!-- validate gate -->
+        <path d="M570 150 L 624 150" stroke="#9a9a93" stroke-width="1.5" marker-end="url(#ar2)"/>
+        <rect x="628" y="112" width="120" height="76" rx="10" fill="#faf7ef" stroke="#e4d7b6" stroke-dasharray="4 3"/>
+        <text x="688" y="140" text-anchor="middle" class="t-mono" font-size="11" fill="#7c6231">validate ✓</text>
+        <text x="688" y="158" text-anchor="middle" class="t-mono" font-size="9" fill="#9a7b3f">ids · FKs ·</text>
+        <text x="688" y="172" text-anchor="middle" class="t-mono" font-size="9" fill="#9a7b3f">required</text>
+
+        <path d="M752 150 L 800 150" stroke="#9a9a93" stroke-width="1.5" marker-end="url(#ar2)"/>
+        <rect x="804" y="118" width="86" height="64" rx="10" fill="#ecf2ef" stroke="#cfe0db"/>
+        <text x="847" y="146" text-anchor="middle" class="t-mono" font-size="11" fill="#1a4d4d">build</text>
+        <text x="847" y="163" text-anchor="middle" class="t-mono" font-size="11" fill="#1a4d4d">→ dist/</text>
+
+        <defs>
+          <marker id="ar2" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto">
+            <path d="M0 0 L9 4.5 L0 9 z" fill="#9a9a93"/>
+          </marker>
+        </defs>
+      </svg>
+    </div>
+  </section>
+
+  <!-- 4 — NO DATABASE INSIGHT -->
+  <section id="nodb">
+    <div class="rail"><span class="num">04</span><span class="lab">The "no database" insight</span></div>
+    <h2 class="sec">The build <em>is</em> the database</h2>
+    <p class="lede">Every database concept already has an equivalent here — and after #4, even the constraint layer exists. The only residue is two small validation gaps to close (D3).</p>
+
+    <div class="diagram">
+      <div class="cap">Mapping — relational concepts → this project</div>
+      <svg viewBox="0 0 900 250" role="img" aria-label="Database concept mapping">
+        <!-- left column: DB -->
+        <text x="20" y="28" class="t-mono" font-size="10" fill="#6b6b66">RELATIONAL DB</text>
+        <text x="500" y="28" class="t-mono" font-size="10" fill="#6b6b66">THIS PROJECT</text>
+
+        <g font-size="12">
+          <rect x="20" y="40" width="200" height="28" rx="6" fill="#fbfaf6" stroke="#d4d1c7"/><text x="32" y="59" class="t-mono">Tables</text>
+          <rect x="20" y="74" width="200" height="28" rx="6" fill="#fbfaf6" stroke="#d4d1c7"/><text x="32" y="93" class="t-mono">Rows</text>
+          <rect x="20" y="108" width="200" height="28" rx="6" fill="#fbfaf6" stroke="#d4d1c7"/><text x="32" y="127" class="t-mono">Columns</text>
+          <rect x="20" y="142" width="200" height="28" rx="6" fill="#fbfaf6" stroke="#d4d1c7"/><text x="32" y="161" class="t-mono">Primary / foreign keys</text>
+          <rect x="20" y="176" width="200" height="28" rx="6" fill="#fbfaf6" stroke="#d4d1c7"/><text x="32" y="195" class="t-mono">Query engine</text>
+          <rect x="20" y="210" width="200" height="28" rx="6" fill="#e3ede1" stroke="#cfe0db"/><text x="32" y="229" class="t-mono" fill="#2c6a3a">Schema / constraints</text>
+        </g>
+
+        <g stroke="#cdcabf" stroke-width="1.2">
+          <line x1="222" y1="54" x2="498" y2="54"/>
+          <line x1="222" y1="88" x2="498" y2="88"/>
+          <line x1="222" y1="122" x2="498" y2="122"/>
+          <line x1="222" y1="156" x2="498" y2="156"/>
+          <line x1="222" y1="190" x2="498" y2="190"/>
+          <line x1="222" y1="224" x2="498" y2="224" stroke="#cfe0db"/>
+        </g>
+
+        <g font-size="12">
+          <rect x="500" y="40" width="390" height="28" rx="6" fill="#e7e9f1" stroke="#c8cee0"/><text x="512" y="59" class="t-mono">content stores (usecases/, lifecycle.json, …)</text>
+          <rect x="500" y="74" width="390" height="28" rx="6" fill="#e7e9f1" stroke="#c8cee0"/><text x="512" y="93" class="t-mono">one .md file / one array entry</text>
+          <rect x="500" y="108" width="390" height="28" rx="6" fill="#e7e9f1" stroke="#c8cee0"/><text x="512" y="127" class="t-mono">frontmatter keys · md body = rich-text col</text>
+          <rect x="500" y="142" width="390" height="28" rx="6" fill="#e7e9f1" stroke="#c8cee0"/><text x="512" y="161" class="t-mono">id · phase/activity/techniques[] refs</text>
+          <rect x="500" y="176" width="390" height="28" rx="6" fill="#e7e9f1" stroke="#c8cee0"/><text x="512" y="195" class="t-mono">loadContent() + reverse indexes</text>
+          <rect x="500" y="210" width="390" height="28" rx="6" fill="#e3ede1" stroke="#cfe0db"/><text x="512" y="229" class="t-mono" fill="#2c6a3a">✓ lifecycle.mjs + build-content (added in #4)</text>
+        </g>
+      </svg>
+    </div>
+    <p class="footnote">Because the model maps 1:1 onto rows and columns, choosing it now is <span class="b">not</span> a bet against a future database — frontmatter becomes columns, the Markdown body becomes a rich-text column, ids become keys. The migration, if it ever happens, is mechanical. <span class="b">#4 already built the constraint layer;</span> D3 just closes its last two gaps.</p>
+  </section>
+
+  <!-- 5 — DECISIONS -->
+  <section id="decisions">
+    <div class="rail"><span class="num">05</span><span class="lab">Your call</span></div>
+    <h2 class="sec">Four decisions</h2>
+    <p class="lede">Pre-set to the agreed direction (D1, your call) and the recommendation (D2–D4). Override anything, leave notes where you want to steer the implementation, then lock it at the bottom.</p>
+
+    <form id="decisions-form">
+
+      <!-- D1 -->
+      <div class="decision" data-q="1" data-title="Where does the editorial prose in lifecycle.json live?">
+        <div class="q"><span class="qn">D1</span><span class="qt">Where does the editorial prose in <code>lifecycle.json</code> live?</span></div>
+        <div class="qd">The remaining wound — after #4, canon + editor's notes are JSON strings (with markdown inside) in <code>lifecycle.json</code>. <span class="b">Owner's call: lift it all to Markdown.</span></div>
+        <div class="opts">
+          <label class="opt"><input type="radio" name="d1" value="A — Leave canon + editor prose in lifecycle.json JSON strings (no change)"><span><span class="ol">A · Leave it in <code>lifecycle.json</code></span><div class="od">Zero work; the pain persists. Prose stays hard to edit and can't render rich text.</div></span></label>
+          <label class="opt"><input type="radio" name="d1" value="B — Lift the long editor notes only; keep short canon one-liners in lifecycle.json (hybrid)"><span><span class="ol">B · Lift editor notes only (hybrid)</span><div class="od">Keep short <code>canon</code> one-liners in <code>lifecycle.json</code>; move only <code>editor.*</code> to <code>content/phases/&lt;id&gt;.md</code>.</div></span></label>
+          <label class="opt"><input type="radio" name="d1" value="C — Lift ALL spine prose (canon + editor) to per-phase Markdown; lifecycle.json keeps skeleton only" checked><span><span class="ol">C · Lift all prose to Markdown<span class="rectag">owner's choice</span></span><div class="od"><code>lifecycle.json</code> keeps only the skeleton (ids, names, order, hue, tagline); both <code>canon</code> and <code>editor.*</code> move to <code>content/phases/&lt;id&gt;.md</code>. <code>build-content</code> merges them back into the generated <code>phases.json</code> — downstream unchanged.</div></span></label>
+        </div>
+        <label class="notes-label" for="n1">Notes / constraints for D1</label>
+        <textarea id="n1" data-note="1" placeholder="e.g. keep activity-level canon inline but move the long editor body out…"></textarea>
+      </div>
+
+      <!-- D2 -->
+      <div class="decision" data-q="2" data-title="How are techniques represented?">
+        <div class="q"><span class="qn">D2</span><span class="qt">How are techniques represented?</span></div>
+        <div class="qd">Today a lean JSON tag list. The stated intent is that they'll "cluster into a richer structure once patterns settle."</div>
+        <div class="opts">
+          <label class="opt"><input type="radio" name="d2" value="A — JSON tag list now; promote a technique to Markdown only when it needs real explanation" checked><span><span class="ol">A · JSON now, Markdown when they grow<span class="rectag">recommended</span></span><div class="od">Keep <code>techniques.json</code> as the tag list; loader prefers an optional <code>content/techniques/&lt;id&gt;.md</code> when present. Pay the cost only when a technique earns it.</div></span></label>
+          <label class="opt"><input type="radio" name="d2" value="B — Move all techniques to Markdown now"><span><span class="ol">B · All techniques to Markdown now</span><div class="od">Consistent with Tier 3, but premature — most descriptions are still one line.</div></span></label>
+          <label class="opt"><input type="radio" name="d2" value="C — Keep techniques JSON-only, indefinitely"><span><span class="ol">C · JSON-only, indefinitely</span><div class="od">Simplest; permanently caps how rich a technique page can get.</div></span></label>
+        </div>
+        <label class="notes-label" for="n2">Notes / constraints for D2</label>
+        <textarea id="n2" data-note="2" placeholder="e.g. start the override with t-evals since it's the only endorsed one…"></textarea>
+      </div>
+
+      <!-- D3 -->
+      <div class="decision" data-q="3" data-title="The validation gate (added in #4) — extend it?">
+        <div class="q"><span class="qn">D3</span><span class="qt">The validation gate (added in #4) — extend it?</span></div>
+        <div class="qd"><span class="b">#4 already built this:</span> <code>build-content</code> + <code>lifecycle.mjs</code> reject duplicate phase/activity ids, broken placements, and unknown technique tags. Two small gaps remain.</div>
+        <div class="opts">
+          <label class="opt"><input type="radio" name="d3" value="A — Extend it: also check duplicate use-case ids + required use-case frontmatter (id/title/phase/activity), and fold in the new per-phase Markdown from D1" checked><span><span class="ol">A · Extend it<span class="rectag">recommended</span></span><div class="od">Add: <span class="b">duplicate use-case ids</span> + <span class="b">required use-case frontmatter present</span> (<code>id</code>, <code>title</code>, <code>phase</code>, <code>activity</code>). Also fold the new per-phase Markdown (D1) into the compile + validate pass.</div></span></label>
+          <label class="opt"><input type="radio" name="d3" value="B — Leave as-is: #4's checks (placements + tags + dup phase/activity ids) are enough for now"><span><span class="ol">B · Leave as-is</span><div class="od">#4's checks are enough for now; revisit if a content bug slips through.</div></span></label>
+        </div>
+        <label class="notes-label" for="n3">Notes / constraints for D3</label>
+        <textarea id="n3" data-note="3" placeholder="e.g. warn (not fail) on missing optional metric, but fail on duplicate ids…"></textarea>
+      </div>
+
+      <!-- D4 -->
+      <div class="decision" data-q="4" data-title="Document the guiding principle as a rule?">
+        <div class="q"><span class="qn">D4</span><span class="qt">Document the guiding principle as a rule?</span></div>
+        <div class="qd">So future content — and future Claude sessions — land in the right tier by default.</div>
+        <div class="opts">
+          <label class="opt"><input type="radio" name="d4" value="A — Yes: write the 'structured if you'd query it, Markdown if you'd read it' rule + three tiers into the README/contributing notes" checked><span><span class="ol">A · Yes, document it<span class="rectag">recommended</span></span><div class="od">Write the rule and the three tiers into the README / contributing notes.</div></span></label>
+          <label class="opt"><input type="radio" name="d4" value="B — No: decide case by case"><span><span class="ol">B · No</span><div class="od">Decide case by case; risk the inconsistency returning.</div></span></label>
+        </div>
+        <label class="notes-label" for="n4">Notes / constraints for D4</label>
+        <textarea id="n4" data-note="4" placeholder="e.g. put it in a new CONTRIBUTING.md rather than the README…"></textarea>
+      </div>
+
+      <!-- overall -->
+      <div class="decision" style="background:var(--bg-elev)">
+        <div class="q"><span class="qn">±</span><span class="qt">Overall verdict & anything else</span></div>
+        <div class="qd">Sequencing, scope cuts, things the four decisions didn't cover, open questions from §11 of the PRD.</div>
+        <label class="notes-label" for="overall">Owner notes</label>
+        <textarea id="overall" style="min-height:90px" placeholder="e.g. extend the #4 validation first, then migrate phases one at a time starting with discover. Also: I'd like YAML over JSON for the skeleton…"></textarea>
+      </div>
+
+    </form>
+
+    <!-- live preview -->
+    <div class="preview-wrap">
+      <div class="preview-head">
+        <h3 class="sub" style="margin:0">Locked decision — preview</h3>
+        <span class="pill" id="rec-flag">as agreed</span>
+      </div>
+      <pre class="preview" id="preview"></pre>
+    </div>
+  </section>
+
+  <section style="border-bottom:0">
+    <p class="dim" style="font-size:13px">Full reasoning: <code>docs/data-layer-prd.md</code> · Generated as a working artifact, not published site content.</p>
+  </section>
+
+</div>
+
+<!-- STICKY LOCK BAR -->
+<div class="lockbar">
+  <div class="inner">
+    <div class="msg" id="lock-msg">Selections start at the recommendation. Lock when ready.</div>
+    <button type="button" class="btn btn-ghost" id="reset-btn">Reset to recommended</button>
+    <button type="button" class="btn btn-primary" id="copy-btn">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+      Copy decision to Claude
+    </button>
+  </div>
+</div>
+
+<div class="toast" id="toast">Copied — paste it back into chat to lock</div>
+
+<script>
+(function(){
+  var DEFAULTS = { d1:'C', d2:'A', d3:'A', d4:'A' };
+  var form = document.getElementById('decisions-form');
+  var preview = document.getElementById('preview');
+  var recFlag = document.getElementById('rec-flag');
+  var lockMsg = document.getElementById('lock-msg');
+
+  function selected(name){
+    var el = form.querySelector('input[name="'+name+'"]:checked');
+    return el ? el.value : '(none chosen)';
+  }
+  function letter(name){
+    var el = form.querySelector('input[name="'+name+'"]:checked');
+    return el ? el.value.trim().charAt(0) : '?';
+  }
+  function note(n){
+    var el = document.querySelector('textarea[data-note="'+n+'"]');
+    return el ? el.value.trim() : '';
+  }
+  function decisionBlock(n, name){
+    var dec = form.querySelector('.decision[data-q="'+n+'"]');
+    var title = dec ? dec.getAttribute('data-title') : '';
+    var out = '### D'+n+' — '+title+'\n- Choice: '+selected(name)+'\n';
+    var nt = note(n);
+    if(nt) out += '- Notes: '+nt+'\n';
+    return out;
+  }
+  function countOverrides(){
+    var c = 0;
+    for(var k in DEFAULTS){ if(letter(k) !== DEFAULTS[k]) c++; }
+    return c;
+  }
+
+  function buildPrompt(){
+    var overall = document.getElementById('overall').value.trim();
+    var n = countOverrides();
+    var head =
+'Lock this data-layer decision and implement it.\n\n' +
+'Context: this is the AI PDLC Playbook static site (no database). The full reasoning is in `docs/data-layer-prd.md` and the decision UI is `docs/data-layer-decision.html`. The owner has reviewed the PRD and made the calls below — treat them as the source of truth, override the PRD recommendation where they differ, and propose a migration plan + the first PR before writing code.\n\n' +
+'## Locked decisions\n\n';
+    var body =
+decisionBlock(1,'d1') + '\n' +
+decisionBlock(2,'d2') + '\n' +
+decisionBlock(3,'d3') + '\n' +
+decisionBlock(4,'d4') + '\n';
+    var tail = '';
+    if(overall) tail += '### Overall verdict & notes\n' + overall + '\n\n';
+    tail +=
+'## What I want from you next\n' +
+'1. Confirm you understand each locked choice (flag any conflicts between them).\n' +
+'2. Give me the incremental migration plan (smallest reversible steps) and what the first PR contains.\n' +
+'3. Then implement on the current branch, keeping rendered output identical until a change is intended.\n\n' +
+'(' + (n===0 ? 'Left as agreed — D1 is the owner call (lift all spine prose to Markdown), D2–D4 at the recommendation.' : n + ' of 4 decisions overridden from the agreed defaults.') + ')\n';
+    return head + body + tail;
+  }
+
+  function refresh(){
+    preview.textContent = buildPrompt();
+    var n = countOverrides();
+    if(n===0){ recFlag.textContent = 'as agreed'; }
+    else { recFlag.textContent = n + ' overridden'; }
+  }
+
+  form.addEventListener('input', refresh);
+  form.addEventListener('change', refresh);
+
+  // copy
+  var toast = document.getElementById('toast');
+  var toastTimer;
+  function showToast(msg){
+    toast.textContent = msg;
+    toast.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function(){ toast.classList.remove('show'); }, 2600);
+  }
+  function copyText(text){
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(text).then(
+        function(){ showToast('Copied — paste it back into chat to lock'); },
+        function(){ fallbackCopy(text); }
+      );
+    } else { fallbackCopy(text); }
+  }
+  function fallbackCopy(text){
+    var ta = document.createElement('textarea');
+    ta.value = text; ta.style.position='fixed'; ta.style.opacity='0';
+    document.body.appendChild(ta); ta.focus(); ta.select();
+    var ok=false; try{ ok = document.execCommand('copy'); }catch(e){}
+    document.body.removeChild(ta);
+    showToast(ok ? 'Copied — paste it back into chat to lock' : 'Copy failed — select the preview text manually');
+  }
+  document.getElementById('copy-btn').addEventListener('click', function(){
+    copyText(buildPrompt());
+    lockMsg.textContent = 'Decision copied. Paste it into the Claude chat to lock and kick off implementation.';
+  });
+
+  // reset
+  document.getElementById('reset-btn').addEventListener('click', function(){
+    for(var k in DEFAULTS){
+      var el = form.querySelector('input[name="'+k+'"][value^="'+DEFAULTS[k]+' "]');
+      if(el) el.checked = true;
+    }
+    form.querySelectorAll('textarea').forEach(function(t){ t.value=''; });
+    refresh();
+    lockMsg.textContent = 'Reset to the recommended decision.';
+  });
+
+  refresh();
+})();
+</script>
+</body>
+</html>

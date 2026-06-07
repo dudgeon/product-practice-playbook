@@ -9,7 +9,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import matter from 'gray-matter';
-import { compileLifecycle } from './lifecycle.mjs';
+import { compileLifecycle, parseSpineProse, mergePhaseProse } from './lifecycle.mjs';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(here, '..', '..');
@@ -35,11 +35,38 @@ function splitSections(body) {
 const sectionBody = (sections, heading) =>
   sections.find((s) => s.heading.toLowerCase() === heading.toLowerCase())?.body || '';
 
+// Read the per-phase editorial prose (content/phases/<id>.md) into a map keyed
+// by phase id: { canon, editor, activities: { <activityId>: { canon, editor } } }.
+export function loadPhaseProse() {
+  const dir = path.join(CONTENT, 'phases');
+  if (!fs.existsSync(dir)) return {};
+  const out = {};
+  for (const file of readDir('phases')) {
+    const { data, content } = matter(fs.readFileSync(file, 'utf8'));
+    const id = data.id || path.basename(file, '.md');
+    out[id] = { id, ...parseSpineProse(content), activities: data.activities || {} };
+  }
+  return out;
+}
+
 export function loadContent() {
   const site = readJSON('site.json');
-  // The spine is compiled from the notional lifecycle definition.
+  // The spine: skeleton compiled from lifecycle.json, prose merged from
+  // content/phases/<id>.md (so canon + the editor's note are authored as Markdown).
   const { phases } = compileLifecycle(readJSON('lifecycle.json'));
-  const techniques = readJSON('techniques.json');
+  const phaseProse = loadPhaseProse();
+  mergePhaseProse(phases, phaseProse);
+
+  // Techniques are a lean JSON tag list; a technique graduates to its own
+  // Markdown file (content/techniques/<id>.md) when it needs real explanation —
+  // frontmatter overrides scalar fields, the body becomes rich `detail`.
+  const techniques = readJSON('techniques.json').map((t) => {
+    const file = path.join(CONTENT, 'techniques', `${t.id}.md`);
+    if (!fs.existsSync(file)) return t;
+    const { data, content } = matter(fs.readFileSync(file, 'utf8'));
+    const detail = content.trim();
+    return { ...t, ...data, ...(detail ? { detail } : {}) };
+  });
 
   const usecases = readDir('usecases').map((file) => {
     const { data, content } = matter(fs.readFileSync(file, 'utf8'));
@@ -95,6 +122,7 @@ export function loadContent() {
   return {
     site,
     phases,
+    phaseProse,
     techniques,
     usecases,
     about,
