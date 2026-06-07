@@ -1,0 +1,36 @@
+name: New technique / endorsement suggestion
+description: Propose a cross-cutting technique tag, or suggest a practice be endorsed.
+title: "[Technique]: "
+labels: ["technique"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Techniques are the **horizontal axis** — cross-cutting tags that gather related
+        approaches across the lifecycle. Endorsement is how the thin protocol grows, and
+        it is deliberately slow.
+  - type: input
+    id: name
+    attributes:
+      label: Technique name
+      placeholder: "Context management"
+    validations:
+      required: true
+  - type: textarea
+    id: description
+    attributes:
+      label: What it is
+      description: A short editorial description of the technique.
+    validations:
+      required: true
+  - type: textarea
+    id: usecases
+    attributes:
+      label: Use cases that apply it
+      description: Link any existing use cases, or describe ones you've seen.
+  - type: checkboxes
+    id: endorse
+    attributes:
+      label: Endorsement
+      options:
+        - label: I'm suggesting this be promoted into the protocol's recommendations (PDLC-endorsed).

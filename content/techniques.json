@@ -1,0 +1,62 @@
+[
+  {
+    "id": "t-subagents",
+    "name": "Subagents",
+    "endorsed": false,
+    "description": "Spinning up scoped sub-agents that each own one job, then composing their output."
+  },
+  {
+    "id": "t-prompt",
+    "name": "Prompt engineering",
+    "endorsed": false,
+    "description": "Shaping prompts, personas, and instructions to steer model behavior reliably."
+  },
+  {
+    "id": "t-context",
+    "name": "Context management",
+    "endorsed": false,
+    "description": "Managing what the model can see — context windows, working directories, freshness."
+  },
+  {
+    "id": "t-skills",
+    "name": "Skills",
+    "endorsed": false,
+    "description": "Packaging a repeatable capability as a reusable skill the agent can invoke."
+  },
+  {
+    "id": "t-hooks",
+    "name": "Hooks",
+    "endorsed": false,
+    "description": "Triggering agent work automatically on an event — a commit, a schedule, a message."
+  },
+  {
+    "id": "t-mcp",
+    "name": "MCP & tools",
+    "endorsed": false,
+    "description": "Connecting agents to external systems and data through tools and MCP servers."
+  },
+  {
+    "id": "t-evals",
+    "name": "Evals",
+    "endorsed": true,
+    "description": "Measuring quality with checks and graders before a change is allowed to ship."
+  },
+  {
+    "id": "t-multiagent",
+    "name": "Multi-agent",
+    "endorsed": false,
+    "description": "Coordinating several agents toward one outcome with clear, legible handoffs."
+  },
+  {
+    "id": "t-structured",
+    "name": "Structured output",
+    "endorsed": false,
+    "description": "Forcing legible, schema-shaped output instead of free text, so results are checkable."
+  },
+  {
+    "id": "t-retrieval",
+    "name": "Retrieval",
+    "endorsed": false,
+    "description": "Finding and grounding on the right source material on demand, with traceability."
+  }
+]

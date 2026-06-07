@@ -1,0 +1,18 @@
+{
+  "title": "AI PDLC Playbook",
+  "shortTitle": "AI PDLC Playbook",
+  "tagline": "A shared playbook for AI-augmented product craft, organized along the lifecycle every product moves through. The protocol is thin and official; the practice is rich and growing.",
+  "initiative": "AI in Product",
+  "repo": "dudgeon/product-practice-playbook",
+  "repoUrl": "https://github.com/dudgeon/product-practice-playbook",
+  "home": {
+    "kicker": "An AI in Product initiative",
+    "headline": "Where in the work does AI actually help?",
+    "lede": "A shared playbook for AI-augmented product craft, organized along the lifecycle every product moves through. The protocol is thin and official; the practice is rich and growing. Start at a phase.",
+    "featuredTitle": "Featured this month",
+    "featuredKicker": "Curated by the editor",
+    "techniquesEyebrow": "Cut across the lifecycle",
+    "techniquesTitle": "Browse by technique",
+    "techniquesCaption": "Techniques are emergent tags for now — they'll cluster into a richer structure once patterns settle."
+  }
+}

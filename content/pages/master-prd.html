@@ -1,0 +1,669 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>AI PDLC Playbook — Master PRD</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400;1,6..72,500&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#f7f5f0; --bg-elev:#fbfaf6; --bg-card:#fff;
+    --ink:#1a1a1a; --ink-2:#3a3a3a; --ink-3:#6b6b66; --ink-4:#9a9a93;
+    --rule:#e6e3da; --rule-2:#d4d1c7; --muted:#ece9e0;
+    --discover:#2d6a6a; --discover-soft:#ecf2ef;
+    --build:#4a5a8a; --build-soft:#e7e9f1;
+    --grow:#3a7a4a; --grow-soft:#e3ede1;
+    --what:#1a1a1a; --how:#2d6a6a; --how-soft:#ecf2ef; --how-line:#cfe0db;
+    --seal:#9a7b3f; --seal-2:#7c6231; --seal-soft:#f3ecdb; --seal-line:#e4d7b6; --canon-bg:#faf7ef;
+    --accent:#2d6a6a; --accent-2:#1f4d4d;
+    --serif:'Newsreader',Georgia,serif; --sans:'IBM Plex Sans',system-ui,sans-serif; --mono:'IBM Plex Mono',ui-monospace,monospace;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:15px;line-height:1.6;-webkit-font-smoothing:antialiased}
+  a{color:inherit}
+  h1,h2,h3,h4{margin:0;font-weight:500;letter-spacing:-.02em;font-family:var(--serif)}
+  p{margin:0 0 14px;max-width:72ch}
+  .mono{font-family:var(--mono)}
+  .eyebrow{font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.14em;color:var(--ink-3)}
+  .dim{color:var(--ink-3)} .b{font-weight:600;color:var(--ink)}
+
+  /* layout */
+  .shell{display:grid;grid-template-columns:248px 1fr;max-width:1320px;margin:0 auto}
+  @media(max-width:1000px){.shell{grid-template-columns:1fr}.toc{display:none}}
+  .toc{position:sticky;top:0;height:100vh;overflow:auto;padding:34px 22px;border-right:1px solid var(--rule);background:var(--bg-elev)}
+  .toc .brand{display:flex;align-items:center;gap:9px;font-family:var(--mono);font-size:12px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;margin-bottom:22px}
+  .toc .mark{width:22px;height:22px;border-radius:5px;background:var(--ink);position:relative;flex-shrink:0}
+  .toc .mark::before{content:'';position:absolute;inset:6px 5px;background:var(--discover);border-radius:1px}
+  .toc .mark::after{content:'';position:absolute;left:5px;right:5px;bottom:6px;height:3px;background:var(--grow);border-radius:1px}
+  .toc ol{list-style:none;margin:0;padding:0;counter-reset:s}
+  .toc li{counter-increment:s;margin:1px 0}
+  .toc a{display:flex;gap:9px;padding:6px 9px;border-radius:6px;font-size:12.5px;color:var(--ink-2);text-decoration:none;line-height:1.3}
+  .toc a:hover{background:var(--muted)}
+  .toc a::before{content:counter(s,decimal-leading-zero);font-family:var(--mono);font-size:10px;color:var(--ink-4);padding-top:1px}
+  main{min-width:0;padding:0 clamp(24px,4vw,64px)}
+  section{padding:56px 0;border-bottom:1px solid var(--rule)}
+  section:last-of-type{border-bottom:0}
+  .rail{display:flex;align-items:baseline;gap:12px;margin-bottom:8px}
+  .rail .num{font-family:var(--mono);font-size:12px;color:#fff;background:var(--ink);border-radius:6px;padding:3px 9px}
+  .rail .lab{font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.12em;color:var(--ink-3)}
+  h2.sec{font-size:clamp(26px,3vw,34px);margin:6px 0 14px;letter-spacing:-.025em}
+  h3.sub{font-size:20px;margin:30px 0 12px}
+  .lede{font-size:18px;line-height:1.55;color:var(--ink-2);max-width:68ch}
+
+  /* masthead */
+  .masthead{padding:72px 0 40px;border-bottom:1px solid var(--rule)}
+  .masthead .kick{font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.16em;color:var(--seal-2);margin-bottom:18px}
+  .masthead h1{font-size:clamp(40px,6vw,68px);line-height:1.02;letter-spacing:-.03em}
+  .masthead .tag{font-size:20px;color:var(--ink-2);margin-top:20px;max-width:60ch}
+  .statline{display:flex;flex-wrap:wrap;gap:0;margin-top:34px;border:1px solid var(--rule);border-radius:12px;overflow:hidden;background:var(--bg-card)}
+  .statline .s{flex:1;min-width:120px;padding:16px 18px;border-right:1px solid var(--rule)}
+  .statline .s:last-child{border-right:0}
+  .statline .v{font-family:var(--serif);font-size:30px;line-height:1}
+  .statline .l{font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--ink-3);margin-top:7px}
+
+  /* generic cards / grids */
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+  @media(max-width:760px){.grid2,.grid3{grid-template-columns:1fr}}
+  .card{background:var(--bg-card);border:1px solid var(--rule);border-radius:12px;padding:20px}
+  .card h4{font-family:var(--sans);font-weight:600;font-size:14.5px;letter-spacing:0;margin-bottom:6px}
+  .card .d{font-size:13.5px;color:var(--ink-3);line-height:1.5}
+  .card .ico{font-family:var(--mono);font-size:11px;color:var(--ink-4);margin-bottom:10px}
+
+  .pill{display:inline-flex;align-items:center;gap:6px;font-family:var(--mono);font-size:11px;border:1px solid var(--rule-2);background:var(--bg-elev);border-radius:999px;padding:3px 10px;color:var(--ink-2)}
+  .seal-ico{display:inline-block;width:12px;height:12px;border-radius:50%;border:1.4px solid var(--seal);background:rgba(154,123,63,.16);position:relative}
+  .endorsed{display:inline-flex;align-items:center;gap:6px;font-family:var(--mono);font-size:10.5px;text-transform:uppercase;letter-spacing:.08em;color:var(--seal-2);background:var(--seal-soft);border:1px solid var(--seal-line);padding:3px 9px;border-radius:999px}
+
+  /* voice cards */
+  .voices{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:8px}
+  @media(max-width:760px){.voices{grid-template-columns:1fr}}
+  .voice{border:1px solid var(--rule);border-radius:12px;padding:18px;background:var(--bg-card);border-top:3px solid var(--vc)}
+  .voice.canon{--vc:var(--seal);background:var(--canon-bg);border-color:var(--seal-line)}
+  .voice.editor{--vc:var(--ink)}
+  .voice.practice{--vc:var(--accent)}
+  .voice .vlabel{display:flex;align-items:center;gap:8px;font-family:var(--mono);font-size:10.5px;text-transform:uppercase;letter-spacing:.1em;margin-bottom:9px}
+  .voice .vmark{width:9px;height:9px;border-radius:2px;background:var(--vc)}
+  .voice.canon .vmark{border-radius:50%}
+  .voice .vname{font-family:var(--serif);font-size:19px;margin-bottom:6px}
+  .voice .vd{font-size:13px;color:var(--ink-3);line-height:1.5}
+  .voice .vex{margin-top:12px;font-size:12.5px;border-top:1px dashed var(--rule-2);padding-top:10px;color:var(--ink-2)}
+  .voice.canon .vname{color:var(--seal-2)} .voice.practice .vname{color:var(--accent-2)}
+
+  /* spine diagram */
+  .spine{display:grid;grid-template-columns:repeat(3,1fr);gap:0;position:relative;margin-top:10px}
+  .spine .railline{position:absolute;top:20px;left:8%;right:8%;height:2px;background:linear-gradient(90deg,var(--discover),var(--build),var(--grow));z-index:0}
+  .pcol{position:relative;z-index:1;padding:0 14px}
+  .pcol .pdot{width:14px;height:14px;border-radius:50%;background:var(--ph);box-shadow:0 0 0 5px var(--bg);margin-bottom:12px}
+  .pcol .pn{font-family:var(--mono);font-size:10px;letter-spacing:.1em;color:var(--ink-4)}
+  .pcol .pnm{font-family:var(--serif);font-size:22px;color:var(--ph);margin:2px 0 4px}
+  .pcol .ptag{font-size:12.5px;color:var(--ink-3);min-height:38px;line-height:1.45}
+  .pcol .acts{display:flex;flex-direction:column;gap:3px;margin-top:8px}
+  .pcol .act{font-size:12.5px;color:var(--ink-2);padding:5px 9px;border:1px solid var(--rule);border-radius:6px;background:var(--bg-card);display:flex;justify-content:space-between;gap:8px}
+  .pcol .act .ed{width:6px;height:6px;border-radius:50%;background:var(--seal);align-self:center}
+  .pcol.discover{--ph:var(--discover)} .pcol.build{--ph:var(--build)} .pcol.grow{--ph:var(--grow)}
+  .canonband{margin-top:18px;border:1px solid var(--seal-line);background:var(--canon-bg);border-radius:10px;padding:14px 18px;position:relative}
+  .canonband::before{content:'';position:absolute;left:0;top:12px;bottom:12px;width:3px;background:var(--seal);border-radius:0 2px 2px 0}
+  .canonband .cl{font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--seal-2);margin-bottom:6px}
+  .canonband .ct{font-family:var(--serif);font-size:16px;color:var(--ink)}
+
+  /* tree (axes) */
+  .axes{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-top:8px}
+  @media(max-width:820px){.axes{grid-template-columns:1fr}}
+  .axis{background:var(--bg-card);border:1px solid var(--rule);border-radius:14px;padding:22px}
+  .axis .abadge{font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:#fff;background:var(--ink);padding:3px 8px;border-radius:4px}
+  .axis h4{font-family:var(--serif);font-size:19px;font-weight:500;letter-spacing:-.01em;margin:10px 0 2px}
+  .axis .asub{font-size:13px;color:var(--ink-3);margin:0 0 16px}
+  .branch{border-left:1px dashed var(--rule-2);margin-left:9px;padding-left:16px}
+  .node{position:relative;margin:7px 0}
+  .node::before{content:'';position:absolute;left:-16px;top:16px;width:12px;height:1px;background:var(--rule-2)}
+  .box{border:1px solid var(--rule-2);border-radius:8px;padding:8px 12px;background:var(--bg-elev);display:inline-flex;flex-direction:column;gap:1px}
+  .box .l{font-family:var(--mono);font-size:9px;text-transform:uppercase;letter-spacing:.1em;color:var(--ink-4)}
+  .box .n{font-size:13.5px;font-weight:500;line-height:1.25}
+  .box.phase{border-left:3px solid var(--discover);background:var(--bg-card)}
+  .box.what{background:#fff;border-color:#cfcdc6}
+  .box.how{background:var(--how-soft);border-color:var(--how-line)} .box.how .l{color:var(--how)}
+  .box.tag{background:var(--seal-soft);border-color:var(--seal-line)} .box.tag .l{color:var(--seal-2)}
+  .pairwrap{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+  .plus{font-family:var(--mono);color:var(--ink-4)}
+
+  /* entity schema */
+  .schema{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:8px}
+  @media(max-width:760px){.schema{grid-template-columns:1fr}}
+  .ent{border:1px solid var(--rule);border-radius:12px;overflow:hidden;background:var(--bg-card)}
+  .ent .ehead{padding:14px 18px;border-bottom:1px solid var(--rule);border-top:3px solid var(--ec);display:flex;align-items:center;justify-content:space-between}
+  .ent.usecase{--ec:var(--what)} .ent.tech{--ec:var(--seal)}
+  .ent .ehead .en{font-family:var(--serif);font-size:19px}
+  .ent .ehead .ea{font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--ink-4)}
+  .ent .fields{padding:6px 0}
+  .ent .f{display:grid;grid-template-columns:130px 1fr;gap:12px;padding:9px 18px;border-top:1px solid var(--rule);font-size:13px}
+  .ent .f:first-child{border-top:0}
+  .ent .f .k{font-family:var(--mono);font-size:12px;color:var(--ink)}
+  .ent .f .v{color:var(--ink-3)}
+  .ent .f .req{color:var(--seal-2);font-family:var(--mono);font-size:9px;text-transform:uppercase;letter-spacing:.08em}
+
+  /* flow / arrows */
+  .flow{display:flex;align-items:stretch;gap:0;border:1px solid var(--rule);border-radius:12px;overflow:hidden;background:var(--bg-card);margin-top:8px;flex-wrap:wrap}
+  .flow .step{flex:1;min-width:150px;padding:18px;border-right:1px solid var(--rule)}
+  .flow .step:last-child{border-right:0}
+  .flow .step .sn{font-family:var(--mono);font-size:10px;color:var(--ink-4)}
+  .flow .step .st{font-family:var(--serif);font-size:17px;margin:6px 0 5px}
+  .flow .step .sd{font-size:12.5px;color:var(--ink-3);line-height:1.45}
+
+  /* sitemap */
+  .sitemap{font-family:var(--mono);font-size:13px;line-height:1.9;background:#1f1d1a;color:#e8e6df;border-radius:12px;padding:22px 24px;overflow:auto;margin-top:8px}
+  .sitemap .r{color:#c9a06a} .sitemap .c{color:#9a958a} .sitemap .k{color:#8fb9c9}
+
+  /* page anatomy wireframes */
+  .wires{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:8px}
+  @media(max-width:860px){.wires{grid-template-columns:1fr}}
+  .wire{border:1px solid var(--rule-2);border-radius:12px;overflow:hidden;background:var(--bg-card);box-shadow:0 1px 3px rgba(0,0,0,.05)}
+  .wire .wt{display:flex;align-items:center;gap:8px;padding:10px 14px;border-bottom:1px solid var(--rule);background:var(--bg-elev)}
+  .wire .wt .dots{display:flex;gap:4px} .wire .wt .dots i{width:8px;height:8px;border-radius:50%;background:var(--rule-2)}
+  .wire .wt .rt{font-family:var(--mono);font-size:11px;color:var(--ink-3)}
+  .wire .body{padding:12px;display:flex;flex-direction:column;gap:8px}
+  .zone{border:1px solid var(--rule);border-left:3px solid var(--zc,var(--rule-2));border-radius:7px;padding:9px 11px;background:var(--bg-elev)}
+  .zone .zn{font-size:12.5px;font-weight:600;color:var(--ink)}
+  .zone .zd{font-size:11.5px;color:var(--ink-3);margin-top:2px;line-height:1.4}
+  .zone.canon{--zc:var(--seal);background:var(--canon-bg)}
+  .zone.editor{--zc:var(--ink)}
+  .zone.practice{--zc:var(--accent)}
+  .zone.lifecycle{--zc:var(--discover)}
+  .zone.tech{--zc:var(--seal-2)}
+  .zone.chrome{--zc:var(--ink-4);background:var(--bg-card)}
+  .zrow{display:flex;gap:8px}.zrow .zone{flex:1}
+  .wcap{font-size:13px;color:var(--ink-3);margin-top:10px;line-height:1.5}
+
+  /* legend */
+  .legend{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0 4px}
+  .lg{display:inline-flex;align-items:center;gap:7px;font-family:var(--mono);font-size:11px;color:var(--ink-2);border:1px solid var(--rule-2);border-radius:999px;padding:4px 11px;background:var(--bg-card)}
+  .lg i{width:9px;height:9px;border-radius:2px}
+
+  /* tokens */
+  .swatches{display:grid;grid-template-columns:repeat(auto-fill,minmax(118px,1fr));gap:10px;margin-top:8px}
+  .sw{border:1px solid var(--rule);border-radius:9px;overflow:hidden;background:var(--bg-card)}
+  .sw .chip{height:46px} .sw .meta{padding:7px 9px} .sw .nm{font-size:11.5px;font-weight:500} .sw .hex{font-family:var(--mono);font-size:10px;color:var(--ink-4)}
+  .type-spec{border:1px solid var(--rule);border-radius:12px;padding:18px 20px;background:var(--bg-card);margin-top:8px}
+  .type-spec .row{display:flex;align-items:baseline;gap:14px;padding:9px 0;border-top:1px solid var(--rule)}
+  .type-spec .row:first-child{border-top:0}
+  .type-spec .tg{font-family:var(--mono);font-size:10.5px;color:var(--ink-4);width:120px;flex-shrink:0}
+
+  /* callout */
+  .callout{border:1px solid var(--seal-line);background:var(--seal-soft);border-radius:10px;padding:14px 18px;margin:16px 0;font-size:14px;color:var(--ink-2)}
+  .callout .ct{font-family:var(--mono);font-size:10.5px;text-transform:uppercase;letter-spacing:.1em;color:var(--seal-2);margin-bottom:6px}
+
+  ul.clean{margin:8px 0 14px;padding-left:0;list-style:none;max-width:72ch}
+  ul.clean li{position:relative;padding-left:20px;margin-bottom:8px;font-size:14.5px;line-height:1.55}
+  ul.clean li::before{content:'';position:absolute;left:4px;top:9px;width:6px;height:6px;border-radius:50%;background:var(--ink-4)}
+  ul.clean li.no::before{background:#b04a2f} ul.clean li.yes::before{background:var(--grow)}
+
+  .qlist{counter-reset:q;list-style:none;padding:0;margin:8px 0 0;max-width:78ch}
+  .qlist li{counter-increment:q;position:relative;padding:13px 0 13px 42px;border-bottom:1px solid var(--rule);font-size:14.5px}
+  .qlist li::before{content:'Q'counter(q);position:absolute;left:0;top:13px;font-family:var(--mono);font-size:11px;color:var(--ink-3);background:var(--bg-elev);border:1px solid var(--rule-2);border-radius:6px;padding:3px 7px}
+  .foot{padding:36px 0 80px;font-family:var(--mono);font-size:12px;color:var(--ink-3)}
+</style>
+</head>
+<body>
+<div class="shell">
+
+  <!-- TOC -->
+  <nav class="toc">
+    <div class="brand"><span class="mark"></span>PDLC · Master PRD</div>
+    <ol>
+      <li><a href="#concept">The concept</a></li>
+      <li><a href="#stance">Why it exists</a></li>
+      <li><a href="#who">Who it's for</a></li>
+      <li><a href="#voices">The three voices</a></li>
+      <li><a href="#spine">The spine</a></li>
+      <li><a href="#axes">Two axes, two entities</a></li>
+      <li><a href="#model">Content model</a></li>
+      <li><a href="#endorse">Endorsement</a></li>
+      <li><a href="#contribute">Contribution</a></li>
+      <li><a href="#sitemap">Sitemap &amp; routes</a></li>
+      <li><a href="#anatomy">Page anatomy</a></li>
+      <li><a href="#design">Design system</a></li>
+      <li><a href="#workflow">Editorial workflow</a></li>
+      <li><a href="#roadmap">Roadmap</a></li>
+      <li><a href="#open">Open questions</a></li>
+    </ol>
+  </nav>
+
+  <main>
+    <!-- MASTHEAD -->
+    <div class="masthead">
+      <div class="kick">Master PRD · from 60,000 feet to the page · v1</div>
+      <h1>AI PDLC Playbook</h1>
+      <p class="tag">A curated, lightly-opinionated library of AI-augmented product craft — organized along a thin, official product-development lifecycle, layered with three distinct voices, and grown from the field through endorsement.</p>
+      <div class="statline">
+        <div class="s"><div class="v">3</div><div class="l">Lifecycle phases</div></div>
+        <div class="s"><div class="v">18</div><div class="l">Key activities</div></div>
+        <div class="s"><div class="v">2</div><div class="l">Entities · axes</div></div>
+        <div class="s"><div class="v">10</div><div class="l">Technique tags</div></div>
+        <div class="s"><div class="v">3</div><div class="l">Editorial voices</div></div>
+        <div class="s"><div class="v">GH</div><div class="l">Contribution model</div></div>
+      </div>
+    </div>
+
+    <!-- 1 CONCEPT -->
+    <section id="concept">
+      <div class="rail"><span class="num">01</span><span class="lab">The concept · 60,000 ft</span></div>
+      <h2 class="sec">Where in the work does AI actually help?</h2>
+      <p class="lede">Teams everywhere are reinventing the same AI-augmented patterns in isolation, and good patterns die because nobody writes them down. The Playbook is the durable place those patterns live — organized so you can find the one that fits <span class="b">where you actually are in the work</span>.</p>
+      <p>It answers one question, repeatedly, at every point of the product lifecycle: <span class="b">given what I'm doing right now, what has worked, how did they do it, and can I trust it?</span> The lifecycle is the spine; everything hangs off it. The protocol is deliberately thin and official; the practice is rich and growing; an editor sits between the two and says what's worth your trust.</p>
+      <div class="grid3" style="margin-top:18px">
+        <div class="card"><div class="ico">PRINCIPLE 01</div><h4>Structured, not emergent</h4><div class="d">A defined 3-phase lifecycle is the backbone — not a taxonomy that sprawls from whatever gets submitted.</div></div>
+        <div class="card"><div class="ico">PRINCIPLE 02</div><h4>Curated, not democratic</h4><div class="d">No reactions, votes, or leaderboards. An editor places, annotates, and endorses. Quality over volume.</div></div>
+        <div class="card"><div class="ico">PRINCIPLE 03</div><h4>Three voices, never blurred</h4><div class="d">What the protocol says, what the editor thinks, and what teams actually do are always visually distinct.</div></div>
+      </div>
+    </section>
+
+    <!-- 2 STANCE -->
+    <section id="stance">
+      <div class="rail"><span class="num">02</span><span class="lab">Why it exists · the stance</span></div>
+      <h2 class="sec">A backbone, on purpose</h2>
+      <p>A predecessor effort was built as a neutral platform: an emergent taxonomy, no opinion about which contributions were best, a venue for others' ideas. It worked — but everything was equally weighted and the structure sprawled. This project takes the opposite stance on structure.</p>
+      <div class="grid2" style="margin-top:8px">
+        <div class="card">
+          <div class="ico">THE OLD WAY · NEUTRAL PLATFORM</div>
+          <ul class="clean" style="margin-bottom:0">
+            <li class="no">Taxonomy grows organically from submissions</li>
+            <li class="no">Neutral on which ideas are best</li>
+            <li class="no">Community signals drive prominence</li>
+            <li class="no">A venue, with little point of view</li>
+          </ul>
+        </div>
+        <div class="card" style="border-color:var(--how-line);background:linear-gradient(180deg,var(--how-soft),var(--bg-card) 70%)">
+          <div class="ico" style="color:var(--how)">THIS PROJECT · OPINIONATED SPINE</div>
+          <ul class="clean" style="margin-bottom:0">
+            <li class="yes">A fixed lifecycle is the spine</li>
+            <li class="yes">An editor curates, places, and endorses</li>
+            <li class="yes">Community signals stripped; trust is editorial</li>
+            <li class="yes">Thin protocol + opinionated expansion</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3 WHO -->
+    <section id="who">
+      <div class="rail"><span class="num">03</span><span class="lab">Who it's for</span></div>
+      <h2 class="sec">A broad org, many teams</h2>
+      <p class="lede">PMs, designers, engineers, researchers, and ops — anyone doing product work who wants to point AI at it well.</p>
+      <div class="grid2" style="margin-top:8px">
+        <div class="card"><div class="ico">PERSONA</div><h4>The practitioner, mid-task</h4><div class="d">"I'm in launch planning — what have others done here?" → enters at the spine, drills phase → activity → use cases.</div></div>
+        <div class="card"><div class="ico">PERSONA</div><h4>The newcomer</h4><div class="d">"What is this, and how is it organized?" → the spine and the voices teach the structure without a manual.</div></div>
+        <div class="card"><div class="ico">PERSONA</div><h4>The contributor</h4><div class="d">"I built something worth sharing." → any "+ Add" link or the header Submit opens a GitHub issue.</div></div>
+        <div class="card"><div class="ico">PERSONA</div><h4>The editor</h4><div class="d">Reads every submission, places it on the spine, writes the note, and decides what gets endorsed.</div></div>
+      </div>
+    </section>
+
+    <!-- 4 VOICES -->
+    <section id="voices">
+      <div class="rail"><span class="num">04</span><span class="lab">The central UX idea</span></div>
+      <h2 class="sec">Three voices, unmistakable at a glance</h2>
+      <p>Every substantive block of content is one of three voices, each with its own treatment. A reader must never confuse the protocol's word with the editor's opinion or with a field report. <span class="b">There is no literal "legend"</span> — the distinction is carried by consistent labeling and color across the whole IA.</p>
+      <div class="voices">
+        <div class="voice canon">
+          <div class="vlabel" style="color:var(--seal-2)"><span class="vmark"></span> Canon</div>
+          <div class="vname">What the PDLC says</div>
+          <div class="vd">The official protocol. Thin, authoritative, sealed in brass. One or two sentences — and sometimes deliberately <i>silent</i>.</div>
+          <div class="vex"><span class="pill"><span class="seal-ico"></span> brass · serif · sealed</span></div>
+        </div>
+        <div class="voice editor">
+          <div class="vlabel" style="color:var(--ink-3)"><span class="vmark"></span> Editor's note</div>
+          <div class="vname">My expansion on the canon</div>
+          <div class="vd">Opinionated, bylined, and clearly the editor's — not the protocol's. On a phase page it's the section's core intro: a lead, a paragraph, and bold-led takeaways.</div>
+          <div class="vex"><span class="pill">ink · italic serif · bylined</span></div>
+        </div>
+        <div class="voice practice">
+          <div class="vlabel" style="color:var(--accent-2)"><span class="vmark"></span> Practice</div>
+          <div class="vname">What teams actually do</div>
+          <div class="vd">The bulk of the library — use-case cards and the technique tags they carry. The field, in the field's words.</div>
+          <div class="vex"><span class="pill">accent · cards · sourced</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 5 SPINE -->
+    <section id="spine">
+      <div class="rail"><span class="num">05</span><span class="lab">The spine · primary axis</span></div>
+      <h2 class="sec">A thin, official lifecycle</h2>
+      <p>Three linear phases, each with 5–8 key activities. The phase and activity names are the editor's to finalize. Many activities will legitimately have <span class="b">no canon and no practice yet</span> — that emptiness is a feature: it shows where the field hasn't filled in, and invites contribution.</p>
+      <div class="spine">
+        <div class="railline"></div>
+        <div class="pcol discover">
+          <div class="pdot"></div><div class="pn">PHASE 01</div><div class="pnm">Discover</div>
+          <div class="ptag">Understand the problem and decide what to build.</div>
+          <div class="acts">
+            <div class="act">Customer research <span class="ed"></span></div>
+            <div class="act">Problem framing</div>
+            <div class="act">Market &amp; competitive sensing</div>
+            <div class="act">Opportunity sizing</div>
+            <div class="act">Requirements &amp; specs <span class="ed"></span></div>
+            <div class="act">Prioritization</div>
+          </div>
+        </div>
+        <div class="pcol build">
+          <div class="pdot"></div><div class="pn">PHASE 02</div><div class="pnm">Build</div>
+          <div class="ptag">Design, prototype, and ship the thing.</div>
+          <div class="acts">
+            <div class="act">Design &amp; prototyping</div>
+            <div class="act">Engineering</div>
+            <div class="act">Code review &amp; QA <span class="ed"></span></div>
+            <div class="act">Technical decisions</div>
+            <div class="act">Documentation</div>
+            <div class="act">Testing &amp; evals <span class="ed"></span></div>
+          </div>
+        </div>
+        <div class="pcol grow">
+          <div class="pdot"></div><div class="pn">PHASE 03</div><div class="pnm">Grow</div>
+          <div class="ptag">Launch, learn, and keep it running.</div>
+          <div class="acts">
+            <div class="act">Launch &amp; GTM</div>
+            <div class="act">Rollout &amp; enablement</div>
+            <div class="act">Analytics &amp; experimentation</div>
+            <div class="act">Iteration &amp; optimization</div>
+            <div class="act">Operations &amp; toil <span class="ed"></span></div>
+            <div class="act">Support &amp; feedback loops</div>
+          </div>
+        </div>
+      </div>
+      <div class="legend"><span class="lg"><i style="background:var(--seal);border-radius:50%"></i> activity has endorsed practice</span></div>
+      <div class="canonband"><div class="cl">Canon · what the PDLC says · Discover</div><div class="ct">"No solution may proceed without a named customer, a written problem, and evidence the problem is worth solving."</div></div>
+    </section>
+
+    <!-- 6 AXES -->
+    <section id="axes">
+      <div class="rail"><span class="num">06</span><span class="lab">Information architecture</span></div>
+      <h2 class="sec">Two axes into one library</h2>
+      <p>The same content is reached two ways: down the <span class="b">lifecycle</span> (where am I in the work?) and across by <span class="b">technique</span> (what method am I using?). Two entities populate them.</p>
+      <div class="legend">
+        <span class="lg"><i style="background:var(--what)"></i> Use case · the <b>what</b></span>
+        <span class="lg"><i style="background:var(--how)"></i> Approach · the <b>how</b></span>
+        <span class="lg"><i style="background:var(--seal)"></i> Technique tag</span>
+      </div>
+      <div class="axes">
+        <div class="axis">
+          <span class="abadge">Axis 1 · primary</span>
+          <h4>Lifecycle</h4>
+          <p class="asub">Phase → activity → use cases done there (use-case-led).</p>
+          <div class="node"><span class="box phase"><span class="l">Phase</span><span class="n">Discover</span></span>
+            <div class="branch">
+              <div class="node"><span class="box"><span class="l">Key activity</span><span class="n">Customer research</span></span>
+                <div class="branch">
+                  <div class="node"><div class="pairwrap"><span class="box what"><span class="l">Use case · what</span><span class="n">Persona synthesizer</span></span><span class="plus">→</span><span class="box how"><span class="l">Approach · how</span><span class="n">instructions · prompt · links</span></span></div></div>
+                  <div class="node"><span class="box what"><span class="l">Use case · what</span><span class="n">Parallel research subagents</span></span></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="axis">
+          <span class="abadge" style="background:var(--seal)">Axis 2 · cross-cutting</span>
+          <h4>Techniques</h4>
+          <p class="asub">A tag → one page → the use cases that apply it.</p>
+          <div class="node"><span class="box tag"><span class="l">Technique tag · page</span><span class="n">#subagents</span></span>
+            <div class="branch">
+              <div class="node"><span class="box" style="background:#fff"><span class="l">Editorial description</span><span class="n">Scoped sub-agents, composed</span></span></div>
+              <div class="node"><span class="box what"><span class="l">Aggregated use case</span><span class="n">Backlog grooming agent</span></span></div>
+              <div class="node"><span class="box what"><span class="l">Aggregated use case</span><span class="n">Parallel research subagents</span></span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="callout"><div class="ct">The naming that resolves the old confusion</div>“Technique” is the <b>tag</b> (the horizontal axis). The reusable “how” is the <b>Approach</b> embedded in a use case — prose instructions, optional prompts, and resource <b>links</b>. There is no standalone “Resource” entity.</div>
+    </section>
+
+    <!-- 7 MODEL -->
+    <section id="model">
+      <div class="rail"><span class="num">07</span><span class="lab">Content model · the data</span></div>
+      <h2 class="sec">Two entities</h2>
+      <div class="schema">
+        <div class="ent usecase">
+          <div class="ehead"><span class="en">Use case</span><span class="ea">lifecycle axis · placed</span></div>
+          <div class="fields">
+            <div class="f"><span class="k">title</span><span class="v">Specific problem, solved a specific way, for a specific user</span></div>
+            <div class="f"><span class="k">problem</span><span class="v">The goal / problem statement <span class="req">req</span></span></div>
+            <div class="f"><span class="k">solution</span><span class="v">The approach — prose instructions <span class="req">req</span></span></div>
+            <div class="f"><span class="k">prompt</span><span class="v">Optional sample prompt / code block</span></div>
+            <div class="f"><span class="k">links[]</span><span class="v">Resource links — label + URL (the "resources")</span></div>
+            <div class="f"><span class="k">impact</span><span class="v">Outcome + optional headline metric — optional</span></div>
+            <div class="f"><span class="k">placement</span><span class="v">{ phase, activity } — one point on the spine <span class="req">req</span></span></div>
+            <div class="f"><span class="k">techniques[]</span><span class="v">Technique tags this approach carries</span></div>
+            <div class="f"><span class="k">tools · author</span><span class="v">Stack used · contributing team</span></div>
+            <div class="f"><span class="k">featured · endorsed</span><span class="v">Editor flags</span></div>
+          </div>
+        </div>
+        <div class="ent tech">
+          <div class="ehead"><span class="en">Technique</span><span class="ea">horizontal axis · a tag</span></div>
+          <div class="fields">
+            <div class="f"><span class="k">id · name</span><span class="v">The tag, e.g. #subagents <span class="req">req</span></span></div>
+            <div class="f"><span class="k">description</span><span class="v">Short editorial gloss on the technique</span></div>
+            <div class="f"><span class="k">endorsed</span><span class="v">Promoted into the protocol's recommendations</span></div>
+            <div class="f"><span class="k">— derived —</span><span class="v">Aggregates every use case tagged with it</span></div>
+            <div class="f"><span class="k">— derived —</span><span class="v">Spans N phases · count of use cases</span></div>
+          </div>
+          <div style="padding:14px 18px;border-top:1px solid var(--rule);font-size:13px;color:var(--ink-3)">A technique page can exist with <b>zero use cases</b> (rare). Tags are <b>flat</b> now; they cluster into families in a later refactor.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 8 ENDORSE -->
+    <section id="endorse">
+      <div class="rail"><span class="num">08</span><span class="lab">How the thin protocol grows</span></div>
+      <h2 class="sec">Endorsement</h2>
+      <p>The canon stays thin. The only way it grows is <span class="b">endorsement</span>: when a practice proves itself across enough teams, the editor promotes it into the protocol's recommendations. Endorsed techniques (and exemplar use cases) carry a brass <span class="endorsed"><span class="seal-ico"></span> PDLC-endorsed</span> seal. It is deliberately slow and rare.</p>
+      <div class="flow">
+        <div class="step"><div class="sn">STAGE 01</div><div class="st">Submitted</div><div class="sd">A use case arrives via GitHub issue — a goal and an approach.</div></div>
+        <div class="step"><div class="sn">STAGE 02</div><div class="st">Placed</div><div class="sd">The editor files it on the spine and tags its techniques.</div></div>
+        <div class="step"><div class="sn">STAGE 03</div><div class="st">Proven</div><div class="sd">A technique recurs across teams with consistent results.</div></div>
+        <div class="step"><div class="sn">STAGE 04</div><div class="st">Endorsed</div><div class="sd">The editor seals it; it joins the protocol's recommendations.</div></div>
+      </div>
+    </section>
+
+    <!-- 9 CONTRIBUTE -->
+    <section id="contribute">
+      <div class="rail"><span class="num">09</span><span class="lab">Growing from the field</span></div>
+      <h2 class="sec">Contribution is GitHub issues</h2>
+      <p>There is <span class="b">no in-app write path</span>. A global "Submit a use case" button in the header and contextual "+ Add" links throughout (scoped to a phase, activity, or technique) all open a modal that previews the relevant issue template and deep-links to the repo. Low-ceremony, public, discussable before merge.</p>
+      <ul class="clean">
+        <li><span class="b">Header → Submit a use case.</span> The front-door contribution.</li>
+        <li><span class="b">Activity → "+ Add a use case here."</span> Pre-scoped to that point on the spine.</li>
+        <li><span class="b">Technique → "+ I used this — add your use case."</span> Attach a goal/approach to an existing technique.</li>
+        <li><span class="b">Empty states</span> carry the same call to action — never a dead end.</li>
+      </ul>
+      <div class="callout"><div class="ct">Build task</div>Wire each modal's primary action to the repo's issue-template deep link (template + prefilled title/labels for the scope). The prototype stubs this.</div>
+    </section>
+
+    <!-- 10 SITEMAP -->
+    <section id="sitemap">
+      <div class="rail"><span class="num">10</span><span class="lab">Information architecture · routes</span></div>
+      <h2 class="sec">Sitemap</h2>
+      <p>A hash-routed SPA in the prototype; use the codebase's real router. The spine is the front door; "Techniques" is the second top-level entry; "About" carries the three explainer pages.</p>
+      <div class="sitemap"><span class="c"># top nav: Lifecycle · Techniques · About</span>
+/                          <span class="c">Home — spine + featured + techniques board</span>
+├─ /phase/<span class="k">:phaseId</span>          <span class="c">canon + editor + activity index</span>
+│   └─ /activity/<span class="k">:id</span>       <span class="c">canon + editor + use-case-led practice</span>
+│       └─ /use-case/<span class="k">:id</span>   <span class="c">Goal → Approach → Impact</span>
+├─ /techniques              <span class="c">the horizontal index</span>
+│   └─ /technique/<span class="k">:id</span>      <span class="c">tag page — aggregates use cases</span>
+└─ /about/<span class="k">:which</span>           <span class="c">pdlc · editor · initiative</span>
+</div>
+    </section>
+
+    <!-- 11 ANATOMY -->
+    <section id="anatomy">
+      <div class="rail"><span class="num">11</span><span class="lab">How the IA flows through page structure</span></div>
+      <h2 class="sec">Page anatomy</h2>
+      <p>Each page is a stack of zones, and every zone carries exactly one voice or entity. This is how the abstract IA becomes something you can build. Zones are color-coded to the legend below.</p>
+      <div class="legend">
+        <span class="lg"><i style="background:var(--ink-4)"></i> chrome</span>
+        <span class="lg"><i style="background:var(--seal)"></i> canon</span>
+        <span class="lg"><i style="background:var(--ink)"></i> editor</span>
+        <span class="lg"><i style="background:var(--accent)"></i> practice</span>
+        <span class="lg"><i style="background:var(--discover)"></i> lifecycle</span>
+        <span class="lg"><i style="background:var(--seal-2)"></i> technique</span>
+      </div>
+      <div class="wires">
+
+        <div class="wire">
+          <div class="wt"><span class="dots"><i></i><i></i><i></i></span><span class="rt">/ · Home</span></div>
+          <div class="body">
+            <div class="zone chrome"><div class="zn">Header</div><div class="zd">Brand · Lifecycle / Techniques / About · Submit</div></div>
+            <div class="zone chrome"><div class="zn">Hero</div><div class="zd">Mission — "Where in the work does AI help?"</div></div>
+            <div class="zone lifecycle"><div class="zn">Interactive spine board</div><div class="zd">3 phases · activities link down · endorsed dots</div></div>
+            <div class="zone practice"><div class="zn">Featured this month</div><div class="zd">Editor-curated use cases</div></div>
+            <div class="zone tech"><div class="zn">Techniques board</div><div class="zd">All tags as chips → technique pages</div></div>
+          </div>
+        </div>
+
+        <div class="wire">
+          <div class="wt"><span class="dots"><i></i><i></i><i></i></span><span class="rt">/phase/:id · Phase</span></div>
+          <div class="body">
+            <div class="zone chrome"><div class="zn">Breadcrumb + phase hero</div><div class="zd">Number · phase-hue title · progress across phases</div></div>
+            <div class="zone canon"><div class="zn">Canon</div><div class="zd">The official line for this phase · brass seal</div></div>
+            <div class="zone editor"><div class="zn">Editor's note</div><div class="zd">Section intro — lead · paragraph · bold bullets</div></div>
+            <div class="zone practice"><div class="zn">Activity index</div><div class="zd">Each activity: canon line · count · endorsed</div></div>
+            <div class="zone tech"><div class="zn">Techniques seen across phase</div><div class="zd">Chip strip → technique pages</div></div>
+          </div>
+        </div>
+
+        <div class="wire">
+          <div class="wt"><span class="dots"><i></i><i></i><i></i></span><span class="rt">/activity/:id · Activity</span></div>
+          <div class="body">
+            <div class="zone chrome"><div class="zn">Breadcrumb + activity hero</div><div class="zd">Phase context · activity name</div></div>
+            <div class="zone canon"><div class="zn">Canon</div><div class="zd">The line for this activity — or "silent"</div></div>
+            <div class="zone editor"><div class="zn">Editor's note</div><div class="zd">Compact, optional</div></div>
+            <div class="zone practice"><div class="zn">"What teams are doing"</div><div class="zd">Use-case cards · or confident empty state + Add</div></div>
+            <div class="zone tech"><div class="zn">Techniques used here</div><div class="zd">Chip strip</div></div>
+          </div>
+        </div>
+
+        <div class="wire">
+          <div class="wt"><span class="dots"><i></i><i></i><i></i></span><span class="rt">/use-case/:id · Use case</span></div>
+          <div class="body">
+            <div class="zone chrome"><div class="zn">Breadcrumb · placement tag · technique tags · endorsed</div><div class="zd">Where it sits + what it carries</div></div>
+            <div class="zrow">
+              <div class="zone practice"><div class="zn">01 Goal · the problem</div><div class="zd">02 Approach — instructions · prompt · links</div></div>
+              <div class="zone tech"><div class="zn">Sidebar</div><div class="zd">Techniques · placement · tools · author</div></div>
+            </div>
+            <div class="zone practice"><div class="zn">03 Impact</div><div class="zd">Optional · phase-hue metric box</div></div>
+          </div>
+        </div>
+
+        <div class="wire">
+          <div class="wt"><span class="dots"><i></i><i></i><i></i></span><span class="rt">/technique/:id · Technique</span></div>
+          <div class="body">
+            <div class="zone tech"><div class="zn">Tag hero</div><div class="zd">#name · endorsed seal · description · counts</div></div>
+            <div class="zone chrome"><div class="zn">"I used this — add your use case"</div><div class="zd">Contribution path</div></div>
+            <div class="zone practice"><div class="zn">Use cases applying this technique</div><div class="zd">Aggregated cards · or stand-alone empty state</div></div>
+            <div class="zone tech"><div class="zn">Often appears with</div><div class="zd">Related tag chips</div></div>
+          </div>
+        </div>
+
+        <div class="wire">
+          <div class="wt"><span class="dots"><i></i><i></i><i></i></span><span class="rt">/techniques · /about/:which</span></div>
+          <div class="body">
+            <div class="zone tech"><div class="zn">Techniques index</div><div class="zd">The horizontal axis — every tag · description · count</div></div>
+            <div class="zone canon"><div class="zn">About the PDLC</div><div class="zd">The thin protocol · three voices in prose · endorsement</div></div>
+            <div class="zone editor"><div class="zn">About the editor</div><div class="zd">Who curates · draft bio + portrait slot</div></div>
+            <div class="zone chrome"><div class="zn">About AI in Product</div><div class="zd">The initiative · how to take part</div></div>
+          </div>
+        </div>
+
+      </div>
+      <p class="wcap">The pattern is consistent everywhere: <span class="b">chrome → canon → editor → practice</span>, with the <span class="b">lifecycle</span> and <span class="b">technique</span> axes threading between leaf pages. Learn it once on a phase page and every other page reads the same way.</p>
+    </section>
+
+    <!-- 12 DESIGN -->
+    <section id="design">
+      <div class="rail"><span class="num">12</span><span class="lab">Design system</span></div>
+      <h2 class="sec">Tokens &amp; type</h2>
+      <h3 class="sub">Palette — warm paper, three phase hues, one brass seal</h3>
+      <div class="swatches">
+        <div class="sw"><div class="chip" style="background:#f7f5f0"></div><div class="meta"><div class="nm">Paper</div><div class="hex">#f7f5f0</div></div></div>
+        <div class="sw"><div class="chip" style="background:#1a1a1a"></div><div class="meta"><div class="nm">Ink</div><div class="hex">#1a1a1a</div></div></div>
+        <div class="sw"><div class="chip" style="background:#2d6a6a"></div><div class="meta"><div class="nm">Discover</div><div class="hex">#2d6a6a</div></div></div>
+        <div class="sw"><div class="chip" style="background:#4a5a8a"></div><div class="meta"><div class="nm">Build</div><div class="hex">#4a5a8a</div></div></div>
+        <div class="sw"><div class="chip" style="background:#3a7a4a"></div><div class="meta"><div class="nm">Grow</div><div class="hex">#3a7a4a</div></div></div>
+        <div class="sw"><div class="chip" style="background:#9a7b3f"></div><div class="meta"><div class="nm">Seal</div><div class="hex">#9a7b3f</div></div></div>
+        <div class="sw"><div class="chip" style="background:#e6e3da"></div><div class="meta"><div class="nm">Rule</div><div class="hex">#e6e3da</div></div></div>
+        <div class="sw"><div class="chip" style="background:#6b6b66"></div><div class="meta"><div class="nm">Ink-3</div><div class="hex">#6b6b66</div></div></div>
+      </div>
+      <div class="type-spec">
+        <div class="row"><span class="tg">Display · serif</span><span style="font-family:var(--serif);font-size:30px;font-weight:500;letter-spacing:-.02em">Newsreader 500</span></div>
+        <div class="row"><span class="tg">Body · sans</span><span style="font-family:var(--sans);font-size:17px">IBM Plex Sans — the reading voice of the library.</span></div>
+        <div class="row"><span class="tg">Labels · mono</span><span style="font-family:var(--mono);font-size:13px;text-transform:uppercase;letter-spacing:.12em">IBM PLEX MONO · EYEBROWS &amp; META</span></div>
+        <div class="row"><span class="tg">Editor · italic</span><span style="font-family:var(--serif);font-style:italic;font-size:18px;color:var(--ink-2)">The editor speaks in italic serif.</span></div>
+      </div>
+      <h3 class="sub">Component vocabulary</h3>
+      <div class="grid3">
+        <div class="card"><div class="ico">CANON</div><div class="d">Brass-sealed block, left bar, serif line. Renders a "silent" state when empty.</div></div>
+        <div class="card"><div class="ico">EDITOR NOTE</div><div class="d">Avatar + bylined italic serif; rich (lead/paragraph/bullets) on phases, compact on activities.</div></div>
+        <div class="card"><div class="ico">USE-CASE CARD</div><div class="d">Placement swatch, title, technique tags, author; lifts on hover.</div></div>
+        <div class="card"><div class="ico">ENDORSED SEAL</div><div class="d">Brass pill + ring-check icon. The only "official" growth signal.</div></div>
+        <div class="card"><div class="ico">TECH CHIP</div><div class="d">#tag + count; endorsed chips carry the seal instead of the hash.</div></div>
+        <div class="card"><div class="ico">SUBMIT MODAL</div><div class="d">GitHub-issue explainer + template preview + deep-link action.</div></div>
+      </div>
+    </section>
+
+    <!-- 13 WORKFLOW -->
+    <section id="workflow">
+      <div class="rail"><span class="num">13</span><span class="lab">Operating model</span></div>
+      <h2 class="sec">Editorial workflow</h2>
+      <p>The app reads from a curated content store. v1 ships content as a static data module (as in the prototype) and can evolve toward repo-backed Markdown/JSON.</p>
+      <div class="flow">
+        <div class="step"><div class="sn">01</div><div class="st">Issue opened</div><div class="sd">Contributor fills a template — goal + approach.</div></div>
+        <div class="step"><div class="sn">02</div><div class="st">Editor triages</div><div class="sd">Places on the spine, tags techniques, links resources.</div></div>
+        <div class="step"><div class="sn">03</div><div class="st">Note written</div><div class="sd">The editor's expansion is added.</div></div>
+        <div class="step"><div class="sn">04</div><div class="st">Merged</div><div class="sd">Appears in the library; may later be endorsed.</div></div>
+      </div>
+    </section>
+
+    <!-- 14 ROADMAP -->
+    <section id="roadmap">
+      <div class="rail"><span class="num">14</span><span class="lab">Phasing</span></div>
+      <h2 class="sec">Roadmap</h2>
+      <div class="grid2">
+        <div class="card" style="border-color:var(--how-line);background:linear-gradient(180deg,var(--how-soft),var(--bg-card) 70%)">
+          <div class="ico" style="color:var(--how)">V1 · THIS PROTOTYPE'S SCOPE</div>
+          <ul class="clean" style="margin-bottom:0">
+            <li class="yes">The full read experience: spine, phase/activity/use-case, techniques index + pages, About</li>
+            <li class="yes">Three-voice system + endorsement seals</li>
+            <li class="yes">GitHub-issue submit affordances (modal + deep links)</li>
+            <li class="yes">Content as a curated static module</li>
+          </ul>
+        </div>
+        <div class="card">
+          <div class="ico">LATER</div>
+          <ul class="clean" style="margin-bottom:0">
+            <li>Search (client-side, then backend)</li>
+            <li>Repo-backed content pipeline (Markdown/JSON)</li>
+            <li>Technique clustering refactor — tags → families</li>
+            <li>Editor tooling; optional lightweight signals if ever wanted</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- 15 OPEN -->
+    <section id="open">
+      <div class="rail"><span class="num">15</span><span class="lab">Still to settle</span></div>
+      <h2 class="sec">Open questions</h2>
+      <ol class="qlist">
+        <li>Final <b>phase &amp; activity names</b> — editor to confirm.</li>
+        <li>Exact <b>endorsement criteria</b>, and whether use cases (not just techniques) can be endorsed.</li>
+        <li><b>Content storage</b> for the build — static module vs repo Markdown vs CMS.</li>
+        <li>The real <b>GitHub repo</b> + issue-template URLs.</li>
+        <li>The editor's real <b>bio</b> and the initiative's real <b>description</b> (currently placeholders).</li>
+        <li>When tags cross the threshold to warrant the <b>families</b> refactor.</li>
+      </ol>
+    </section>
+
+    <div class="foot">AI PDLC Playbook · Master PRD · v1 — companion to the working prototype (AI PDLC Playbook.html) and the developer handoff bundle.</div>
+  </main>
+</div>
+</body>
+</html>
