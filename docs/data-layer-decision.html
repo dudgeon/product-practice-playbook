@@ -130,11 +130,15 @@
       <div class="s"><div class="v">0</div><div class="l">Databases</div></div>
       <div class="s"><div class="v">3 tiers</div><div class="l">Proposed model</div></div>
       <div class="s"><div class="v">4</div><div class="l">Decisions for you</div></div>
-      <div class="s"><div class="v">~40 lines</div><div class="l">To add safety</div></div>
+      <div class="s"><div class="v">#4 ✓</div><div class="l">Validation landed</div></div>
     </div>
     <div class="callout" style="margin-top:24px">
+      <div class="h">Reconciled against PR #4</div>
+      <p style="margin-bottom:0"><span class="b">PR #4 ("Abstract the lifecycle to JSON") changed two premises.</span> The spine now lives in <code>content/lifecycle.json</code> (the editable source of truth); <code>content/phases.json</code> is a <span class="b">generated, git-ignored snapshot</span>. And a <span class="b">validation gate now exists</span> — <code>build-content</code> fails on broken placements or unknown tags. What #4 left untouched: editorial prose still sits as JSON strings (now in <code>lifecycle.json</code>). That's the remaining wound, and the focus of D1.</p>
+    </div>
+    <div class="callout" style="margin-top:14px">
       <div class="h">How to use this page</div>
-      <p style="margin-bottom:0">Read sections 1–4 for the reasoning (the full write-up is in <code>docs/data-layer-prd.md</code>). In section 5, each decision is pre-set to the recommendation — change anything you disagree with and add notes. When you're happy, hit <span class="b">Copy decision to Claude</span> at the bottom and paste it back into chat to lock it.</p>
+      <p style="margin-bottom:0">Read sections 1–4 for the reasoning (the full write-up is in <code>docs/data-layer-prd.md</code>). In section 5, each decision is pre-set to the recommendation (D1 reflects your call: <span class="b">lift all spine prose to Markdown</span>) — change anything you disagree with and add notes. When you're happy, hit <span class="b">Copy decision to Claude</span> at the bottom and paste it back into chat to lock it.</p>
     </div>
   </header>
 
@@ -145,56 +149,66 @@
     <p class="lede">Content is split across JSON and Markdown today, but by accident of how it grew, not by a rule. That's fine where it landed well, and painful where it didn't.</p>
 
     <div class="diagram">
-      <div class="cap">Today — the build pipeline (content → query layer → static site)</div>
-      <svg viewBox="0 0 900 250" role="img" aria-label="Current build pipeline diagram">
+      <div class="cap">Today (post-#4) — source → compile + validate → snapshot → query layer → site</div>
+      <svg viewBox="0 0 960 250" role="img" aria-label="Current build pipeline diagram">
         <!-- content stores -->
         <g>
-          <rect x="10" y="20" width="200" height="210" rx="10" fill="#fbfaf6" stroke="#d4d1c7"/>
-          <text x="24" y="44" class="t-mono" font-size="10" fill="#6b6b66">content/  (source of truth)</text>
+          <rect x="10" y="20" width="190" height="210" rx="10" fill="#fbfaf6" stroke="#d4d1c7"/>
+          <text x="22" y="44" class="t-mono" font-size="10" fill="#6b6b66">content/  (source)</text>
 
-          <rect x="24" y="58" width="172" height="34" rx="7" fill="#e7e9f1" stroke="#c8cee0"/>
-          <text x="34" y="79" class="t-mono" font-size="11">site.json · config</text>
+          <rect x="22" y="56" width="166" height="30" rx="7" fill="#e7e9f1" stroke="#c8cee0"/>
+          <text x="32" y="75" class="t-mono" font-size="11">site.json · config</text>
 
-          <rect x="24" y="100" width="172" height="44" rx="7" fill="#f6e9e6" stroke="#e7c9c2"/>
-          <text x="34" y="119" class="t-mono" font-size="11">phases.json</text>
-          <text x="34" y="135" class="t-mono" font-size="9.5" fill="#9a3f3f">prose trapped in JSON ⚠</text>
+          <rect x="22" y="94" width="166" height="46" rx="7" fill="#f6e9e6" stroke="#e7c9c2"/>
+          <text x="32" y="113" class="t-mono" font-size="11">lifecycle.json</text>
+          <text x="32" y="130" class="t-mono" font-size="9.5" fill="#9a3f3f">prose still in JSON ⚠</text>
 
-          <rect x="24" y="152" width="172" height="34" rx="7" fill="#ecf2ef" stroke="#cfe0db"/>
-          <text x="34" y="173" class="t-mono" font-size="11">techniques.json · tags</text>
+          <rect x="22" y="148" width="166" height="30" rx="7" fill="#ecf2ef" stroke="#cfe0db"/>
+          <text x="32" y="167" class="t-mono" font-size="11">techniques.json · tags</text>
 
-          <rect x="24" y="194" width="172" height="30" rx="7" fill="#e3ede1" stroke="#cfe0db"/>
-          <text x="34" y="213" class="t-mono" font-size="11">usecases/*.md ✓</text>
+          <rect x="22" y="186" width="166" height="34" rx="7" fill="#e3ede1" stroke="#cfe0db"/>
+          <text x="32" y="207" class="t-mono" font-size="11">usecases/*.md ✓</text>
         </g>
 
-        <!-- arrow -->
-        <path d="M214 125 L 268 125" stroke="#9a9a93" stroke-width="1.5" marker-end="url(#ar)"/>
+        <path d="M200 125 L 246 125" stroke="#9a9a93" stroke-width="1.5" marker-end="url(#ar)"/>
+
+        <!-- build-content: compile + validate (added in #4) -->
+        <g>
+          <rect x="250" y="84" width="130" height="92" rx="10" fill="#f3ecdb" stroke="#e4d7b6"/>
+          <text x="315" y="116" text-anchor="middle" class="t-mono" font-size="11.5" fill="#7c6231">build-content</text>
+          <text x="315" y="136" text-anchor="middle" class="t-mono" font-size="9.5" fill="#9a7b3f">compile spine ✓</text>
+          <text x="315" y="152" text-anchor="middle" class="t-mono" font-size="9.5" fill="#9a7b3f">validate refs ✓</text>
+          <text x="315" y="166" text-anchor="middle" class="t-mono" font-size="8.5" fill="#9a7b3f">(new in #4)</text>
+        </g>
+
+        <path d="M380 125 L 424 125" stroke="#9a9a93" stroke-width="1.5" marker-end="url(#ar)"/>
+
+        <!-- generated snapshot -->
+        <g>
+          <rect x="428" y="90" width="120" height="80" rx="10" fill="#fbfaf6" stroke="#d4d1c7" stroke-dasharray="4 3"/>
+          <text x="488" y="120" text-anchor="middle" class="t-mono" font-size="11" fill="#3a3a3a">phases.json</text>
+          <text x="488" y="138" text-anchor="middle" class="t-mono" font-size="9" fill="#6b6b66">generated</text>
+          <text x="488" y="152" text-anchor="middle" class="t-mono" font-size="9" fill="#6b6b66">git-ignored</text>
+        </g>
+
+        <path d="M548 125 L 592 125" stroke="#9a9a93" stroke-width="1.5" marker-end="url(#ar)"/>
 
         <!-- loader -->
         <g>
-          <rect x="272" y="78" width="180" height="94" rx="10" fill="#1a1a1a"/>
-          <text x="362" y="112" text-anchor="middle" class="t-mono" font-size="12" fill="#fff">loadContent()</text>
-          <text x="362" y="132" text-anchor="middle" class="t-mono" font-size="9.5" fill="#bdbab2">in-memory query layer</text>
-          <text x="362" y="150" text-anchor="middle" class="t-mono" font-size="9.5" fill="#bdbab2">lookups · reverse indexes</text>
+          <rect x="596" y="90" width="140" height="80" rx="10" fill="#1a1a1a"/>
+          <text x="666" y="120" text-anchor="middle" class="t-mono" font-size="12" fill="#fff">loadContent()</text>
+          <text x="666" y="140" text-anchor="middle" class="t-mono" font-size="9.5" fill="#bdbab2">query layer ·</text>
+          <text x="666" y="154" text-anchor="middle" class="t-mono" font-size="9.5" fill="#bdbab2">reverse indexes</text>
         </g>
 
-        <path d="M456 125 L 510 125" stroke="#9a9a93" stroke-width="1.5" marker-end="url(#ar)"/>
+        <path d="M736 125 L 780 125" stroke="#9a9a93" stroke-width="1.5" marker-end="url(#ar)"/>
 
-        <!-- build -->
+        <!-- build + dist -->
         <g>
-          <rect x="514" y="78" width="150" height="94" rx="10" fill="#fbfaf6" stroke="#d4d1c7"/>
-          <text x="589" y="112" text-anchor="middle" class="t-mono" font-size="12" fill="#1a1a1a">build.mjs</text>
-          <text x="589" y="132" text-anchor="middle" class="t-mono" font-size="9.5" fill="#6b6b66">templates →</text>
-          <text x="589" y="148" text-anchor="middle" class="t-mono" font-size="9.5" fill="#6b6b66">HTML</text>
-        </g>
-
-        <path d="M668 125 L 722 125" stroke="#9a9a93" stroke-width="1.5" marker-end="url(#ar)"/>
-
-        <!-- dist -->
-        <g>
-          <rect x="726" y="78" width="160" height="94" rx="10" fill="#ecf2ef" stroke="#cfe0db"/>
-          <text x="806" y="108" text-anchor="middle" class="t-mono" font-size="12" fill="#1a4d4d">dist/</text>
-          <text x="806" y="128" text-anchor="middle" class="t-mono" font-size="9.5" fill="#2d6a6a">portable static</text>
-          <text x="806" y="144" text-anchor="middle" class="t-mono" font-size="9.5" fill="#2d6a6a">Pages · local · file://</text>
+          <rect x="784" y="90" width="166" height="80" rx="10" fill="#ecf2ef" stroke="#cfe0db"/>
+          <text x="867" y="120" text-anchor="middle" class="t-mono" font-size="11.5" fill="#1a4d4d">build.mjs → dist/</text>
+          <text x="867" y="140" text-anchor="middle" class="t-mono" font-size="9" fill="#2d6a6a">portable static</text>
+          <text x="867" y="154" text-anchor="middle" class="t-mono" font-size="9" fill="#2d6a6a">Pages · local · file://</text>
         </g>
 
         <defs>
@@ -219,8 +233,8 @@
       </div>
       <div class="card" style="border-color:var(--warn-line);background:var(--warn-soft)">
         <span class="pill" style="color:var(--warn);border-color:var(--warn-line);background:#fff">⚠ the wound</span>
-        <h4 style="margin-top:8px">Prose inside JSON</h4>
-        <div class="d"><code>phases.json</code> stuffs editor's notes — with <code>**bold**</code> — into JSON strings. Hard to edit, no rich-text render, escaping pain. Plus: <span class="b">no foreign-key checks anywhere.</span></div>
+        <h4 style="margin-top:8px">Prose still inside JSON</h4>
+        <div class="d"><code>lifecycle.json</code> stuffs canon + editor's notes — with <code>**bold**</code> — into JSON strings. Hard to edit, no rich-text render, escaping pain. <span class="b">Foreign-key checks now exist (#4)</span> — but the prose wound doesn't. That's D1.</div>
       </div>
     </div>
   </section>
@@ -302,7 +316,7 @@
   <section id="nodb">
     <div class="rail"><span class="num">04</span><span class="lab">The "no database" insight</span></div>
     <h2 class="sec">The build <em>is</em> the database</h2>
-    <p class="lede">Every database concept already has an equivalent here — except one. The only missing piece is the constraint layer, and it's ~40 lines.</p>
+    <p class="lede">Every database concept already has an equivalent here — and after #4, even the constraint layer exists. The only residue is two small validation gaps to close (D3).</p>
 
     <div class="diagram">
       <div class="cap">Mapping — relational concepts → this project</div>
@@ -317,7 +331,7 @@
           <rect x="20" y="108" width="200" height="28" rx="6" fill="#fbfaf6" stroke="#d4d1c7"/><text x="32" y="127" class="t-mono">Columns</text>
           <rect x="20" y="142" width="200" height="28" rx="6" fill="#fbfaf6" stroke="#d4d1c7"/><text x="32" y="161" class="t-mono">Primary / foreign keys</text>
           <rect x="20" y="176" width="200" height="28" rx="6" fill="#fbfaf6" stroke="#d4d1c7"/><text x="32" y="195" class="t-mono">Query engine</text>
-          <rect x="20" y="210" width="200" height="28" rx="6" fill="#f6e9e6" stroke="#e7c9c2"/><text x="32" y="229" class="t-mono" fill="#9a3f3f">Schema / constraints</text>
+          <rect x="20" y="210" width="200" height="28" rx="6" fill="#e3ede1" stroke="#cfe0db"/><text x="32" y="229" class="t-mono" fill="#2c6a3a">Schema / constraints</text>
         </g>
 
         <g stroke="#cdcabf" stroke-width="1.2">
@@ -326,38 +340,38 @@
           <line x1="222" y1="122" x2="498" y2="122"/>
           <line x1="222" y1="156" x2="498" y2="156"/>
           <line x1="222" y1="190" x2="498" y2="190"/>
-          <line x1="222" y1="224" x2="498" y2="224" stroke="#e7c9c2" stroke-dasharray="4 3"/>
+          <line x1="222" y1="224" x2="498" y2="224" stroke="#cfe0db"/>
         </g>
 
         <g font-size="12">
-          <rect x="500" y="40" width="390" height="28" rx="6" fill="#e7e9f1" stroke="#c8cee0"/><text x="512" y="59" class="t-mono">content stores (usecases/, phases.json, …)</text>
+          <rect x="500" y="40" width="390" height="28" rx="6" fill="#e7e9f1" stroke="#c8cee0"/><text x="512" y="59" class="t-mono">content stores (usecases/, lifecycle.json, …)</text>
           <rect x="500" y="74" width="390" height="28" rx="6" fill="#e7e9f1" stroke="#c8cee0"/><text x="512" y="93" class="t-mono">one .md file / one array entry</text>
           <rect x="500" y="108" width="390" height="28" rx="6" fill="#e7e9f1" stroke="#c8cee0"/><text x="512" y="127" class="t-mono">frontmatter keys · md body = rich-text col</text>
           <rect x="500" y="142" width="390" height="28" rx="6" fill="#e7e9f1" stroke="#c8cee0"/><text x="512" y="161" class="t-mono">id · phase/activity/techniques[] refs</text>
           <rect x="500" y="176" width="390" height="28" rx="6" fill="#e7e9f1" stroke="#c8cee0"/><text x="512" y="195" class="t-mono">loadContent() + reverse indexes</text>
-          <rect x="500" y="210" width="390" height="28" rx="6" fill="#f3ecdb" stroke="#e4d7b6"/><text x="512" y="229" class="t-mono" fill="#7c6231">→ ADD: build-time validate.mjs (the gap)</text>
+          <rect x="500" y="210" width="390" height="28" rx="6" fill="#e3ede1" stroke="#cfe0db"/><text x="512" y="229" class="t-mono" fill="#2c6a3a">✓ lifecycle.mjs + build-content (added in #4)</text>
         </g>
       </svg>
     </div>
-    <p class="footnote">Because the model maps 1:1 onto rows and columns, choosing it now is <span class="b">not</span> a bet against a future database — frontmatter becomes columns, the Markdown body becomes a rich-text column, ids become keys. The migration, if it ever happens, is mechanical.</p>
+    <p class="footnote">Because the model maps 1:1 onto rows and columns, choosing it now is <span class="b">not</span> a bet against a future database — frontmatter becomes columns, the Markdown body becomes a rich-text column, ids become keys. The migration, if it ever happens, is mechanical. <span class="b">#4 already built the constraint layer;</span> D3 just closes its last two gaps.</p>
   </section>
 
   <!-- 5 — DECISIONS -->
   <section id="decisions">
     <div class="rail"><span class="num">05</span><span class="lab">Your call</span></div>
     <h2 class="sec">Four decisions</h2>
-    <p class="lede">Each is pre-set to the recommendation. Override anything, leave notes where you want to steer the implementation, then lock it at the bottom.</p>
+    <p class="lede">Pre-set to the agreed direction (D1, your call) and the recommendation (D2–D4). Override anything, leave notes where you want to steer the implementation, then lock it at the bottom.</p>
 
     <form id="decisions-form">
 
       <!-- D1 -->
-      <div class="decision" data-q="1" data-title="Where does the editorial prose in phases.json live?">
-        <div class="q"><span class="qn">D1</span><span class="qt">Where does the editorial prose in <code>phases.json</code> live?</span></div>
-        <div class="qd">The wound from section 1 — canon lines and editor's notes are currently JSON strings with markdown inside them.</div>
+      <div class="decision" data-q="1" data-title="Where does the editorial prose in lifecycle.json live?">
+        <div class="q"><span class="qn">D1</span><span class="qt">Where does the editorial prose in <code>lifecycle.json</code> live?</span></div>
+        <div class="qd">The remaining wound — after #4, canon + editor's notes are JSON strings (with markdown inside) in <code>lifecycle.json</code>. <span class="b">Owner's call: lift it all to Markdown.</span></div>
         <div class="opts">
-          <label class="opt"><input type="radio" name="d1" value="A — Leave it in JSON strings (no change)"><span><span class="ol">A · Leave it in JSON strings</span><div class="od">Zero work; the pain persists. Prose stays hard to edit and can't render rich text.</div></span></label>
-          <label class="opt"><input type="radio" name="d1" value="B — Lift prose to per-phase Markdown files, slim phases.json to a skeleton" checked><span><span class="ol">B · Lift to per-phase Markdown<span class="rectag">recommended</span></span><div class="od">Slim <code>phases.json</code> to skeleton (ids, order, hue, names); move canon + editor notes to <code>content/phases/&lt;id&gt;.md</code>, joined by id — exactly how use cases work.</div></span></label>
-          <label class="opt"><input type="radio" name="d1" value="C — Markdown-in-frontmatter (one file per phase, prose in multiline frontmatter)"><span><span class="ol">C · Markdown-in-frontmatter</span><div class="od">One file per phase but prose lives in multi-line frontmatter blocks. Half-measure; still awkward for long prose.</div></span></label>
+          <label class="opt"><input type="radio" name="d1" value="A — Leave canon + editor prose in lifecycle.json JSON strings (no change)"><span><span class="ol">A · Leave it in <code>lifecycle.json</code></span><div class="od">Zero work; the pain persists. Prose stays hard to edit and can't render rich text.</div></span></label>
+          <label class="opt"><input type="radio" name="d1" value="B — Lift the long editor notes only; keep short canon one-liners in lifecycle.json (hybrid)"><span><span class="ol">B · Lift editor notes only (hybrid)</span><div class="od">Keep short <code>canon</code> one-liners in <code>lifecycle.json</code>; move only <code>editor.*</code> to <code>content/phases/&lt;id&gt;.md</code>.</div></span></label>
+          <label class="opt"><input type="radio" name="d1" value="C — Lift ALL spine prose (canon + editor) to per-phase Markdown; lifecycle.json keeps skeleton only" checked><span><span class="ol">C · Lift all prose to Markdown<span class="rectag">owner's choice</span></span><div class="od"><code>lifecycle.json</code> keeps only the skeleton (ids, names, order, hue, tagline); both <code>canon</code> and <code>editor.*</code> move to <code>content/phases/&lt;id&gt;.md</code>. <code>build-content</code> merges them back into the generated <code>phases.json</code> — downstream unchanged.</div></span></label>
         </div>
         <label class="notes-label" for="n1">Notes / constraints for D1</label>
         <textarea id="n1" data-note="1" placeholder="e.g. keep activity-level canon inline but move the long editor body out…"></textarea>
@@ -377,16 +391,15 @@
       </div>
 
       <!-- D3 -->
-      <div class="decision" data-q="3" data-title="Add a build-time validation gate?">
-        <div class="q"><span class="qn">D3</span><span class="qt">Add a build-time validation gate?</span></div>
-        <div class="qd">The one missing database concept — constraints. Catch broken references before they ship.</div>
+      <div class="decision" data-q="3" data-title="The validation gate (added in #4) — extend it?">
+        <div class="q"><span class="qn">D3</span><span class="qt">The validation gate (added in #4) — extend it?</span></div>
+        <div class="qd"><span class="b">#4 already built this:</span> <code>build-content</code> + <code>lifecycle.mjs</code> reject duplicate phase/activity ids, broken placements, and unknown technique tags. Two small gaps remain.</div>
         <div class="opts">
-          <label class="opt"><input type="radio" name="d3" value="A — Yes, now: unique ids + foreign-key resolution + required fields fail the build" checked><span><span class="ol">A · Yes, now<span class="rectag">recommended</span></span><div class="od">Add <code>src/lib/validate.mjs</code>, called first in <code>build()</code>. Unique ids, resolvable FKs, required frontmatter → red build otherwise. Highest safety-per-line in the proposal.</div></span></label>
-          <label class="opt"><input type="radio" name="d3" value="B — Later: ship the file moves first, add the gate in a follow-up"><span><span class="ol">B · Later</span><div class="od">Do the file moves first, add validation in a follow-up PR.</div></span></label>
-          <label class="opt"><input type="radio" name="d3" value="C — No: rely on review to catch broken references"><span><span class="ol">C · No</span><div class="od">Lean on PR review. Cheapest now, silent failures later.</div></span></label>
+          <label class="opt"><input type="radio" name="d3" value="A — Extend it: also check duplicate use-case ids + required use-case frontmatter (id/title/phase/activity), and fold in the new per-phase Markdown from D1" checked><span><span class="ol">A · Extend it<span class="rectag">recommended</span></span><div class="od">Add: <span class="b">duplicate use-case ids</span> + <span class="b">required use-case frontmatter present</span> (<code>id</code>, <code>title</code>, <code>phase</code>, <code>activity</code>). Also fold the new per-phase Markdown (D1) into the compile + validate pass.</div></span></label>
+          <label class="opt"><input type="radio" name="d3" value="B — Leave as-is: #4's checks (placements + tags + dup phase/activity ids) are enough for now"><span><span class="ol">B · Leave as-is</span><div class="od">#4's checks are enough for now; revisit if a content bug slips through.</div></span></label>
         </div>
         <label class="notes-label" for="n3">Notes / constraints for D3</label>
-        <textarea id="n3" data-note="3" placeholder="e.g. warn (not fail) on missing optional metric, but fail on bad technique refs…"></textarea>
+        <textarea id="n3" data-note="3" placeholder="e.g. warn (not fail) on missing optional metric, but fail on duplicate ids…"></textarea>
       </div>
 
       <!-- D4 -->
@@ -406,7 +419,7 @@
         <div class="q"><span class="qn">±</span><span class="qt">Overall verdict & anything else</span></div>
         <div class="qd">Sequencing, scope cuts, things the four decisions didn't cover, open questions from §11 of the PRD.</div>
         <label class="notes-label" for="overall">Owner notes</label>
-        <textarea id="overall" style="min-height:90px" placeholder="e.g. do D3 first as its own PR against today's content, then migrate phases one at a time. Also: I'd like YAML over JSON for the skeleton…"></textarea>
+        <textarea id="overall" style="min-height:90px" placeholder="e.g. extend the #4 validation first, then migrate phases one at a time starting with discover. Also: I'd like YAML over JSON for the skeleton…"></textarea>
       </div>
 
     </form>
@@ -415,7 +428,7 @@
     <div class="preview-wrap">
       <div class="preview-head">
         <h3 class="sub" style="margin:0">Locked decision — preview</h3>
-        <span class="pill" id="rec-flag">all recommended</span>
+        <span class="pill" id="rec-flag">as agreed</span>
       </div>
       <pre class="preview" id="preview"></pre>
     </div>
@@ -443,7 +456,7 @@
 
 <script>
 (function(){
-  var DEFAULTS = { d1:'B', d2:'A', d3:'A', d4:'A' };
+  var DEFAULTS = { d1:'C', d2:'A', d3:'A', d4:'A' };
   var form = document.getElementById('decisions-form');
   var preview = document.getElementById('preview');
   var recFlag = document.getElementById('rec-flag');
@@ -494,14 +507,14 @@ decisionBlock(4,'d4') + '\n';
 '1. Confirm you understand each locked choice (flag any conflicts between them).\n' +
 '2. Give me the incremental migration plan (smallest reversible steps) and what the first PR contains.\n' +
 '3. Then implement on the current branch, keeping rendered output identical until a change is intended.\n\n' +
-'(' + (n===0 ? 'All four decisions left at the recommendation.' : n + ' of 4 decisions overridden from the recommendation.') + ')\n';
+'(' + (n===0 ? 'Left as agreed — D1 is the owner call (lift all spine prose to Markdown), D2–D4 at the recommendation.' : n + ' of 4 decisions overridden from the agreed defaults.') + ')\n';
     return head + body + tail;
   }
 
   function refresh(){
     preview.textContent = buildPrompt();
     var n = countOverrides();
-    if(n===0){ recFlag.textContent = 'all recommended'; }
+    if(n===0){ recFlag.textContent = 'as agreed'; }
     else { recFlag.textContent = n + ' overridden'; }
   }
 
