@@ -30,6 +30,7 @@ export function layout({ title, description = '', nav = 'lifecycle', main, bodyC
 <link rel="stylesheet" href="${asset('css/base.css')}">
 <link rel="stylesheet" href="${asset('css/pb-styles.css')}">
 <link rel="stylesheet" href="${asset('css/app-styles.css')}">
+<link rel="stylesheet" href="${asset('css/lifecycle.css')}">
 <link rel="stylesheet" href="${asset('css/site.css')}">
 ${head}
 </head>
