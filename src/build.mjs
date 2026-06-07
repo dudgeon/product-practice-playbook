@@ -98,6 +98,22 @@ function notFoundPage(site) {
 `;
 }
 
+// Phase-keyed CSS derived from the lifecycle so adding/renaming/recoloring a
+// stage Just Works: hue tokens, the featured-card soft gradient, the --phase
+// var per phase, and the home spine rail gradient across all phases.
+function lifecycleCss(phases) {
+  const tokens = phases.map((p) => `  --${p.id}: ${p.hue}; --${p.id}-soft: ${p.soft};`).join('\n');
+  const rules = phases
+    .map(
+      (p) =>
+        `.phase-col.pc-${p.id}, .uc-card.p-${p.id}, .feat-card.p-${p.id} { --phase: var(--${p.id}); }\n` +
+        `.feat-card.p-${p.id} { background: linear-gradient(160deg, var(--${p.id}-soft), var(--bg-card) 65%); border-color: color-mix(in oklab, var(--${p.id}) 18%, var(--rule)); }`
+    )
+    .join('\n');
+  const rail = `.spine-rail { background: linear-gradient(90deg, ${phases.map((p) => p.hue).join(', ')}); }`;
+  return `/* Generated from content/lifecycle.json by the build — do not edit. */\n:root {\n${tokens}\n}\n${rules}\n${rail}\n`;
+}
+
 function build() {
   const db = loadContent();
   bindData(db);
@@ -182,6 +198,8 @@ function build() {
 
   // ---- Assets ----
   fs.cpSync(path.join(ROOT, 'src', 'assets'), path.join(DIST, 'assets'), { recursive: true });
+  // Phase-keyed CSS derived from the lifecycle (written after the static copy).
+  fs.writeFileSync(path.join(DIST, 'assets', 'css', 'lifecycle.css'), lifecycleCss(db.phases));
 
   console.log(`Built ${pageCount} pages → dist/ (relative links; portable)`);
 }

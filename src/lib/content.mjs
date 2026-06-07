@@ -9,6 +9,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import matter from 'gray-matter';
+import { compileLifecycle } from './lifecycle.mjs';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(here, '..', '..');
@@ -36,7 +37,8 @@ const sectionBody = (sections, heading) =>
 
 export function loadContent() {
   const site = readJSON('site.json');
-  const phases = readJSON('phases.json');
+  // The spine is compiled from the notional lifecycle definition.
+  const { phases } = compileLifecycle(readJSON('lifecycle.json'));
   const techniques = readJSON('techniques.json');
 
   const usecases = readDir('usecases').map((file) => {

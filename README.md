@@ -43,22 +43,25 @@ A small zero‑framework static‑site generator (plain Node ESM):
 ```
 content/                 ← the source of truth (edit these)
   site.json                site config + home copy
-  phases.json              the spine: phases, activities, canon, editor notes
+  lifecycle.json           the notional spine: stages + key activities (+ canon/editor)
   techniques.json          the horizontal technique tags
   usecases/*.md            one use case per file: YAML frontmatter + prose
   about/*.md               the three About pages
   pages/*.html             self-contained ancillary docs (Master PRD, IA Proposal)
+  phases.json              GENERATED from lifecycle.json (git-ignored snapshot)
 src/
-  lib/                     content loader, markdown, links, html helpers
+  lib/                     content loader, lifecycle compiler, markdown, links, html
   components.mjs           the design system as reusable template functions
   pages.mjs                page renderers (home, phase, activity, use case, …)
   gallery.mjs              the template gallery
   layout.mjs               the document shell
-  build.mjs                the build: content + templates → dist/
+  build.mjs                the build: content + templates → dist/ (+ phase CSS)
   assets/                  css (base + the design's stylesheets) + the tiny modal js
 scripts/
+  build-content.mjs        compile + validate the lifecycle into content artifacts
   bootstrap-content.mjs    one-time: derived content/ from the design's data module
   serve.mjs                zero-dep local preview server
+.claude/skills/            /build-content and /build-site skills
 design-reference/          the original design handoff (provenance, not built)
 ```
 
@@ -66,6 +69,36 @@ At build time the loader reads `content/`, the components/pages turn it into
 HTML, and everything is written to `dist/` as real directories (one
 `index.html` per route) so it deploys anywhere. The **template gallery** renders
 straight from `src/components.mjs`, so it stays an honest reference.
+
+## The lifecycle is data — changing the stages
+
+The product‑development lifecycle (the **stages** and their **key activities**)
+is notional and lives entirely in **`content/lifecycle.json`** — the single
+source of truth for the spine. When the stages or activities change, you don't
+touch templates or CSS:
+
+1. Edit `content/lifecycle.json` (add / rename / reorder / recolor phases and
+   activities). Keep `id`s stable — use cases reference them — or omit `id` on a
+   new entry to auto‑slug it from the name. `hue` is optional (auto‑assigned),
+   and phase numbers + soft tints are derived.
+2. Run **`npm run build-content`** (or the **`/build-content`** skill). It
+   compiles the spine, writes the generated `content/phases.json` snapshot, and
+   **validates** the rest of the content store — catching any use case that
+   points at a renamed/removed stage or an unknown technique tag — then prints a
+   coverage report.
+3. Run **`npm run build`** (or the **`/build-site`** skill) to render. The build
+   also generates the phase‑keyed CSS (hue tokens, the featured‑card tints, and
+   the spine‑rail gradient) from the lifecycle, so new stages render correctly
+   with no CSS edits.
+
+### Skills
+
+Two committed Claude Code skills wrap the two steps:
+
+| Skill | Does | Run directly |
+|---|---|---|
+| **`/build-content`** | Compile + validate the lifecycle into content artifacts (after editing `lifecycle.json`) | `npm run build-content` |
+| **`/build-site`** | Render the static site from the content into `dist/` | `npm run build` |
 
 ## Run it locally
 
