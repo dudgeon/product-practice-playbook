@@ -1,40 +1,56 @@
-// URL + route helpers.
+// URL + route helpers — fully relative, so the build is portable.
 //
-// The site is rendered as real directories (one index.html per route) so it
-// works as a plain static deploy. Internal links are root-relative and
-// prefixed with BASE_URL, which lets the same build serve from the domain
-// root locally (`/`) and from a project subpath on GitHub Pages
-// (`/product-practice-playbook/`). Set BASE_URL in the environment at build
-// time; it defaults to `/`.
+// Every internal link is computed relative to the page being rendered and
+// points at an explicit index.html file. That means the exact same dist/ works
+// in all of:
+//   • GitHub Pages under a project subpath (/product-practice-playbook/…)
+//   • any local static server (npm run serve)
+//   • opening dist/index.html straight off disk via file://
+// No base path / configuration required.
 
-function resolveBase() {
-  let b = process.env.BASE_URL || '/';
-  if (!b.startsWith('/')) b = '/' + b;
-  if (!b.endsWith('/')) b += '/';
-  return b;
+import path from 'node:path';
+
+// Site-root-relative directory of the page currently being rendered
+// (no leading/trailing slash; '' for the home page). Set per page by the build.
+let currentDir = '';
+export function setCurrentDir(dir = '') {
+  currentDir = String(dir).replace(/^\/+|\/+$/g, '');
 }
 
-export const BASE_URL = resolveBase();
+// Canonical site-root-relative target FILES (every route is a dir + index.html).
+const TARGET = {
+  home: 'index.html',
+  phase: (id) => `phase/${id}/index.html`,
+  activity: (id) => `activity/${id}/index.html`,
+  usecase: (id) => `use-case/${id}/index.html`,
+  technique: (id) => `technique/${id}/index.html`,
+  techniques: 'techniques/index.html',
+  about: (which) => `about/${which}/index.html`,
+  gallery: 'gallery/index.html',
+  prd: 'prd/index.html',
+  ia: 'ia/index.html',
+};
 
-/** Root-relative URL for an internal path, base-prefixed and slash-normalized. */
-export function url(p = '') {
-  const clean = String(p).replace(/^\/+/, '');
-  return (BASE_URL + clean).replace(/\/{2,}/g, '/');
+/** Relative URL from the current page's directory to a site-root-relative file. */
+export function rel(targetFile) {
+  const from = '/' + currentDir; // current page directory, rooted
+  const to = '/' + String(targetFile).replace(/^\/+/, '');
+  return path.posix.relative(from, to) || 'index.html';
 }
 
-/** URL for a bundled asset under /assets. */
-export const asset = (p = '') => url('assets/' + String(p).replace(/^\/+/, ''));
+/** Relative URL for a bundled asset under /assets. */
+export const asset = (p = '') => rel('assets/' + String(p).replace(/^\/+/, ''));
 
-/** Named routes — the single source of truth for internal link shapes. */
+/** Named routes — relative to whichever page is being rendered. */
 export const routes = {
-  home: () => url(''),
-  phase: (id) => url(`phase/${id}/`),
-  activity: (id) => url(`activity/${id}/`),
-  usecase: (id) => url(`use-case/${id}/`),
-  technique: (id) => url(`technique/${id}/`),
-  techniques: () => url('techniques/'),
-  about: (which) => url(`about/${which}/`),
-  gallery: () => url('gallery/'),
-  prd: () => url('prd/'),
-  ia: () => url('ia/'),
+  home: () => rel(TARGET.home),
+  phase: (id) => rel(TARGET.phase(id)),
+  activity: (id) => rel(TARGET.activity(id)),
+  usecase: (id) => rel(TARGET.usecase(id)),
+  technique: (id) => rel(TARGET.technique(id)),
+  techniques: () => rel(TARGET.techniques),
+  about: (which) => rel(TARGET.about(which)),
+  gallery: () => rel(TARGET.gallery),
+  prd: () => rel(TARGET.prd),
+  ia: () => rel(TARGET.ia),
 };

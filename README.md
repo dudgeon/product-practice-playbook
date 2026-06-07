@@ -66,15 +66,20 @@ HTML, and everything is written to `dist/` as real directories (one
 `index.html` per route) so it deploys anywhere. The **template gallery** renders
 straight from `src/components.mjs`, so it stays an honest reference.
 
-## Local development
+## Run it locally
+
+Clone/download the repo, then:
 
 ```bash
 npm install
-npm run build      # → dist/   (set BASE_URL=/sub/path/ for a project subpath)
-npm run serve      # → http://localhost:8080
-# or just:
-npm run dev        # build + serve
+npm run dev        # build + serve at http://localhost:8080
 ```
+
+Or step by step — `npm run build` (→ `dist/`) then `npm run serve`. All internal
+links are **relative**, so the built `dist/` is fully portable: it works on
+GitHub Pages under the project subpath, behind any local static server, **and**
+opened straight off disk — you can double‑click `dist/index.html` and click
+through the whole site over `file://`, no server required.
 
 **Editing content** — change the files under `content/` and rebuild. Use cases
 are Markdown with frontmatter:
@@ -105,9 +110,8 @@ What changed (optional).
 ## Deployment
 
 GitHub Actions builds and publishes to **GitHub Pages** on every push to `main`
-(see [`.github/workflows/pages.yml`](.github/workflows/pages.yml)). The build
-runs with `BASE_URL=/product-practice-playbook/` so links resolve under the
-project subpath.
+(see [`.github/workflows/pages.yml`](.github/workflows/pages.yml)). Because links
+are relative, no base‑path configuration is needed.
 
 **First‑time setup:** in the repo's **Settings → Pages**, set the source to
 **GitHub Actions**. The workflow attempts to enable this automatically; once a
