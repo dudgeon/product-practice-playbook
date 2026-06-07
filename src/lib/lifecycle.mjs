@@ -88,6 +88,26 @@ export function validateContent({ phases, usecases, techniques }) {
   const errors = [];
   const warnings = [];
 
+  // Required frontmatter + unique ids — the use-case "schema" the loader assumes.
+  const REQUIRED = [
+    ['id', (u) => u.id],
+    ['title', (u) => u.title],
+    ['phase', (u) => u.placement.phase],
+    ['activity', (u) => u.placement.activity],
+  ];
+  const seenUsecase = new Set();
+  for (const u of usecases) {
+    const label = u.id ? `"${u.id}"` : '(missing id)';
+    const missing = REQUIRED.filter(([, get]) => !get(u)).map(([k]) => k);
+    if (missing.length) {
+      errors.push(`use case ${label}: missing required frontmatter — ${missing.join(', ')}.`);
+    }
+    if (u.id) {
+      if (seenUsecase.has(u.id)) errors.push(`duplicate use-case id "${u.id}".`);
+      seenUsecase.add(u.id);
+    }
+  }
+
   for (const u of usecases) {
     const ph = phaseById.get(u.placement.phase);
     if (!ph) {
