@@ -2,26 +2,28 @@
 name: build-content
 description: >-
   Recompile and validate the playbook's content artifacts when the product
-  lifecycle changes. Use when content/lifecycle.json is edited — stages or key
-  activities added, renamed, reordered, or recolored — or before building the
-  site, to regenerate content/phases.json and confirm every use case still
-  places onto a real stage and activity.
+  lifecycle changes. Use when content/lifecycle.json is edited — phases,
+  subphases, or key activities added, renamed, reordered, or recolored — or
+  before building the site, to regenerate content/phases.json and confirm every
+  use case still places onto a real stage and activity.
 allowed-tools: Bash(npm run build-content:*) Bash(node scripts/build-content.mjs:*)
 ---
 
-The product lifecycle — the **stages and their key activities** — lives in
-`content/lifecycle.json`. That file is the single source of truth for the spine.
-This skill compiles it into the content artifacts the site renders from and
-validates the rest of the content store against it.
+The product lifecycle — the **phases, their subphases, and the key activities**
+within each — lives in `content/lifecycle.json`. That file is the single source
+of truth for the spine. This skill compiles it into the content artifacts the
+site renders from and validates the rest of the content store against it.
 
 1. If the user described a lifecycle change, edit `content/lifecycle.json` to
-   match (add / rename / reorder / recolor entries under `phases[]`, each with
-   `activities[]`).
-   - **Keep existing `id`s stable** — use cases reference them by id. Only set a
-     new `id` for a genuinely new stage/activity; omit `id` to auto‑slug it from
-     the name.
+   match. The hierarchy is `phases[]` → each with `subphases[]` → each with
+   `activities[]`. (A phase may instead use a flat `activities[]`; it compiles
+   as one implicit subphase.)
+   - **Keep existing `id`s stable** — use cases reference activities by id, and a
+     use case's subphase is derived from its activity. Only set a new `id` for a
+     genuinely new phase/subphase/activity; omit `id` to auto‑slug it from the
+     name.
    - `hue` is optional (auto‑assigned from a palette if omitted); `soft` tint and
-     the phase number (`n`) are derived automatically.
+     the phase/subphase numbers (`n`) are derived automatically.
 2. Run `npm run build-content`.
 3. Report the coverage summary. **If validation fails**, it is almost always a
    use case in `content/usecases/*.md` whose `phase` / `activity` frontmatter

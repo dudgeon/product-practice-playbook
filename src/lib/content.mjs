@@ -89,10 +89,22 @@ export function loadContent() {
 
   // ---- Lookups + reverse indexes (mirror of the prototype helpers) ----
   const phase = (id) => phases.find((p) => p.id === id);
+  // Walk phase → subphase → activity so a resolved activity carries both its
+  // phase and the subphase it sits in (the subphase is derived from the activity,
+  // never stored on the use case). Returns null if the id resolves to no activity.
   const activity = (id) => {
     for (const p of phases) {
-      const a = p.activities.find((x) => x.id === id);
-      if (a) return { ...a, phase: p };
+      for (const s of p.subphases) {
+        const a = s.activities.find((x) => x.id === id);
+        if (a) return { ...a, phase: p, subphase: s };
+      }
+    }
+    return null;
+  };
+  const subphase = (id) => {
+    for (const p of phases) {
+      const s = p.subphases.find((x) => x.id === id);
+      if (s) return { ...s, phase: p };
     }
     return null;
   };
@@ -102,6 +114,12 @@ export function loadContent() {
 
   const ucByPhase = (pid) => usecases.filter((u) => u.placement.phase === pid);
   const ucByActivity = (aid) => usecases.filter((u) => u.placement.activity === aid);
+  const ucBySubphase = (sid) => {
+    const s = subphase(sid);
+    if (!s) return [];
+    const ids = new Set(s.activities.map((a) => a.id));
+    return usecases.filter((u) => ids.has(u.placement.activity));
+  };
   const ucByTechnique = (tid) => usecases.filter((u) => u.techniques.includes(tid));
   const techCount = (tid) => ucByTechnique(tid).length;
 
@@ -128,11 +146,13 @@ export function loadContent() {
     about,
     phase,
     activity,
+    subphase,
     technique,
     usecase,
     aboutPage,
     ucByPhase,
     ucByActivity,
+    ucBySubphase,
     ucByTechnique,
     techCount,
     techniquesInPhase,

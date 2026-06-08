@@ -1,5 +1,5 @@
 {
-  "_note": "The notional product development lifecycle: stages and their key activities — the SKELETON of the spine (ids, names, order, hue, tagline). Editorial PROSE (canon + the editor's note) lives in content/phases/<id>.md and is merged into the compiled snapshot by `npm run build-content`. Edit either, then run build-content to recompile + validate. ids are stable references used by use cases and by the phase prose files — keep them stable when renaming. Phase numbers and soft tints derive automatically; hue may be omitted to auto-assign from the palette.",
+  "_note": "The notional product development lifecycle: stages → subphases → their key activities — the SKELETON of the spine (ids, names, order, hue, tagline). Hierarchy is lifecycle → phases → subphases → activities. Editorial PROSE (canon + the editor's note) lives in content/phases/<id>.md and is merged into the compiled snapshot by `npm run build-content`; activity-level prose is keyed there by activity id. Edit either, then run build-content to recompile + validate. ids are stable references: use cases place by activity id (the subphase is derived from it), and the phase prose files reference phase + activity ids — keep them stable when renaming. Phase numbers, subphase numbers, and soft tints derive automatically; hue may be omitted to auto-assign from the palette. NOTE: subphase names below are a first-draft scaffold — rename them and grow each to its real 5–10 activities here. (A phase may still use a flat \"activities\" array instead of \"subphases\"; it compiles as a single implicit subphase.)",
   "phases": [
     {
       "id": "discover",
@@ -7,13 +7,34 @@
       "hue": "#2d6a6a",
       "soft": "#ecf2ef",
       "tagline": "Understand the problem and decide what to build.",
-      "activities": [
-        { "id": "d-research", "name": "Customer research" },
-        { "id": "d-framing", "name": "Problem framing" },
-        { "id": "d-sensing", "name": "Market & competitive sensing" },
-        { "id": "d-sizing", "name": "Opportunity sizing" },
-        { "id": "d-specs", "name": "Requirements & specs" },
-        { "id": "d-prioritize", "name": "Prioritization" }
+      "subphases": [
+        {
+          "id": "understand",
+          "name": "Understand",
+          "tagline": "Get close to the customer and the market.",
+          "activities": [
+            { "id": "d-research", "name": "Customer research" },
+            { "id": "d-sensing", "name": "Market & competitive sensing" }
+          ]
+        },
+        {
+          "id": "frame",
+          "name": "Frame",
+          "tagline": "Turn signal into a stated problem worth solving.",
+          "activities": [
+            { "id": "d-framing", "name": "Problem framing" },
+            { "id": "d-sizing", "name": "Opportunity sizing" }
+          ]
+        },
+        {
+          "id": "define",
+          "name": "Define",
+          "tagline": "Commit to what's in, and in what order.",
+          "activities": [
+            { "id": "d-specs", "name": "Requirements & specs" },
+            { "id": "d-prioritize", "name": "Prioritization" }
+          ]
+        }
       ]
     },
     {
@@ -22,13 +43,34 @@
       "hue": "#4a5a8a",
       "soft": "#e7e9f1",
       "tagline": "Design, prototype, and ship the thing.",
-      "activities": [
-        { "id": "b-design", "name": "Design & prototyping" },
-        { "id": "b-eng", "name": "Engineering" },
-        { "id": "b-review", "name": "Code review & QA" },
-        { "id": "b-decisions", "name": "Technical decisions" },
-        { "id": "b-docs", "name": "Documentation" },
-        { "id": "b-testing", "name": "Testing & evals" }
+      "subphases": [
+        {
+          "id": "design",
+          "name": "Design",
+          "tagline": "Shape the solution and the calls behind it.",
+          "activities": [
+            { "id": "b-design", "name": "Design & prototyping" },
+            { "id": "b-decisions", "name": "Technical decisions" }
+          ]
+        },
+        {
+          "id": "implement",
+          "name": "Implement",
+          "tagline": "Write the code and the docs that explain it.",
+          "activities": [
+            { "id": "b-eng", "name": "Engineering" },
+            { "id": "b-docs", "name": "Documentation" }
+          ]
+        },
+        {
+          "id": "verify",
+          "name": "Verify",
+          "tagline": "Prove it works before it ships.",
+          "activities": [
+            { "id": "b-review", "name": "Code review & QA" },
+            { "id": "b-testing", "name": "Testing & evals" }
+          ]
+        }
       ]
     },
     {
@@ -37,13 +79,34 @@
       "hue": "#3a7a4a",
       "soft": "#e3ede1",
       "tagline": "Launch, learn, and keep it running.",
-      "activities": [
-        { "id": "g-launch", "name": "Launch & GTM" },
-        { "id": "g-enable", "name": "Rollout & enablement" },
-        { "id": "g-analytics", "name": "Analytics & experimentation" },
-        { "id": "g-iterate", "name": "Iteration & optimization" },
-        { "id": "g-ops", "name": "Operations & toil" },
-        { "id": "g-support", "name": "Support & feedback loops" }
+      "subphases": [
+        {
+          "id": "launch",
+          "name": "Launch",
+          "tagline": "Get it into the world and into hands.",
+          "activities": [
+            { "id": "g-launch", "name": "Launch & GTM" },
+            { "id": "g-enable", "name": "Rollout & enablement" }
+          ]
+        },
+        {
+          "id": "measure",
+          "name": "Measure",
+          "tagline": "Learn from real use and act on it.",
+          "activities": [
+            { "id": "g-analytics", "name": "Analytics & experimentation" },
+            { "id": "g-iterate", "name": "Iteration & optimization" }
+          ]
+        },
+        {
+          "id": "operate",
+          "name": "Operate",
+          "tagline": "Keep it healthy and close the loop.",
+          "activities": [
+            { "id": "g-ops", "name": "Operations & toil" },
+            { "id": "g-support", "name": "Support & feedback loops" }
+          ]
+        }
       ]
     }
   ]

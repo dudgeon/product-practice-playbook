@@ -45,6 +45,9 @@ export const asset = (p = '') => rel('assets/' + String(p).replace(/^\/+/, ''));
 export const routes = {
   home: () => rel(TARGET.home),
   phase: (id) => rel(TARGET.phase(id)),
+  // Subphases aren't standalone pages — they're deep-linkable anchored sections
+  // on their phase page (e.g. phase/discover/#understand).
+  subphase: (phaseId, subId) => `${rel(TARGET.phase(phaseId))}#${subId}`,
   activity: (id) => rel(TARGET.activity(id)),
   usecase: (id) => rel(TARGET.usecase(id)),
   technique: (id) => rel(TARGET.technique(id)),

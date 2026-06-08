@@ -43,7 +43,7 @@ A small zero‑framework static‑site generator (plain Node ESM):
 ```
 content/                 ← the source of truth (edit these)
   site.json                site config + home copy
-  lifecycle.json           the spine SKELETON: stages + key activities (ids, names, order, hue, tagline)
+  lifecycle.json           the spine SKELETON: phases → subphases → key activities (ids, names, order, hue, tagline)
   phases/*.md              per-phase editorial prose: canon + the editor's note (merged into the spine)
   techniques.json          the horizontal technique tags
   techniques/*.md          optional: a technique's long-form explanation (overrides the tag)
@@ -94,10 +94,18 @@ That resolves into three tiers:
 | **Taxonomy / skeleton** | JSON, id‑keyed | `lifecycle.json` (the spine), `techniques.json` (tags) |
 | **Prose entities** | Markdown + frontmatter | `usecases/*.md`, `about/*.md`, `phases/*.md`, optional `techniques/*.md` |
 
-So the spine's **structure** (ids, order, hue) is JSON in `lifecycle.json`, while
-its **prose** (canon + the editor's note) is Markdown in `content/phases/<id>.md`
-and merged back into the compiled spine at load time — the same frontmatter‑plus‑
-body shape use cases already use. Full reasoning + the decision record:
+The spine nests four deep — **lifecycle → phase → subphase → key activity**.
+Phases hold **subphases** (named groupings), and subphases hold the **key
+activities**. A use case still places by `activity` alone (activity ids are
+globally unique), so its subphase is *derived*, not stored. Subphases aren't
+their own pages — they render as deep‑linkable anchored sections on the phase
+page (e.g. `phase/discover/#understand`) and as sub‑headers in the home spine.
+
+So the spine's **structure** (ids, order, hue, the subphase grouping) is JSON in
+`lifecycle.json`, while its **prose** (canon + the editor's note) is Markdown in
+`content/phases/<id>.md` and merged back into the compiled spine at load time —
+the same frontmatter‑plus‑body shape use cases already use. Full reasoning + the
+decision record:
 [`docs/data-layer-prd.md`](docs/data-layer-prd.md) and
 [`docs/data-layer-decision.html`](docs/data-layer-decision.html).
 
@@ -131,17 +139,20 @@ the tag's fields and its Markdown body renders as the technique's detail.
 
 ## The lifecycle is data — changing the stages
 
-The product‑development lifecycle (the **stages** and their **key activities**)
-is notional and lives entirely in **`content/lifecycle.json`** — the single
-source of truth for the spine. When the stages or activities change, you don't
-touch templates or CSS:
+The product‑development lifecycle (the **stages**, their **subphases**, and the
+**key activities** within each) is notional and lives entirely in
+**`content/lifecycle.json`** — the single source of truth for the spine. When
+the structure changes, you don't touch templates or CSS:
 
 1. Edit `content/lifecycle.json` for **structure** (add / rename / reorder /
-   recolor phases and activities), and `content/phases/<id>.md` for the
-   **prose** (canon + the editor's note). Keep `id`s stable — use cases and the
-   phase prose files reference them — or omit `id` on a new entry to auto‑slug it
-   from the name. `hue` is optional (auto‑assigned); phase numbers + soft tints
-   are derived. A new phase needs a matching `content/phases/<id>.md`.
+   recolor phases, subphases, and activities — each phase holds `subphases[]`,
+   each subphase holds `activities[]`), and `content/phases/<id>.md` for the
+   **prose** (canon + the editor's note, keyed by activity id). Keep `id`s
+   stable — use cases and the phase prose files reference them — or omit `id` on
+   a new entry to auto‑slug it from the name. `hue` is optional (auto‑assigned);
+   phase + subphase numbers and soft tints are derived. A new phase needs a
+   matching `content/phases/<id>.md`. (A phase may still use a flat `activities[]`
+   instead of `subphases[]`; it compiles as one implicit subphase.)
 2. Run **`npm run build-content`** (or the **`/build-content`** skill). It
    compiles the spine, merges the per‑phase prose, writes the generated
    `content/phases.json` snapshot, and **validates** the content store —
