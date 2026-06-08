@@ -33,12 +33,21 @@ export function softFromHue(hue, amount = 0.12) {
 /**
  * Compile the raw lifecycle.json into the spine the renderer expects.
  * Throws on structural problems (missing names, duplicate ids).
+ *
+ * Hierarchy: phase → subphase → activity. Each compiled phase carries its
+ * `subphases` (the grouped structure the spine + phase page render from) AND a
+ * flattened `activities` list (every lookup, the build loop, and activity pages
+ * read this — so an activity stays addressable by its globally-unique id and a
+ * use case still places by activity alone, with the subphase derived). A phase
+ * may also use a flat `activities` array with no subphases — it compiles as a
+ * single implicit subphase, so older lifecycle.json files keep working.
  */
 export function compileLifecycle(raw) {
   if (!raw || !Array.isArray(raw.phases)) {
     throw new Error('lifecycle.json must be an object with a "phases" array.');
   }
   const seenPhase = new Set();
+  const seenSubphase = new Set();
   const seenActivity = new Set();
 
   const phases = raw.phases.map((p, i) => {
@@ -51,15 +60,45 @@ export function compileLifecycle(raw) {
     const hue = isHex(p.hue) ? p.hue : DEFAULT_PALETTE[i % DEFAULT_PALETTE.length];
     const soft = isHex(p.soft) ? p.soft : softFromHue(hue);
 
-    const activities = (p.activities || []).map((a, j) => {
-      if (!a.name) throw new Error(`Activity #${j + 1} in phase "${id}" is missing a name.`);
+    const compileActivity = (a, j, where) => {
+      if (!a.name) throw new Error(`Activity #${j + 1} in ${where} is missing a name.`);
       const aid = a.id || slug(a.name);
       if (seenActivity.has(aid)) throw new Error(`Duplicate activity id "${aid}".`);
       seenActivity.add(aid);
       const out = { id: aid, name: a.name, canon: a.canon ?? null };
       if (a.editor) out.editor = a.editor;
       return out;
+    };
+
+    // New shape: subphases[] each holding activities[]. Back-compat: a flat
+    // activities[] becomes one implicit subphase carrying the phase's identity.
+    const rawSubs = Array.isArray(p.subphases)
+      ? p.subphases
+      : [{ id, name: p.name, activities: p.activities || [], implicit: true }];
+
+    const subphases = rawSubs.map((s, k) => {
+      if (!s.name) throw new Error(`Subphase #${k + 1} in phase "${id}" is missing a name.`);
+      const sid = s.id || slug(s.name);
+      if (!sid) throw new Error(`Subphase #${k + 1} in phase "${id}" could not derive an id.`);
+      if (seenSubphase.has(sid)) throw new Error(`Duplicate subphase id "${sid}".`);
+      seenSubphase.add(sid);
+      const activities = (s.activities || []).map((a, j) =>
+        compileActivity(a, j, `subphase "${sid}"`)
+      );
+      return {
+        id: sid,
+        n: `${String(i + 1).padStart(2, '0')}.${k + 1}`,
+        name: s.name,
+        tagline: s.tagline || '',
+        canon: s.canon ?? null,
+        editor: s.editor ?? null,
+        implicit: !!s.implicit,
+        activities,
+      };
     });
+
+    // Flattened view — the spine's leaf list, in order, across all subphases.
+    const activities = subphases.flatMap((s) => s.activities);
 
     return {
       id,
@@ -70,6 +109,7 @@ export function compileLifecycle(raw) {
       tagline: p.tagline || '',
       canon: p.canon ?? null,
       editor: p.editor ?? null,
+      subphases,
       activities,
     };
   });

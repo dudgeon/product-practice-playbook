@@ -192,17 +192,25 @@ export function spineBoard() {
           `<a class="phase-head-link" href="${routes.phase(p.id)}"><div class="phase-name">${esc(p.name)}</div></a>` +
           `<div class="phase-tag">${esc(p.tagline)}</div>` +
           `<div class="activity-list">` +
-          p.activities
-            .map((a) => {
-              const n = DB.ucByActivity(a.id).length;
-              const end = DB.activityEndorsed(a.id);
-              return (
-                `<a class="${cx('activity-row', n === 0 && 'empty')}" href="${routes.activity(a.id)}">` +
-                `<span class="a-name row" style="gap:7px">` +
-                when(end, () => `<span class="endorse-dot" title="Has PDLC-endorsed practice"></span>`) +
-                `${esc(a.name)}</span>` +
-                `<span class="a-count">${n || '—'}</span></a>`
-              );
+          p.subphases
+            .map((s) => {
+              const rows = s.activities
+                .map((a) => {
+                  const n = DB.ucByActivity(a.id).length;
+                  const end = DB.activityEndorsed(a.id);
+                  return (
+                    `<a class="${cx('activity-row', n === 0 && 'empty')}" href="${routes.activity(a.id)}">` +
+                    `<span class="a-name row" style="gap:7px">` +
+                    when(end, () => `<span class="endorse-dot" title="Has PDLC-endorsed practice"></span>`) +
+                    `${esc(a.name)}</span>` +
+                    `<span class="a-count">${n || '—'}</span></a>`
+                  );
+                })
+                .join('');
+              // Implicit subphases (a flat-activities phase) carry no real label.
+              return s.implicit
+                ? rows
+                : `<a class="subphase-head" href="${routes.subphase(p.id, s.id)}">${esc(s.name)}</a>${rows}`;
             })
             .join('') +
           `</div></div>`

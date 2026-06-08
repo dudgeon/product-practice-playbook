@@ -41,6 +41,7 @@ try {
   process.exit(1);
 }
 const { phases, phaseProse } = db;
+const subphaseCount = phases.reduce((a, p) => a + p.subphases.filter((s) => !s.implicit).length, 0);
 const activityCount = phases.reduce((a, p) => a + p.activities.length, 0);
 
 // 1b. Validate the per-phase prose (every phase has its file; no stray files or
@@ -55,8 +56,8 @@ if (proseErrors.length) {
 // 2. Materialize the compiled + merged spine snapshot.
 fs.writeFileSync(path.join(CONTENT, 'phases.json'), JSON.stringify(phases, null, 2) + '\n');
 console.log(
-  `Compiled spine: ${c.bold(phases.length + ' phases')}, ${c.bold(activityCount + ' activities')}, ` +
-    `${c.bold(Object.keys(phaseProse).length + ' prose files')} ` +
+  `Compiled spine: ${c.bold(phases.length + ' phases')}, ${c.bold(subphaseCount + ' subphases')}, ` +
+    `${c.bold(activityCount + ' activities')}, ${c.bold(Object.keys(phaseProse).length + ' prose files')} ` +
     `→ wrote content/phases.json ${c.dim('(generated snapshot)')}\n`
 );
 
@@ -80,6 +81,12 @@ for (const p of phases) {
     `  ${p.n} ${p.name.padEnd(12)} ${String(total).padStart(2)} use case(s) across ${p.activities.length} activities` +
       (empty.length ? c.dim(`  · empty: ${empty.join(', ')}`) : c.green('  · full'))
   );
+  for (const s of p.subphases.filter((x) => !x.implicit)) {
+    const sTotal = db.ucBySubphase(s.id).length;
+    console.log(
+      c.dim(`     ${s.n} ${s.name.padEnd(12)} ${String(sTotal).padStart(2)} uc · ${s.activities.length} activities`)
+    );
+  }
 }
 const emptyTechs = db.techniques.filter((t) => db.ucByTechnique(t.id).length === 0).map((t) => '#' + t.name);
 console.log(

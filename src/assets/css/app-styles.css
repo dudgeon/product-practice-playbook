@@ -221,6 +221,25 @@
 .phase-progress .pp { flex: 1; height: 4px; border-radius: 2px; background: var(--rule-2); cursor: pointer; }
 .phase-progress .pp.on { background: var(--phase); }
 
+/* subphase groups on the phase page (anchored, deep-linkable sections) */
+.subphase-group { margin-top: 22px; scroll-margin-top: 84px; }
+.subphase-group:first-of-type { margin-top: 10px; }
+.subphase-bar {
+  display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap;
+  padding: 0 16px 8px; margin-bottom: 4px; border-bottom: 1px solid var(--rule);
+}
+.subphase-bar .sp-n {
+  font-family: var(--mono); font-size: 11px; color: var(--phase, var(--ink-4)); margin-right: 9px;
+}
+.subphase-bar .sp-name {
+  font-family: var(--serif); font-size: 18px; font-weight: 500; color: var(--ink); letter-spacing: -0.01em;
+}
+.subphase-bar .sp-tag { font-size: 13px; color: var(--ink-3); flex: 1; min-width: 140px; }
+.subphase-bar .sp-meta {
+  font-family: var(--mono); font-size: 10.5px; text-transform: uppercase;
+  letter-spacing: 0.08em; color: var(--ink-4); margin-left: auto;
+}
+
 /* activity index list on phase page */
 .act-index { display: flex; flex-direction: column; gap: 2px; }
 .act-item {

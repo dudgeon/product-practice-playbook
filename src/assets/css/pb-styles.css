@@ -134,6 +134,16 @@
 }
 .phase-tag { font-size: 13px; color: var(--ink-3); line-height: 1.5; margin-bottom: 16px; min-height: 40px; }
 .activity-list { display: flex; flex-direction: column; gap: 2px; }
+/* Subphase sub-header inside a spine column. */
+.subphase-head {
+  display: block; margin: 12px 0 3px; padding: 0 12px;
+  font-family: var(--mono); font-size: 10px; font-weight: 500;
+  text-transform: uppercase; letter-spacing: 0.12em;
+  color: var(--phase, var(--ink-3)); text-decoration: none;
+  border-left: 2px solid var(--phase, var(--rule-2));
+}
+.subphase-head:first-child { margin-top: 2px; }
+.subphase-head:hover { opacity: 0.7; }
 .activity-row {
   display: flex; align-items: baseline; justify-content: space-between;
   gap: 10px; padding: 9px 12px; border-radius: 7px;

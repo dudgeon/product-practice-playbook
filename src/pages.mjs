@@ -81,16 +81,35 @@ export function phasePage(db, p) {
     )
     .join('');
 
-  const actIndex = p.activities
-    .map((a, i) => {
-      const n = db.ucByActivity(a.id).length;
-      const isEndorsed = db.activityEndorsed(a.id);
+  const actRow = (a, i) => {
+    const n = db.ucByActivity(a.id).length;
+    const isEndorsed = db.activityEndorsed(a.id);
+    return (
+      `<a class="act-item" href="${routes.activity(a.id)}">` +
+      `<span class="ai-n">${pad2(i + 1)}</span>` +
+      `<div><div class="row" style="gap:9px"><span class="ai-name">${esc(a.name)}</span>${when(isEndorsed, () => endorsed())}</div>` +
+      `<div class="ai-canon${a.canon ? '' : ' silent'}">${esc(a.canon || 'The protocol is silent here.')}</div></div>` +
+      `<div class="ai-meta"><span class="ai-count">${n ? plural(n, 'use case') : 'No practice yet'}</span><span class="arrow">${arrowR()}</span></div></a>`
+    );
+  };
+
+  // Group the index by subphase, with each group an anchored, deep-linkable
+  // section (phase/<id>/#<subphase>). Activity numbers run continuously across
+  // the phase so they still match the activity page's "ACTIVITY NN".
+  let gi = 0;
+  const actIndex = p.subphases
+    .map((s) => {
+      const rows = s.activities.map((a) => actRow(a, gi++)).join('');
+      if (s.implicit) return `<div class="act-index">${rows}</div>`;
+      const ucs = db.ucBySubphase(s.id).length;
       return (
-        `<a class="act-item" href="${routes.activity(a.id)}">` +
-        `<span class="ai-n">${pad2(i + 1)}</span>` +
-        `<div><div class="row" style="gap:9px"><span class="ai-name">${esc(a.name)}</span>${when(isEndorsed, () => endorsed())}</div>` +
-        `<div class="ai-canon${a.canon ? '' : ' silent'}">${esc(a.canon || 'The protocol is silent here.')}</div></div>` +
-        `<div class="ai-meta"><span class="ai-count">${n ? plural(n, 'use case') : 'No practice yet'}</span><span class="arrow">${arrowR()}</span></div></a>`
+        `<section class="subphase-group" id="${esc(s.id)}">` +
+        `<div class="subphase-bar">` +
+        `<div><span class="sp-n">${esc(s.n)}</span><span class="sp-name">${esc(s.name)}</span></div>` +
+        when(s.tagline, () => `<span class="sp-tag">${esc(s.tagline)}</span>`) +
+        `<span class="sp-meta">${plural(s.activities.length, 'activity').replace('activitys', 'activities')} · ${plural(ucs, 'use case')}</span>` +
+        `</div>` +
+        `<div class="act-index">${rows}</div></section>`
       );
     })
     .join('');
@@ -115,7 +134,7 @@ export function phasePage(db, p) {
       count: p.activities.length,
       right: addLink({ label: p.name, children: '+ Add to this phase' }),
     }) +
-    `<div class="act-index">${actIndex}</div>` +
+    actIndex +
     when(
       techs.length > 0,
       () =>
@@ -141,6 +160,9 @@ export function activityPage(db, a) {
     crumbs([
       { label: 'Lifecycle', href: routes.home() },
       { label: p.name, href: routes.phase(p.id), cls: 'phase', style: `color:${p.hue}` },
+      ...(a.subphase && !a.subphase.implicit
+        ? [{ label: a.subphase.name, href: routes.subphase(p.id, a.subphase.id) }]
+        : []),
       { label: a.name, style: 'color:var(--ink-2)' },
     ]) +
     `<div class="phase-hero" style="padding-bottom:18px">` +
@@ -205,7 +227,12 @@ export function usecasePage(db, u) {
     `<div style="margin-top:10px;font-size:12px;color:var(--ink-3);line-height:1.5">The approach is aggregated on each technique page.</div></div>` +
     `<div class="side-box tinted"><div class="sb-label">Placed on the spine</div>` +
     `<div class="row" style="gap:9px"><span class="phase-dot" style="background:${p.hue};width:12px;height:12px;box-shadow:none"></span>` +
-    `<span style="font-size:13.5px"><a href="${routes.phase(p.id)}"><strong>${esc(p.name)}</strong></a> › <a href="${routes.activity(act.id)}">${esc(act.name)}</a></span></div></div>` +
+    `<span style="font-size:13.5px"><a href="${routes.phase(p.id)}"><strong>${esc(p.name)}</strong></a> › ` +
+    when(
+      act.subphase && !act.subphase.implicit,
+      () => `<a href="${routes.subphase(p.id, act.subphase.id)}">${esc(act.subphase.name)}</a> › `
+    ) +
+    `<a href="${routes.activity(act.id)}">${esc(act.name)}</a></span></div></div>` +
     `<div class="side-box"><div class="sb-label">Tools</div><div class="wrap">${u.tools.map((t) => `<span class="tag">${esc(t)}</span>`).join('')}</div></div>` +
     `<div class="side-box"><div class="sb-label">Contributed by</div>${author(u.author, 'Submitting team')}</div>`;
 
@@ -214,6 +241,9 @@ export function usecasePage(db, u) {
     crumbs([
       { label: 'Lifecycle', href: routes.home() },
       { label: p.name, href: routes.phase(p.id), cls: 'phase', style: `color:${p.hue}` },
+      ...(act.subphase && !act.subphase.implicit
+        ? [{ label: act.subphase.name, href: routes.subphase(p.id, act.subphase.id) }]
+        : []),
       { label: act.name, href: routes.activity(act.id) },
     ]) +
     `<div class="leaf" style="margin-top:8px">` +
