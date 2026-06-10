@@ -16,6 +16,9 @@ import {
   home,
   phasePage,
   activityPage,
+  enablersIndex,
+  trackPage,
+  enablerPage,
   usecasePage,
   techniquePage,
   techniquesIndex,
@@ -98,12 +101,15 @@ function notFoundPage(site) {
 `;
 }
 
-// Phase-keyed CSS derived from the lifecycle so adding/renaming/recoloring a
-// stage Just Works: hue tokens, the featured-card soft gradient, the --phase
-// var per phase, and the home spine rail gradient across all phases.
-function lifecycleCss(phases) {
-  const tokens = phases.map((p) => `  --${p.id}: ${p.hue}; --${p.id}-soft: ${p.soft};`).join('\n');
-  const rules = phases
+// Spine-keyed CSS derived from the lifecycle + enablement taxonomies so
+// adding/renaming/recoloring a stage or track Just Works: hue tokens, the
+// featured-card soft gradient, the --phase var per root, and the home spine
+// rail gradient across the lifecycle phases (the enabler board inlines its
+// own rail from track hues).
+function spineCss(phases, tracks = []) {
+  const roots = [...phases, ...tracks];
+  const tokens = roots.map((p) => `  --${p.id}: ${p.hue}; --${p.id}-soft: ${p.soft};`).join('\n');
+  const rules = roots
     .map(
       (p) =>
         `.phase-col.pc-${p.id}, .uc-card.p-${p.id}, .feat-card.p-${p.id} { --phase: var(--${p.id}); }\n` +
@@ -111,7 +117,7 @@ function lifecycleCss(phases) {
     )
     .join('\n');
   const rail = `.spine-rail { background: linear-gradient(90deg, ${phases.map((p) => p.hue).join(', ')}); }`;
-  return `/* Generated from content/lifecycle.json by the build — do not edit. */\n:root {\n${tokens}\n}\n${rules}\n${rail}\n`;
+  return `/* Generated from content/lifecycle.json + content/enablers.json by the build — do not edit. */\n:root {\n${tokens}\n}\n${rules}\n${rail}\n`;
 }
 
 function build() {
@@ -146,11 +152,38 @@ function build() {
     }
   }
 
+  // ---- The enablement spine (the second axis) ----
+  if (db.tracks.length) {
+    render('enablers', {
+      title: `Enablers · ${db.site.title}`,
+      description:
+        'The second axis — what platform, process, data, and product owners owe the org so agents get traction.',
+      nav: 'enablers',
+      mainFn: () => enablersIndex(db),
+    });
+    for (const t of db.tracks) {
+      render(`track/${t.id}`, {
+        title: `${t.name} · ${db.site.title}`,
+        description: t.tagline,
+        nav: 'enablers',
+        mainFn: () => trackPage(db, t),
+      });
+      for (const e of t.enablers) {
+        render(`enabler/${e.id}`, {
+          title: `${e.name} · ${t.name} · ${db.site.title}`,
+          description: e.canon || `${e.name} — ${t.name}.`,
+          nav: 'enablers',
+          mainFn: () => enablerPage(db, db.enabler(e.id)),
+        });
+      }
+    }
+  }
+
   for (const u of db.usecases) {
     render(`use-case/${u.id}`, {
       title: `${u.title} · ${db.site.title}`,
       description: u.goal,
-      nav: 'lifecycle',
+      nav: u.placement.track ? 'enablers' : 'lifecycle',
       mainFn: () => usecasePage(db, u),
     });
   }
@@ -198,8 +231,8 @@ function build() {
 
   // ---- Assets ----
   fs.cpSync(path.join(ROOT, 'src', 'assets'), path.join(DIST, 'assets'), { recursive: true });
-  // Phase-keyed CSS derived from the lifecycle (written after the static copy).
-  fs.writeFileSync(path.join(DIST, 'assets', 'css', 'lifecycle.css'), lifecycleCss(db.phases));
+  // Spine-keyed CSS derived from both taxonomies (written after the static copy).
+  fs.writeFileSync(path.join(DIST, 'assets', 'css', 'lifecycle.css'), spineCss(db.phases, db.tracks));
 
   console.log(`Built ${pageCount} pages → dist/ (relative links; portable)`);
 }

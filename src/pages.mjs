@@ -13,12 +13,14 @@ import {
   editorNote,
   practiceHead,
   techTag,
+  enablerTag,
   author,
   useCaseCard,
   featCard,
   techChip,
   techBoard,
   spineBoard,
+  trackBoard,
   crumbs,
   addLink,
 } from './components.mjs';
@@ -26,6 +28,23 @@ import {
 const pad2 = (n) => String(n).padStart(2, '0');
 const plural = (n, word) => `${n} ${word}${n === 1 ? '' : 's'}`;
 const ucGrid = (ucs) => `<div class="uc-grid">${ucs.map((u) => useCaseCard(u)).join('')}</div>`;
+
+// The enablement spine carries no endorsements yet (locked decision D5) —
+// every shelf page wears this quietly instead of the seal machinery.
+const provisionalPill = () =>
+  `<span class="note-pill">Provisional — no endorsements on this spine yet</span>`;
+
+// Submit-affordance config for the enablement shelf: same loop, different
+// scoped issue template. Placement remains the editor's curation step.
+const enablerAdd = (label, children) =>
+  addLink({
+    label,
+    template: 'enabler.yml',
+    labels: 'enabler',
+    scope: 'track › enabler',
+    verb: 'Propose an enabler',
+    children,
+  });
 
 const emptyState = (title, body, link) =>
   `<div class="side-box tinted" style="border-style:dashed;text-align:center;padding:34px 24px">` +
@@ -191,10 +210,166 @@ export function activityPage(db, a) {
   );
 }
 
+// ---------------------------------------------------------- ENABLERS IX -----
+export function enablersIndex(db) {
+  return (
+    `<div class="fade-in"><div class="wrap-wide">` +
+    `<div class="home-hero" style="padding:40px 0 14px">` +
+    `<div class="kicker-mono" style="margin-bottom:12px">The second axis</div>` +
+    `<div class="pb-h1" style="font-size:40px">Enablers</div>` +
+    `<p class="pb-lede" style="margin-top:14px">What platform, process, data, and product owners owe the org so everyone else's agents get traction — work that makes building easier even when nothing is being built. Each enabler collects the practice that meets it, and lifecycle use cases cite the enablers they lean on.</p>` +
+    `<div style="margin-top:16px">${provisionalPill()}</div>` +
+    `</div>` +
+    trackBoard() +
+    `<div class="row" style="justify-content:flex-end;margin-top:10px">${enablerAdd(null, '+ Propose an enabler')}</div>` +
+    `<p class="kicker-mono" style="margin-top:14px;color:var(--ink-4);text-transform:none;letter-spacing:0;font-size:12px">The tracks are emergent — flat for now, firming into areas as enablers cluster. Expectations stay proposals until there's an authority to endorse them.</p>` +
+    `</div></div>`
+  );
+}
+
+// ----------------------------------------------------------------- TRACK ----
+export function trackPage(db, t) {
+  const idx = db.tracks.findIndex((x) => x.id === t.id);
+  const next = db.tracks[idx + 1];
+  const prev = db.tracks[idx - 1];
+  const techs = db.techniquesInTrack(t.id);
+
+  const progress = db.tracks
+    .map(
+      (x) =>
+        `<a class="pp${x.id === t.id ? ' on' : ''}" style="${x.id === t.id ? `background:${t.hue}` : ''}" href="${routes.track(x.id)}" aria-label="Go to ${esc(x.name)}"></a>`
+    )
+    .join('');
+
+  const enbRow = (e, i) => {
+    const n = db.ucByEnabler(e.id).length;
+    const unlocks = db.ucEnabledBy(e.id).length;
+    return (
+      `<a class="act-item" href="${routes.enabler(e.id)}">` +
+      `<span class="ai-n">${pad2(i + 1)}</span>` +
+      `<div><div class="row" style="gap:9px"><span class="ai-name">${esc(e.name)}</span></div>` +
+      `<div class="ai-canon${e.canon ? '' : ' silent'}">${esc(e.canon || 'No expectation drafted yet.')}</div></div>` +
+      `<div class="ai-meta"><span class="ai-count">${n ? plural(n, 'use case') : 'No practice yet'}${unlocks ? ` · unlocks ${unlocks}` : ''}</span><span class="arrow">${arrowR()}</span></div></a>`
+    );
+  };
+
+  // Group the index by area, with each group an anchored, deep-linkable
+  // section (track/<id>/#<area>) — flat tracks render one unlabeled run.
+  let gi = 0;
+  const enbIndex = t.areas
+    .map((ar) => {
+      const rows = ar.enablers.map((e) => enbRow(e, gi++)).join('');
+      if (ar.implicit) return `<div class="act-index">${rows}</div>`;
+      const n = ar.enablers.reduce((a, e) => a + db.ucByEnabler(e.id).length, 0);
+      return (
+        `<section class="subphase-group" id="${esc(ar.id)}">` +
+        `<div class="subphase-bar">` +
+        `<div><span class="sp-n">${esc(ar.n)}</span><span class="sp-name">${esc(ar.name)}</span></div>` +
+        when(ar.tagline, () => `<span class="sp-tag">${esc(ar.tagline)}</span>`) +
+        `<span class="sp-meta">${plural(ar.enablers.length, 'enabler')} · ${plural(n, 'use case')}</span>` +
+        `</div>` +
+        `<div class="act-index">${rows}</div></section>`
+      );
+    })
+    .join('');
+
+  return (
+    `<div class="wrap-narrow fade-in" style="--phase:${t.hue}">` +
+    crumbs([
+      { label: 'Enablers', href: routes.enablers() },
+      { label: `Track ${t.n} · ${t.name}`, cls: 'phase', style: `color:${t.hue}` },
+    ]) +
+    `<div class="phase-hero">` +
+    `<div class="ph-num">TRACK ${esc(t.n)} OF ${pad2(db.tracks.length)}</div>` +
+    `<div class="ph-title"><span class="ph-dot" style="background:${t.hue}"></span><h1 style="color:${t.hue}">${esc(t.name)}</h1></div>` +
+    `<p class="pb-lede">${esc(t.tagline)}</p>` +
+    `<div class="row" style="margin-top:14px">${provisionalPill()}</div>` +
+    `<div class="phase-progress">${progress}</div></div>` +
+    canon({ text: t.canon, label: 'The expectation · proposed' }) +
+    `<div style="height:24px"></div>` +
+    editorNote({ text: t.editor }) +
+    `<div class="divider"></div>` +
+    practiceHead({
+      title: `Enablers for ${t.name.toLowerCase()}`,
+      count: t.enablers.length,
+      right: enablerAdd(t.name, '+ Propose an enabler here'),
+    }) +
+    enbIndex +
+    when(
+      techs.length > 0,
+      () =>
+        `<div class="section-gap"><div class="pb-rail-label">Techniques seen across ${esc(t.name)}</div>${techBoard(techs)}</div>`
+    ) +
+    `<div class="divider"></div>` +
+    `<div class="row" style="justify-content:space-between">` +
+    (prev ? `<a href="${routes.track(prev.id)}" class="btn ghost sm">← ${esc(prev.name)}</a>` : `<span></span>`) +
+    (next ? `<a href="${routes.track(next.id)}" class="btn ghost sm">${esc(next.name)} →</a>` : `<span></span>`) +
+    `</div></div>`
+  );
+}
+
+// --------------------------------------------------------------- ENABLER ----
+export function enablerPage(db, e) {
+  const t = e.track;
+  const ucs = db.ucByEnabler(e.id);
+  const unlocks = db.ucEnabledBy(e.id);
+  const techs = db.techniquesInEnabler(e.id);
+  const eIdx = t.enablers.findIndex((x) => x.id === e.id);
+
+  return (
+    `<div class="wrap-narrow fade-in" style="--phase:${t.hue}">` +
+    crumbs([
+      { label: 'Enablers', href: routes.enablers() },
+      { label: t.name, href: routes.track(t.id), cls: 'phase', style: `color:${t.hue}` },
+      ...(e.area && !e.area.implicit
+        ? [{ label: e.area.name, href: routes.area(t.id, e.area.id) }]
+        : []),
+      { label: e.name, style: 'color:var(--ink-2)' },
+    ]) +
+    `<div class="phase-hero" style="padding-bottom:18px">` +
+    `<div class="ph-num" style="color:${t.hue}">${esc(t.name.toUpperCase())} · ENABLER ${pad2(eIdx + 1)}</div>` +
+    `<div class="ph-title" style="margin:10px 0 12px"><h1 style="font-size:38px;color:var(--ink)">${esc(e.name)}</h1></div>` +
+    `<div class="row">${provisionalPill()}</div></div>` +
+    canon({
+      text: e.canon,
+      label: 'The expectation · proposed',
+      silent: 'No expectation drafted yet — this enabler is still forming.',
+    }) +
+    when(e.editor, () => `<div style="height:24px"></div>` + editorNote({ text: e.editor, compact: true })) +
+    `<div class="divider"></div>` +
+    practiceHead({
+      title: 'How teams met it',
+      count: ucs.length,
+      right: enablerAdd(`${t.name} · ${e.name}`, '+ Show how you met it'),
+    }) +
+    (ucs.length
+      ? ucGrid(ucs)
+      : emptyState(
+          'No practice documented yet.',
+          'The expectation is drafted, but nobody has shown the work. Met it? Add the worked example.',
+          enablerAdd(`${t.name} · ${e.name}`, '+ Add the first one')
+        )) +
+    when(
+      unlocks.length > 0,
+      () =>
+        `<div class="section-gap"><div class="pb-rail-label">Lifecycle use cases this unlocks</div>${ucGrid(unlocks)}` +
+        `<p class="kicker-mono" style="margin-top:12px;color:var(--ink-4);text-transform:none;letter-spacing:0;font-size:12px">Declared by their authors via enabled_by — the demand signal for this expectation.</p></div>`
+    ) +
+    when(
+      techs.length > 0,
+      () => `<div class="section-gap"><div class="pb-rail-label">Techniques used here</div>${techBoard(techs)}</div>`
+    ) +
+    `</div>`
+  );
+}
+
 // -------------------------------------------------------------- USE CASE ----
 export function usecasePage(db, u) {
-  const p = db.phase(u.placement.phase);
-  const act = db.activity(u.placement.activity);
+  // One entity, two spines: `p`/`act` are phase/activity on the lifecycle,
+  // track/enabler on the enablement spine. Same anatomy either way.
+  const onEnablement = !!u.placement.track;
+  const p = onEnablement ? db.track(u.placement.track) : db.phase(u.placement.phase);
+  const act = onEnablement ? db.enabler(u.placement.enabler) : db.activity(u.placement.activity);
 
   const approachExtras =
     when(
@@ -215,6 +390,34 @@ export function usecasePage(db, u) {
         `</div>`
     );
 
+  const placementBox = onEnablement
+    ? `<div class="side-box tinted"><div class="sb-label">Placed on the spine</div>` +
+      `<div class="row" style="gap:9px"><span class="phase-dot" style="background:${p.hue};width:12px;height:12px;box-shadow:none"></span>` +
+      `<span style="font-size:13.5px"><a href="${routes.track(p.id)}"><strong>${esc(p.name)}</strong></a> › ` +
+      when(
+        act.area && !act.area.implicit,
+        () => `<a href="${routes.area(p.id, act.area.id)}">${esc(act.area.name)}</a> › `
+      ) +
+      `<a href="${routes.enabler(act.id)}">${esc(act.name)}</a></span></div>` +
+      `<div style="margin-top:10px;font-size:12px;color:var(--ink-3);line-height:1.5">An enabling use case — practice that meets an expectation, rather than work in a lifecycle phase.</div></div>`
+    : `<div class="side-box tinted"><div class="sb-label">Placed on the spine</div>` +
+      `<div class="row" style="gap:9px"><span class="phase-dot" style="background:${p.hue};width:12px;height:12px;box-shadow:none"></span>` +
+      `<span style="font-size:13.5px"><a href="${routes.phase(p.id)}"><strong>${esc(p.name)}</strong></a> › ` +
+      when(
+        act.subphase && !act.subphase.implicit,
+        () => `<a href="${routes.subphase(p.id, act.subphase.id)}">${esc(act.subphase.name)}</a> › `
+      ) +
+      `<a href="${routes.activity(act.id)}">${esc(act.name)}</a></span></div></div>`;
+
+  // The soft edge (locked D4): rendered only when the author declared it —
+  // absence is the expected case, never nagged.
+  const enabledByBox = when(
+    Array.isArray(u.enabled_by) && u.enabled_by.length > 0,
+    () =>
+      `<div class="side-box"><div class="sb-label">Enabled by</div><div class="wrap">${u.enabled_by.map(enablerTag).join('')}</div>` +
+      `<div style="margin-top:10px;font-size:12px;color:var(--ink-3);line-height:1.5">Preconditions this approach leans on.</div></div>`
+  );
+
   const side =
     when(
       u.endorsed,
@@ -225,30 +428,35 @@ export function usecasePage(db, u) {
     ) +
     `<div class="side-box"><div class="sb-label">Techniques</div><div class="wrap">${u.techniques.map(techTag).join('')}</div>` +
     `<div style="margin-top:10px;font-size:12px;color:var(--ink-3);line-height:1.5">The approach is aggregated on each technique page.</div></div>` +
-    `<div class="side-box tinted"><div class="sb-label">Placed on the spine</div>` +
-    `<div class="row" style="gap:9px"><span class="phase-dot" style="background:${p.hue};width:12px;height:12px;box-shadow:none"></span>` +
-    `<span style="font-size:13.5px"><a href="${routes.phase(p.id)}"><strong>${esc(p.name)}</strong></a> › ` +
-    when(
-      act.subphase && !act.subphase.implicit,
-      () => `<a href="${routes.subphase(p.id, act.subphase.id)}">${esc(act.subphase.name)}</a> › `
-    ) +
-    `<a href="${routes.activity(act.id)}">${esc(act.name)}</a></span></div></div>` +
+    enabledByBox +
+    placementBox +
     `<div class="side-box"><div class="sb-label">Tools</div><div class="wrap">${u.tools.map((t) => `<span class="tag">${esc(t)}</span>`).join('')}</div></div>` +
     `<div class="side-box"><div class="sb-label">Contributed by</div>${author(u.author, 'Submitting team')}</div>`;
 
+  const crumbItems = onEnablement
+    ? [
+        { label: 'Enablers', href: routes.enablers() },
+        { label: p.name, href: routes.track(p.id), cls: 'phase', style: `color:${p.hue}` },
+        ...(act.area && !act.area.implicit
+          ? [{ label: act.area.name, href: routes.area(p.id, act.area.id) }]
+          : []),
+        { label: act.name, href: routes.enabler(act.id) },
+      ]
+    : [
+        { label: 'Lifecycle', href: routes.home() },
+        { label: p.name, href: routes.phase(p.id), cls: 'phase', style: `color:${p.hue}` },
+        ...(act.subphase && !act.subphase.implicit
+          ? [{ label: act.subphase.name, href: routes.subphase(p.id, act.subphase.id) }]
+          : []),
+        { label: act.name, href: routes.activity(act.id) },
+      ];
+
   return (
     `<div class="wrap-narrow fade-in" style="--phase:${p.hue};max-width:1080px">` +
-    crumbs([
-      { label: 'Lifecycle', href: routes.home() },
-      { label: p.name, href: routes.phase(p.id), cls: 'phase', style: `color:${p.hue}` },
-      ...(act.subphase && !act.subphase.implicit
-        ? [{ label: act.subphase.name, href: routes.subphase(p.id, act.subphase.id) }]
-        : []),
-      { label: act.name, href: routes.activity(act.id) },
-    ]) +
+    crumbs(crumbItems) +
     `<div class="leaf" style="margin-top:8px">` +
     `<div class="leaf-main pcs" style="--phase:${p.hue}">` +
-    `<div class="leaf-meta"><a href="${routes.phase(p.id)}" class="tag lc" style="--phase:${p.hue}">${esc(p.name)} · ${esc(act.name)}</a>` +
+    `<div class="leaf-meta"><a href="${onEnablement ? routes.track(p.id) : routes.phase(p.id)}" class="tag lc" style="--phase:${p.hue}">${esc(p.name)} · ${esc(act.name)}</a>` +
     u.techniques.map(techTag).join('') +
     when(u.endorsed, () => endorsed()) +
     `</div>` +
@@ -270,7 +478,10 @@ export function usecasePage(db, u) {
 export function techniquePage(db, t) {
   const ucs = db.ucByTechnique(t.id);
   const related = db.techniques.filter((x) => x.id !== t.id).slice(0, 6);
-  const phases = new Set(ucs.map((u) => u.placement.phase));
+  // One technique pool, two spines: count the lifecycle and enablement
+  // footprints separately (a use case sits on exactly one).
+  const phases = new Set(ucs.map((u) => u.placement.phase).filter(Boolean));
+  const tracks = new Set(ucs.map((u) => u.placement.track).filter(Boolean));
 
   return (
     `<div class="wrap-narrow fade-in">` +
@@ -284,7 +495,7 @@ export function techniquePage(db, t) {
     `<p class="pb-lede">${esc(t.description)} A horizontal technique — it shows up across the lifecycle wherever a use case applies it. Tag-based for now; related techniques will cluster into families once the patterns settle.</p>` +
     `<div class="row" style="gap:18px;margin-top:4px">` +
     `<span class="kicker-mono" style="text-transform:none;letter-spacing:0">${plural(ucs.length, 'use case')}</span>` +
-    `<span class="kicker-mono" style="text-transform:none;letter-spacing:0">spans ${plural(phases.size, 'phase')}</span>` +
+    `<span class="kicker-mono" style="text-transform:none;letter-spacing:0">spans ${plural(phases.size, 'phase')}${tracks.size ? ` · ${plural(tracks.size, 'track')}` : ''}</span>` +
     `<span style="flex:1"></span>${addLink({ label: t.name, scopeField: 'techniques', children: '+ I used this — add your use case' })}` +
     `</div></div>` +
     when(t.detail, () => `<div class="tech-detail pb-prose">${md(t.detail)}</div>`) +
