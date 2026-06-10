@@ -1,0 +1,809 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>AI PDLC Playbook — The Field IA Proposal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400;1,6..72,500&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#f7f5f0; --bg-elev:#fbfaf6; --bg-card:#fff;
+    --ink:#1a1a1a; --ink-2:#3a3a3a; --ink-3:#6b6b66; --ink-4:#9a9a93;
+    --rule:#e6e3da; --rule-2:#d4d1c7; --muted:#ece9e0;
+    --discover:#2d6a6a; --discover-soft:#ecf2ef;
+    --build:#4a5a8a; --build-soft:#e7e9f1;
+    --grow:#3a7a4a; --grow-soft:#e3ede1;
+    --tr-data:#8a5a3a; --tr-platform:#3a6f8f; --tr-direction:#6a4a8a;
+    --field:#5a6a4a; --field-soft:#edf0e7; --field-line:#cdd5bd;
+    --seal:#9a7b3f; --seal-2:#7c6231; --seal-soft:#f3ecdb; --seal-line:#e4d7b6; --canon-bg:#faf7ef;
+    --warn:#9a3f3f; --warn-soft:#f6e9e6; --warn-line:#e7c9c2;
+    --accent:#2d6a6a; --accent-2:#1f4d4d;
+    --serif:'Newsreader',Georgia,serif; --sans:'IBM Plex Sans',system-ui,sans-serif; --mono:'IBM Plex Mono',ui-monospace,monospace;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:15px;line-height:1.6;-webkit-font-smoothing:antialiased}
+  a{color:var(--accent)}
+  h1,h2,h3,h4{margin:0;font-weight:500;letter-spacing:-.02em;font-family:var(--serif)}
+  p{margin:0 0 14px;max-width:74ch}
+  .mono{font-family:var(--mono)}
+  .eyebrow{font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.14em;color:var(--ink-3)}
+  .dim{color:var(--ink-3)} .b{font-weight:600;color:var(--ink)}
+  code{font-family:var(--mono);font-size:.88em;background:var(--muted);padding:1px 5px;border-radius:4px}
+
+  .wrap{max-width:980px;margin:0 auto;padding:0 clamp(20px,4vw,40px)}
+  section{padding:48px 0;border-bottom:1px solid var(--rule)}
+  section:last-of-type{border-bottom:0}
+  .rail{display:flex;align-items:baseline;gap:12px;margin-bottom:10px}
+  .rail .num{font-family:var(--mono);font-size:12px;color:#fff;background:var(--ink);border-radius:6px;padding:3px 9px}
+  .rail .lab{font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.12em;color:var(--ink-3)}
+  h2.sec{font-size:clamp(24px,3vw,32px);margin:6px 0 14px;letter-spacing:-.025em}
+  h3.sub{font-size:19px;margin:28px 0 10px}
+  .lede{font-size:18px;line-height:1.55;color:var(--ink-2);max-width:70ch}
+
+  .masthead{padding:64px 0 36px;border-bottom:1px solid var(--rule)}
+  .masthead .kick{font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.16em;color:var(--seal-2);margin-bottom:16px}
+  .masthead h1{font-size:clamp(36px,6vw,58px);line-height:1.03;letter-spacing:-.03em}
+  .masthead .tag{font-size:19px;color:var(--ink-2);margin-top:18px;max-width:64ch}
+  .statline{display:flex;flex-wrap:wrap;gap:0;margin-top:30px;border:1px solid var(--rule);border-radius:12px;overflow:hidden;background:var(--bg-card)}
+  .statline .s{flex:1;min-width:130px;padding:15px 18px;border-right:1px solid var(--rule)}
+  .statline .s:last-child{border-right:0}
+  .statline .v{font-family:var(--serif);font-size:24px;line-height:1.1}
+  .statline .l{font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--ink-3);margin-top:7px}
+
+  .callout{border:1px solid var(--rule);background:var(--bg-card);border-radius:12px;padding:18px 20px;margin:18px 0}
+  .callout.rec{background:var(--seal-soft);border-color:var(--seal-line)}
+  .callout.warn{background:var(--warn-soft);border-color:var(--warn-line)}
+  .callout.field{background:var(--field-soft);border-color:var(--field-line)}
+  .callout .h{font-family:var(--mono);font-size:10.5px;text-transform:uppercase;letter-spacing:.1em;color:var(--ink-3);margin-bottom:8px}
+  .callout.rec .h{color:var(--seal-2)} .callout.warn .h{color:var(--warn)} .callout.field .h{color:var(--field)}
+  .callout p:last-child{margin-bottom:0}
+
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+  @media(max-width:760px){.grid3,.grid2{grid-template-columns:1fr}}
+  .card{background:var(--bg-card);border:1px solid var(--rule);border-radius:12px;padding:18px}
+  .card h4{font-family:var(--sans);font-weight:600;font-size:14px;letter-spacing:0;margin-bottom:6px}
+  .card .d{font-size:13px;color:var(--ink-3);line-height:1.5}
+  .pill{display:inline-flex;align-items:center;gap:6px;font-family:var(--mono);font-size:11px;border:1px solid var(--rule-2);background:var(--bg-elev);border-radius:999px;padding:3px 10px;color:var(--ink-2)}
+
+  .tablewrap{overflow-x:auto;border:1px solid var(--rule);border-radius:12px;background:var(--bg-card);margin:18px 0}
+  table.tbl{width:100%;border-collapse:collapse;font-size:13.5px}
+  table.tbl th{font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:.09em;color:var(--ink-3);text-align:left;font-weight:500;padding:12px 14px;border-bottom:1px solid var(--rule-2);background:var(--bg-elev);white-space:nowrap}
+  table.tbl td{padding:12px 14px;border-bottom:1px solid var(--rule);vertical-align:top;line-height:1.5}
+  table.tbl tr:last-child td{border-bottom:0}
+  .ok{color:var(--grow);font-weight:600} .half{color:var(--seal-2);font-weight:600} .no{color:var(--warn);font-weight:600}
+
+  .navmock{display:inline-flex;align-items:center;gap:14px;font-family:var(--mono);font-size:12px;border:1px solid var(--rule);background:var(--bg-elev);border-radius:999px;padding:7px 16px;margin:4px 0 12px;flex-wrap:wrap}
+  .navmock .nv{color:var(--ink-3)}
+  .navmock .new{color:#41502f;font-weight:600;background:var(--field-soft);border:1px solid var(--field);border-radius:999px;padding:1px 9px}
+
+  .option{background:var(--bg-card);border:1px solid var(--rule);border-radius:14px;padding:22px;margin:18px 0}
+  .option.rec{border-color:var(--seal-line);box-shadow:0 0 0 3px var(--seal-soft)}
+  .option .oh{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:4px}
+  .option .ok-letter{font-family:var(--mono);font-size:12px;color:#fff;background:var(--ink);border-radius:6px;padding:2px 8px}
+  .option .ot{font-family:var(--serif);font-size:21px;letter-spacing:-.02em}
+  .option .osub{font-size:13.5px;color:var(--ink-3);margin:2px 0 12px}
+  .endorsed{display:inline-flex;align-items:center;gap:6px;font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--seal-2);background:var(--seal-soft);border:1px solid var(--seal-line);padding:3px 9px;border-radius:999px}
+  .verdicts{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0 12px}
+  .verdicts .v{font-family:var(--mono);font-size:10.5px;border:1px solid var(--rule);background:var(--bg-elev);border-radius:999px;padding:3px 10px;color:var(--ink-2)}
+  .verdicts .v.good{border-color:#cfe0db;background:var(--grow-soft);color:#2c5a38}
+  .verdicts .v.mid{border-color:var(--seal-line);background:var(--seal-soft);color:var(--seal-2)}
+  .verdicts .v.bad{border-color:var(--warn-line);background:var(--warn-soft);color:var(--warn)}
+  .option .meta{font-size:13px;color:var(--ink-3);line-height:1.55}
+  .option .meta .b{color:var(--ink)}
+
+  pre.snip{background:var(--bg-elev);border:1px solid var(--rule);border-radius:12px;padding:16px 18px;font-family:var(--mono);font-size:12px;line-height:1.6;overflow:auto;margin:0 0 14px;color:var(--ink-2)}
+  pre.snip .c{color:var(--ink-4)}
+  pre.snip .k{color:var(--accent-2)}
+  pre.snip .f{color:#41502f}
+
+  .diagram{background:var(--bg-card);border:1px solid var(--rule);border-radius:14px;padding:22px 20px;margin:18px 0;overflow-x:auto}
+  .diagram .cap{font-family:var(--mono);font-size:10.5px;text-transform:uppercase;letter-spacing:.1em;color:var(--ink-3);margin-bottom:16px}
+  svg{display:block;max-width:100%;height:auto;font-family:var(--mono)}
+  svg text{fill:var(--ink-2)}
+  svg .t-mono{font-family:var(--mono);font-size:11px}
+
+  .decision{background:var(--bg-card);border:1px solid var(--rule);border-radius:14px;padding:22px;margin:18px 0}
+  .decision > .q{display:flex;align-items:baseline;gap:10px;margin-bottom:4px}
+  .decision .qn{font-family:var(--mono);font-size:12px;color:#fff;background:var(--accent);border-radius:6px;padding:2px 8px;flex-shrink:0}
+  .decision .qt{font-family:var(--serif);font-size:20px;letter-spacing:-.02em}
+  .decision .qd{font-size:13.5px;color:var(--ink-3);margin:2px 0 16px}
+  .opts{display:grid;gap:10px}
+  .opt{display:flex;gap:12px;align-items:flex-start;border:1px solid var(--rule);border-radius:10px;padding:13px 15px;cursor:pointer;transition:border-color .12s,background .12s}
+  .opt:hover{border-color:var(--rule-2);background:var(--bg-elev)}
+  .opt input{margin-top:3px;accent-color:var(--accent);width:16px;height:16px;flex-shrink:0;cursor:pointer}
+  .opt .ol{font-weight:600;font-size:14px}
+  .opt .od{font-size:13px;color:var(--ink-3);line-height:1.5;margin-top:2px}
+  .opt:has(input:checked){border-color:var(--accent);background:var(--discover-soft);box-shadow:inset 0 0 0 1px var(--accent)}
+  .opt .rectag{font-family:var(--mono);font-size:9.5px;text-transform:uppercase;letter-spacing:.08em;color:var(--seal-2);background:var(--seal-soft);border:1px solid var(--seal-line);padding:1px 7px;border-radius:999px;margin-left:8px;vertical-align:middle}
+  .notes-label{display:block;font-family:var(--mono);font-size:10.5px;text-transform:uppercase;letter-spacing:.1em;color:var(--ink-3);margin:16px 0 6px}
+  textarea{width:100%;font-family:var(--sans);font-size:14px;line-height:1.55;color:var(--ink);background:var(--bg);border:1px solid var(--rule-2);border-radius:9px;padding:11px 13px;resize:vertical;min-height:52px}
+  textarea:focus{outline:none;border-color:var(--accent);background:var(--bg-card)}
+
+  .lockbar{position:sticky;bottom:0;z-index:50;background:var(--bg-elev);border-top:1px solid var(--rule);box-shadow:0 -6px 20px rgba(0,0,0,.04)}
+  .lockbar .inner{max-width:980px;margin:0 auto;padding:14px clamp(20px,4vw,40px);display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+  .lockbar .msg{font-size:13px;color:var(--ink-3);flex:1;min-width:200px}
+  .btn{display:inline-flex;align-items:center;gap:9px;font-family:var(--sans);font-weight:600;font-size:14px;border:0;border-radius:9px;padding:11px 20px;cursor:pointer;text-decoration:none;transition:transform .08s,background .12s}
+  .btn:active{transform:translateY(1px)}
+  .btn-primary{background:var(--accent);color:#fff}
+  .btn-primary:hover{background:var(--accent-2)}
+  .btn-ghost{background:transparent;color:var(--ink-2);border:1px solid var(--rule-2)}
+  .btn-ghost:hover{background:var(--muted)}
+  .btn svg{width:15px;height:15px;display:block}
+
+  .preview-wrap{margin-top:18px}
+  .preview-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:8px}
+  pre.preview{background:#1a1a1a;color:#e8e6df;font-family:var(--mono);font-size:12px;line-height:1.6;border-radius:12px;padding:18px 18px;overflow:auto;max-height:420px;margin:0;white-space:pre-wrap;word-break:break-word}
+  .toast{position:fixed;left:50%;bottom:84px;transform:translateX(-50%) translateY(20px);background:var(--ink);color:#fff;font-size:13px;font-family:var(--mono);padding:10px 18px;border-radius:999px;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;z-index:100}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+  .footnote{font-size:12.5px;color:var(--ink-4);margin-top:8px}
+  ul.tight{margin:0 0 14px;padding-left:20px} ul.tight li{margin:4px 0;max-width:72ch}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+  <!-- MASTHEAD -->
+  <header class="masthead">
+    <div class="kick">AI PDLC Playbook · IA proposal · 2026-06-10</div>
+    <h1>The Field: publish first, curate by pulling</h1>
+    <p class="tag">A per-user namespace where anyone's <span class="b">uncurated</span> use cases live and are linkable the day they're written — with a much lighter placement (just <code>kind: lifecycle | enabling</code>, plus an optional pointer). The curator stops being a gate at intake and becomes a <span class="b">pull</span>: the Field is the pool the curated shelves and the featured strip draw from. This proposal lays out the IA options. Read 01–07, make the calls in 08, lock it at the bottom.</p>
+    <div class="statline">
+      <div class="s"><div class="v">1</div><div class="l">New surface</div></div>
+      <div class="s"><div class="v">3</div><div class="l">Storage models</div></div>
+      <div class="s"><div class="v">4</div><div class="l">Surfacing options</div></div>
+      <div class="s"><div class="v">2</div><div class="l">Intake paths</div></div>
+      <div class="s"><div class="v">6</div><div class="l">Decisions for you</div></div>
+    </div>
+    <div class="callout" style="margin-top:24px">
+      <div class="h">Where this sits in the stack</div>
+      <p style="margin-bottom:0">Builds on the <span class="b">two-spine model</span> just implemented in PR #6 (lifecycle + enablement; one use-case entity; soft <code>enabled_by</code>): field notes may point at <em>either</em> spine, at any altitude. And it <span class="b">reshapes the submission loop</span> the adjacent session is designing — intake becomes two paths (self-publish to your namespace, or an issue for drive-bys), and the curation queue starts reading the Field instead of only the issue tracker. §07 carries the updated coordination asks.</p>
+    </div>
+    <div class="callout field" style="margin-top:14px">
+      <div class="h">Why "the Field"</div>
+      <p style="margin-bottom:0">The site already uses the word. An empty activity page says <em>"This activity is on the spine, but <span class="b">the field</span> hasn't filled it in."</em> The Practice voice is "what teams are doing" — field reports. So the uncurated surface is <span class="b">the Field</span>, an entry is a <span class="b">field note</span>, and promotion is <span class="b">elevation</span> — vocabulary the playbook already speaks. (Rename freely in D6's notes if it doesn't sit right.)</p>
+    </div>
+  </header>
+
+  <!-- 1 — THE PREMISE -->
+  <section id="premise">
+    <div class="rail"><span class="num">01</span><span class="lab">The premise</span></div>
+    <h2 class="sec">The gate is also a bottleneck — and a chill</h2>
+    <p class="lede">Today every visible word passed the editor: a submission is an issue, and it becomes content only when the editor writes the file. That keeps the shelves impeccable — and caps throughput at one person's attention.</p>
+
+    <div class="tablewrap">
+      <table class="tbl">
+        <thead><tr><th></th><th>Today — the gate model</th><th>Proposed — the pull model</th></tr></thead>
+        <tbody>
+          <tr><td class="b">A submission is…</td><td>an issue, waiting in a queue</td><td><span class="b">content</span>, live in your namespace the day you write it</td></tr>
+          <tr><td class="b">Visible when…</td><td>the editor elevates it (or never)</td><td>immediately — unmistakably marked unreviewed</td></tr>
+          <tr><td class="b">Placement burden</td><td>editor does leaf-level placement at intake</td><td>author gives one word (<code>kind</code>) + an optional pointer; leaf placement happens at elevation</td></tr>
+          <tr><td class="b">The curator is…</td><td>a gate — nothing exists until they act</td><td>a <span class="b">pull</span> — the best of the Field gets elevated, voiced, placed</td></tr>
+          <tr><td class="b">Author's stake</td><td>can't link to their own practice</td><td>a durable, linkable record under their name</td></tr>
+          <tr><td class="b">Curated promise</td><td colspan="2">unchanged — the spines and the featured strip stay 100% editor-curated</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <ul class="tight">
+      <li><span class="b">Submissions die in queues.</span> The half-written issue that never became a use case is practice the playbook lost. A namespace makes the default outcome "published rough," not "lost."</li>
+      <li><span class="b">Authors need an address.</span> "Look at my field note" is a different social contract than "I filed an issue" — it gives practice a URL, an owner, and pride of authorship before any editor touches it.</li>
+      <li><span class="b">Curation gets better inputs.</span> The curator browses a living pool — sortable, linkable, already in the file format — instead of reconstructing context from issue threads.</li>
+    </ul>
+
+    <h3 class="sub">Precedents — this pattern has many names</h3>
+    <div class="grid3">
+      <div class="card"><h4>Wiki user namespaces</h4><div class="d">MediaWiki's <code>User:</code> pages — personal space with full publishing rights, clearly outside the encyclopedia proper. Promotion = an editor moves content mainspace-ward.</div></div>
+      <div class="card"><h4>Innersource / fork → upstream</h4><div class="d">Work freely in your fork; upstream pulls what clears the bar. Ownership by path; promotion by pull. The git-native shape of this proposal.</div></div>
+      <div class="card"><h4>Draft → published workflows</h4><div class="d">Every CMS separates workflow state from content. The lesson: make state <em>structural</em> (where it lives), not just a flag someone forgets to check.</div></div>
+      <div class="card"><h4>Digital gardens</h4><div class="d">Personal, perpetually rough notes published without apology — with the polish living elsewhere. The Field is the org's shared garden.</div></div>
+      <div class="card"><h4>Scoped packages</h4><div class="d">npm's <code>@user/pkg</code> — a namespace that grants autonomy precisely because it can't collide with the curated registry's top level.</div></div>
+      <div class="card"><h4>Answer first, curate later</h4><div class="d">Stack Overflow publishes everything instantly; curation (votes, accepted, dupes) is a lens applied after. Visibility and authority are different axes.</div></div>
+    </div>
+  </section>
+
+  <!-- 2 — THE LADDER -->
+  <section id="ladder">
+    <div class="rail"><span class="num">02</span><span class="lab">The entity ladder</span></div>
+    <h2 class="sec">Field note → use case → featured / endorsed</h2>
+    <p class="lede">One anatomy all the way up — Goal → Approach → Impact — so elevation is an <em>edit</em>, never a rewrite from scratch. What changes per rung is structure and authority, not shape.</p>
+
+    <div class="diagram">
+      <div class="cap">The pull model — authorship flows right, provenance points back</div>
+      <svg viewBox="0 0 960 320" role="img" aria-label="Field notes elevate into curated use cases, which can be featured or endorsed">
+        <!-- field -->
+        <rect x="10" y="30" width="300" height="230" rx="12" fill="#edf0e7" stroke="#5a6a4a"/>
+        <text x="26" y="56" class="t-mono" font-size="10" fill="#41502f">THE FIELD — per-user namespaces</text>
+        <text x="26" y="72" class="t-mono" font-size="9" fill="#6b6b66">content/field/&lt;handle&gt;/*.md · unreviewed</text>
+        <rect x="26" y="86" width="268" height="44" rx="8" fill="#fff" stroke="#cdd5bd" stroke-dasharray="5 3"/>
+        <text x="38" y="105" class="t-mono" font-size="10">field note · kind: lifecycle</text>
+        <text x="38" y="121" class="t-mono" font-size="9" fill="#6b6b66">near: g-ops (optional) · @mreyes</text>
+        <rect x="26" y="138" width="268" height="44" rx="8" fill="#fff" stroke="#cdd5bd" stroke-dasharray="5 3"/>
+        <text x="38" y="157" class="t-mono" font-size="10">field note · kind: enabling</text>
+        <text x="38" y="173" class="t-mono" font-size="9" fill="#6b6b66">near: data (optional) · @okafor</text>
+        <rect x="26" y="190" width="268" height="44" rx="8" fill="#fff" stroke="#cdd5bd" stroke-dasharray="5 3"/>
+        <text x="38" y="209" class="t-mono" font-size="10">field note · kind: lifecycle</text>
+        <text x="38" y="225" class="t-mono" font-size="9" fill="#6b6b66">unplaced · @mreyes</text>
+        <text x="26" y="248" class="t-mono" font-size="9" fill="#9a9a93">no seal · no featured · no editor's note</text>
+
+        <!-- pull arrow -->
+        <path d="M310 108 C 360 108, 360 130, 406 130" fill="none" stroke="#9a7b3f" stroke-width="2" marker-end="url(#arP)"/>
+        <text x="358" y="98" text-anchor="middle" class="t-mono" font-size="9.5" fill="#7c6231">the curator pulls:</text>
+        <text x="358" y="112" text-anchor="middle" class="t-mono" font-size="9.5" fill="#7c6231">copy · voice · place</text>
+
+        <!-- curated -->
+        <rect x="410" y="60" width="280" height="160" rx="12" fill="#fbfaf6" stroke="#d4d1c7"/>
+        <text x="426" y="86" class="t-mono" font-size="10" fill="#6b6b66">THE CURATED SHELVES</text>
+        <text x="426" y="102" class="t-mono" font-size="9" fill="#9a9a93">content/usecases/*.md · two spines</text>
+        <rect x="426" y="116" width="248" height="48" rx="8" fill="#fff" stroke="#d4d1c7"/>
+        <text x="438" y="135" class="t-mono" font-size="10">use case · phase + activity</text>
+        <text x="438" y="151" class="t-mono" font-size="9" fill="#6b6b66">techniques · editor's note · voiced</text>
+        <text x="426" y="186" class="t-mono" font-size="9" fill="#7c6231">source: field/mreyes/f-triage-cache</text>
+        <text x="426" y="202" class="t-mono" font-size="9" fill="#9a9a93">provenance, validated both ways</text>
+
+        <!-- provenance backlink -->
+        <path d="M426 192 C 350 230, 330 210, 296 206" fill="none" stroke="#9a9a93" stroke-width="1.3" stroke-dasharray="5 3" marker-end="url(#arG)"/>
+        <text x="362" y="236" text-anchor="middle" class="t-mono" font-size="9" fill="#9a9a93">"Elevated ↑" (derived)</text>
+
+        <!-- elevation states -->
+        <path d="M690 140 L 740 140" stroke="#9a7b3f" stroke-width="2" marker-end="url(#arP)"/>
+        <rect x="744" y="84" width="206" height="50" rx="10" fill="#f3ecdb" stroke="#e4d7b6"/>
+        <text x="847" y="105" text-anchor="middle" class="t-mono" font-size="10.5" fill="#7c6231">featured · the home strip</text>
+        <text x="847" y="122" text-anchor="middle" class="t-mono" font-size="9" fill="#9a7b3f">curated-pool flag only</text>
+        <rect x="744" y="146" width="206" height="50" rx="10" fill="#f3ecdb" stroke="#e4d7b6"/>
+        <text x="847" y="167" text-anchor="middle" class="t-mono" font-size="10.5" fill="#7c6231">endorsed ◈ the seal</text>
+        <text x="847" y="184" text-anchor="middle" class="t-mono" font-size="9" fill="#9a7b3f">never reachable from the Field</text>
+
+        <defs>
+          <marker id="arP" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto"><path d="M0 0 L9 4.5 L0 9 z" fill="#9a7b3f"/></marker>
+          <marker id="arG" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto"><path d="M0 0 L9 4.5 L0 9 z" fill="#9a9a93"/></marker>
+        </defs>
+      </svg>
+    </div>
+
+    <div class="callout">
+      <div class="h">What a rung grants — and what it forbids</div>
+      <p><span class="b">Field note:</span> same Goal → Approach → Impact body; frontmatter is just <code>id</code>, <code>title</code>, <code>kind</code>, optional <code>near</code>/<code>tools</code>/<code>techniques</code>. Owner derived from the path, never typed. <span class="b">Forbidden by validation:</span> <code>featured</code>, <code>endorsed</code>, leaf placement fields — curation outputs can't be self-granted.</p>
+      <p style="margin-bottom:0"><span class="b">Elevation grants:</span> leaf placement (activity or enabler), technique tags checked, the editor's note, eligibility for featured/endorsed — and the curated register of the Practice voice. The voices stay honest: a field note is <em>raw</em> practice; canon and the editor never speak in the Field.</p>
+    </div>
+  </section>
+
+  <!-- 3 — STORAGE -->
+  <section id="storage">
+    <div class="rail"><span class="num">03</span><span class="lab">Storage</span></div>
+    <h2 class="sec">Where the namespace lives in the content store</h2>
+    <p class="lede">The data-layer rule still governs — structured if you'd query it, Markdown if you'd read it — and adds one question: is "uncurated" a <em>place</em> or a <em>flag</em>?</p>
+
+    <!-- S-A -->
+    <div class="option rec">
+      <div class="oh"><span class="ok-letter">A</span><span class="ot">Directory-per-user</span><span class="endorsed">✦ recommended</span></div>
+      <div class="osub"><code>content/field/&lt;handle&gt;/*.md</code> — the namespace is the path; the loader reads the Field as a separate collection with <code>owner</code> derived from the directory.</div>
+      <div class="grid2">
+<pre class="snip">content/
+  usecases/              <span class="c">← curated, two spines (unchanged)</span>
+  <span class="f">field/                 ← the Field (new)</span>
+    <span class="f">mreyes/</span>
+      <span class="f">f-triage-cache.md</span>
+      <span class="f">f-eval-notes.md</span>
+    <span class="f">okafor/</span>
+      <span class="f">f-dictionary-draft.md</span></pre>
+        <div class="meta" style="font-size:13px;color:var(--ink-3)"><span class="b">Why it wins:</span> uncurated is <em>structural</em> — no query can leak it into a curated view by forgetting a filter. Ownership is enforceable by path (CODEOWNERS / a one-line PR check: you may merge what's under your own handle). Deleting a namespace is <code>rm -r</code>. The curated pool's loader, validation, and pages don't change at all.</div>
+      </div>
+      <div class="verdicts"><span class="v good">leak-proof by construction</span><span class="v good">path-scoped merge rights</span><span class="v good">curated store untouched</span><span class="v mid">one more collection in the loader</span></div>
+    </div>
+
+    <!-- S-B -->
+    <div class="option">
+      <div class="oh"><span class="ok-letter">B</span><span class="ot">One pool + a status flag</span></div>
+      <div class="osub"><code>content/usecases/*.md</code> grows <code>status: field</code> and <code>owner:</code> frontmatter; curated is <code>status: curated</code> (default).</div>
+      <div class="verdicts"><span class="v good">one entity, one folder</span><span class="v bad">every existing query needs a status filter — one miss leaks unreviewed content into the shelves</span><span class="v bad">merge rights can't be path-scoped</span><span class="v bad">owner typed, not derived</span></div>
+      <div class="meta"><span class="b">Verdict:</span> workflow state as a flag is exactly the failure the CMS precedent warns about. Rejected unless the namespace idea itself shrinks to a handful of files.</div>
+    </div>
+
+    <!-- S-C -->
+    <div class="option">
+      <div class="oh"><span class="ok-letter">C</span><span class="ot">A separate repo (or orphan branch)</span></div>
+      <div class="osub">A <code>playbook-field</code> repo; the build pulls it in (submodule / fetch) or it deploys as its own site.</div>
+      <div class="verdicts"><span class="v good">hardest isolation; separate permissions for free</span><span class="v bad">breaks the one-build model — cross-links, shared techniques, and the elevation diff all get harder</span><span class="v bad">two repos to govern</span></div>
+      <div class="meta"><span class="b">Verdict:</span> the escape hatch if the Field grows huge or needs different access control. Not the starting point.</div>
+    </div>
+  </section>
+
+  <!-- 4 — PLACEMENT -->
+  <section id="placement">
+    <div class="rail"><span class="num">04</span><span class="lab">The light placement</span></div>
+    <h2 class="sec">One required word, one optional pointer</h2>
+    <p class="lede">Curated use cases place at the leaf (activity / enabler), validated hard. A field note shouldn't have to know the taxonomy that well — but the more it says, the more surfaces can carry it.</p>
+
+    <div class="grid2">
+      <div>
+        <div class="eyebrow" style="margin-bottom:8px">content/field/mreyes/f-triage-cache.md — the whole schema</div>
+<pre class="snip">---
+id: f-triage-cache
+title: 'Caching system prompts across
+        our triage fleet'
+<span class="k">kind: lifecycle</span>        <span class="c"># required: lifecycle | enabling</span>
+<span class="k">near: g-ops</span>            <span class="c"># optional: ANY id on either spine —</span>
+                       <span class="c"># a phase, subphase, activity,</span>
+                       <span class="c"># track, area, or enabler</span>
+techniques: [t-context] <span class="c"># optional, validated if present</span>
+tools: [Claude Code]    <span class="c"># optional</span>
+---
+## Goal
+Thirty triage agents re-derived the same
+system prompt every run…
+
+## Approach
+…
+
+## Impact (optional)
+…</pre>
+        <p class="footnote">Owner = the directory (<code>@mreyes</code>), never typed. No <code>featured</code>, <code>endorsed</code>, <code>phase</code>/<code>activity</code>, or <code>track</code>/<code>enabler</code> — validation rejects curation-only fields in the Field.</p>
+      </div>
+      <div>
+        <div class="tablewrap" style="margin-top:0">
+          <table class="tbl">
+            <thead><tr><th>Option</th><th>Author burden</th><th>What can carry it</th></tr></thead>
+            <tbody>
+              <tr><td><span class="b">A · <code>kind</code> + optional <code>near</code></span> <span class="endorsed" style="margin-left:4px">rec</span></td><td>one word; pointer only if obvious</td><td>user page + Field index always; the pointed-at page's "from the field" strip when <code>near</code> is given — at <em>any</em> altitude (a note near <code>discover</code> shows on the Discover phase page; near <code>e-priorities</code> on that enabler page)</td></tr>
+              <tr><td><span class="b">B · <code>kind</code> only</span></td><td>one word</td><td>user page + Field index only — nothing contextual; the strips never light up</td></tr>
+              <tr><td><span class="b">C · <code>kind</code> + required root</span></td><td>two fields, must know phases/tracks</td><td>root pages only; forces a guess exactly when the author is least sure</td></tr>
+              <tr><td><span class="b">D · full leaf placement</span></td><td>same as curated</td><td>everything — but it's the curated schema minus review, which blurs the rungs</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="callout" style="margin-top:14px">
+          <div class="h">Why "near", not "placed"</div>
+          <p style="margin-bottom:0"><code>near</code> is deliberately humble: <em>file this in the vicinity of X</em>. It resolves against both spines at any tier (ids are globally unique across them — guaranteed by the PR #6 collision guards), validates only if present, and is replaced by real leaf placement at elevation. The author's guess never masquerades as the editor's filing.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 5 — SURFACING -->
+  <section id="surfacing">
+    <div class="rail"><span class="num">05</span><span class="lab">Surfacing</span></div>
+    <h2 class="sec">Where field notes appear on the site</h2>
+    <p class="lede">The register must be unmistakable everywhere: dashed borders, a mono byline, an "unreviewed" microcopy — and never a seal, never the featured strip. Within that, four levels of presence.</p>
+
+    <!-- V-A -->
+    <div class="option rec">
+      <div class="oh"><span class="ok-letter">A</span><span class="ot">Namespace pages + contextual strips</span><span class="endorsed">✦ recommended</span></div>
+      <div class="osub">Three surfaces: a Field index, per-user pages, and a quiet "From the field" strip on whichever spine page a note is <code>near</code>.</div>
+      <ul class="tight">
+        <li><span class="b"><code>/field/</code></span> — the index: latest notes, by-author roll-up, an "unelevated, most linked-to" sort for the curator. The curation queue, in public.</li>
+        <li><span class="b"><code>/field/&lt;handle&gt;/</code></span> — a person's page: their notes, their elevated record ("3 notes elevated into the playbook").</li>
+        <li><span class="b"><code>/field/&lt;handle&gt;/&lt;id&gt;/</code></span> — the note itself: same Goal/Approach/Impact layout, dashed frame, byline, "Unreviewed field note" banner, and — if elevated — the "Elevated ↑" link to the curated version.</li>
+        <li><span class="b">"From the field" strips</span> — on phase/activity/track/enabler pages with notes <code>near</code> them: a compact, visually lighter row set <em>below</em> curated practice. This is what makes the one-word placement pay rent — and it finally gives empty activities a truthful state: "nothing curated yet, but two field notes nearby."</li>
+      </ul>
+      <div class="diagram" style="margin-top:6px">
+        <div class="cap">An activity page under option A — curated practice, then the field, registers kept apart</div>
+        <svg viewBox="0 0 960 240" role="img" aria-label="Wireframe of an activity page with a from-the-field strip">
+          <rect x="10" y="14" width="940" height="212" rx="12" fill="#fbfaf6" stroke="#d4d1c7"/>
+          <text x="30" y="44" class="t-mono" font-size="10" fill="#6b6b66">ACTIVITY · OPERATIONS &amp; TOIL</text>
+          <rect x="30" y="56" width="560" height="22" rx="5" fill="#faf7ef" stroke="#e4d7b6"/>
+          <text x="40" y="71" class="t-mono" font-size="9" fill="#7c6231">canon ◈ — what the PDLC says</text>
+          <text x="30" y="102" class="t-mono" font-size="10" fill="#3a3a3a">PRACTICE · what teams are doing (curated)</text>
+          <rect x="30" y="112" width="280" height="56" rx="8" fill="#fff" stroke="#d4d1c7"/>
+          <text x="42" y="132" class="t-mono" font-size="9.5">use case · Backlog grooming agent</text>
+          <text x="42" y="148" class="t-mono" font-size="9" fill="#6b6b66">Grow · Operations &amp; toil · Delta Velocity</text>
+          <rect x="322" y="112" width="280" height="56" rx="8" fill="#fff" stroke="#d4d1c7"/>
+          <text x="334" y="132" class="t-mono" font-size="9.5">use case · Agentic Slack triage</text>
+          <text x="334" y="148" class="t-mono" font-size="9" fill="#6b6b66">Grow · Operations &amp; toil · Northstar Squad</text>
+          <line x1="30" y1="182" x2="930" y2="182" stroke="#e6e3da"/>
+          <text x="30" y="200" class="t-mono" font-size="10" fill="#41502f">FROM THE FIELD · unreviewed, near this activity</text>
+          <rect x="380" y="190" width="270" height="26" rx="6" fill="#edf0e7" stroke="#5a6a4a" stroke-dasharray="5 3"/>
+          <text x="392" y="207" class="t-mono" font-size="9" fill="#41502f">f · Caching system prompts… — @mreyes</text>
+          <rect x="660" y="190" width="270" height="26" rx="6" fill="#edf0e7" stroke="#5a6a4a" stroke-dasharray="5 3"/>
+          <text x="672" y="207" class="t-mono" font-size="9" fill="#41502f">f · Overnight toil ledger… — @okafor</text>
+        </svg>
+      </div>
+      <div class="verdicts"><span class="v good">authors get an address</span><span class="v good">light placement pays off contextually</span><span class="v good">curator queue is public</span><span class="v mid">cost: ~3 page templates + a strip component</span></div>
+    </div>
+
+    <!-- V-B -->
+    <div class="option">
+      <div class="oh"><span class="ok-letter">B</span><span class="ot">Namespace pages only</span></div>
+      <div class="osub">The <code>/field/…</code> surfaces exist, but spine pages never show field content — no strips.</div>
+      <div class="verdicts"><span class="v good">zero risk to the curated reading experience</span><span class="v bad"><code>near</code> buys nothing — notes are findable only by people who already know the author</span><span class="v mid">a safe v1 that A can grow out of</span></div>
+    </div>
+
+    <!-- V-C -->
+    <div class="option">
+      <div class="oh"><span class="ok-letter">C</span><span class="ot">Mixed grids with a badge</span></div>
+      <div class="osub">Field notes render in the same practice grids as curated use cases, wearing an "unreviewed" badge.</div>
+      <div class="verdicts"><span class="v bad">erodes the curated promise — the shelf stops meaning "the editor stands behind this"</span><span class="v bad">badge-blindness is real</span></div>
+      <div class="meta"><span class="b">Verdict:</span> rejected. The whole design depends on the registers staying legible at a glance.</div>
+    </div>
+
+    <!-- V-D -->
+    <div class="option">
+      <div class="oh"><span class="ok-letter">D</span><span class="ot">No pages — a curator-only pool</span></div>
+      <div class="osub">Field files exist in the repo and feed the curation queue, but the site doesn't render them.</div>
+      <div class="verdicts"><span class="v good">cheapest</span><span class="v bad">fails the brief — "a user's submissions live" somewhere they can point at</span><span class="v bad">no social reason to write one</span></div>
+    </div>
+
+    <div class="callout">
+      <div class="h">Navigation presence (D4 below)</div>
+      <p style="margin-bottom:0">If the Field gets surfaces, does it get a top-nav item? <span class="b">Lifecycle · Enablers · Techniques · <span style="border-bottom:2px dashed var(--field)">Field</span> · About</span> says participation is first-class — at the cost of a fifth item. The quiet alternative: reach the Field from the submit flow, the footer, and the strips. Recommendation: <span class="b">top-level</span> — the header already shouts "Submit a use case"; the Field is where that invitation finally leads to something the submitter owns.</p>
+    </div>
+  </section>
+
+  <!-- 6 — ELEVATION -->
+  <section id="elevation">
+    <div class="rail"><span class="num">06</span><span class="lab">Elevation</span></div>
+    <h2 class="sec">The pull: how a field note becomes a use case</h2>
+    <p class="lede">"The curator pulls in featured content to elevate" — mechanically, three ways to do the pull.</p>
+
+    <!-- E-A -->
+    <div class="option rec">
+      <div class="oh"><span class="ok-letter">A</span><span class="ot">Copy-on-elevate, provenance both ways</span><span class="endorsed">✦ recommended</span></div>
+      <div class="osub">The curator copies the note into <code>content/usecases/</code>, edits freely (leaf placement, tags, trims, the editor's note), and records where it came from. The original stays the author's.</div>
+      <div class="grid2">
+<pre class="snip"><span class="c"># content/usecases/u-triage-cache.md (curated copy)</span>
+---
+id: u-triage-cache
+title: 'Prompt caching across a triage fleet'
+phase: grow
+activity: g-ops
+techniques: [t-context]
+<span class="k">source: field/mreyes/f-triage-cache</span>   <span class="c"># validated ref</span>
+author: Northstar Squad
+---
+<span class="c"># the field note needs NO new field —</span>
+<span class="c"># its "Elevated ↑" banner is the reverse join,</span>
+<span class="c"># derived at build time from `source`.</span></pre>
+        <div class="meta" style="font-size:13px;color:var(--ink-3)"><span class="b">Why it wins:</span> the curated version is an <em>editorial artifact</em> — voiced, placed, possibly cut in half — which is exactly what the editor already does to issue submissions. The author's original survives in their register and their namespace; the curator never edits inside someone else's directory; and the link is one validated frontmatter field with a derived reverse join (the same pattern as <code>enabled_by</code>). Double-counting is a non-issue: practice grids draw only from the curated pool, strips only from the Field — and an elevated note can drop out of the strips automatically.</div>
+      </div>
+      <div class="verdicts"><span class="v good">author's record preserved</span><span class="v good">curator edits only curated space</span><span class="v good">one new field, validated</span><span class="v mid">two documents exist (by design)</span></div>
+    </div>
+
+    <!-- E-B -->
+    <div class="option">
+      <div class="oh"><span class="ok-letter">B</span><span class="ot">Move-on-elevate</span></div>
+      <div class="osub"><code>git mv</code> from the namespace into the curated pool; the user page lists "elevated" by link.</div>
+      <div class="verdicts"><span class="v good">single instance, no drift</span><span class="v bad">the author's original text is overwritten by editing — their record now lives only in git history</span><span class="v bad">namespaces thin out exactly when their owners succeed</span></div>
+    </div>
+
+    <!-- E-C -->
+    <div class="option">
+      <div class="oh"><span class="ok-letter">C</span><span class="ot">Flag-in-place</span></div>
+      <div class="osub">The curator sets <code>status: curated</code> + leaf placement on the file where it sits; "curated" becomes a query, not a place.</div>
+      <div class="verdicts"><span class="v bad">curator edits inside user namespaces</span><span class="v bad">reintroduces the status-flag leak risk storage option A exists to prevent</span><span class="v mid">cheapest single-file story</span></div>
+    </div>
+
+    <div class="callout rec">
+      <div class="h">What the curator's queue looks like under A</div>
+      <p style="margin-bottom:0">The Field index, sorted for the editor: <span class="b">unelevated first</span>, then by recency; later, by signal (how many curated pages a note sits near, GitHub reactions on its PR — additive, not structural). Elevation itself is one PR: add the curated file with <code>source:</code>, build-content validates the ref, the strips and banners update themselves. The gate didn't disappear — it moved to where it scales: <em>after</em> publication, on the editor's clock.</p>
+    </div>
+  </section>
+
+  <!-- 7 — INTAKE + COORDINATION -->
+  <section id="intake">
+    <div class="rail"><span class="num">07</span><span class="lab">Intake &amp; the loop</span></div>
+    <h2 class="sec">Two ways in, one light gate</h2>
+    <p class="lede">The submission loop stops being the only door and becomes the assisted one. Both paths end in the same place: a file in your namespace.</p>
+
+    <div class="grid2">
+      <div class="card">
+        <h4>Path 1 — self-publish (git-native)</h4>
+        <div class="d">Open a PR that only touches <code>content/field/&lt;your-handle&gt;/**</code>. A one-line CI check verifies path-matches-author and runs the light validation; on green it can <span class="b">auto-merge</span>. Your namespace, your merge — the org's innersource muscle, reused.</div>
+      </div>
+      <div class="card">
+        <h4>Path 2 — assisted (everyone else)</h4>
+        <div class="d">The existing issue templates stay, with one new outcome: instead of waiting for the editor to write a curated file, a <span class="b">bot (or the editor) scaffolds the field note</span> into the submitter's namespace from the issue fields. Drive-by contributors get an address too.</div>
+      </div>
+    </div>
+
+    <div class="diagram">
+      <div class="cap">The loop with the Field in it — publication first, curation as a pull</div>
+      <svg viewBox="0 0 960 300" role="img" aria-label="Two intake paths feed the field; the curator elevates from the field to the curated shelves">
+        <rect x="10" y="40" width="170" height="56" rx="10" fill="#fff" stroke="#d4d1c7"/>
+        <text x="95" y="63" text-anchor="middle" class="t-mono" font-size="10">PR into your</text>
+        <text x="95" y="79" text-anchor="middle" class="t-mono" font-size="10">own namespace</text>
+        <rect x="10" y="120" width="170" height="56" rx="10" fill="#fff" stroke="#d4d1c7"/>
+        <text x="95" y="143" text-anchor="middle" class="t-mono" font-size="10">issue (template)</text>
+        <text x="95" y="159" text-anchor="middle" class="t-mono" font-size="9" fill="#6b6b66">bot scaffolds the note</text>
+
+        <path d="M180 68 C 220 68, 220 95, 252 100" fill="none" stroke="#9a9a93" stroke-width="1.5" marker-end="url(#arH)"/>
+        <path d="M180 148 C 220 148, 220 120, 252 113" fill="none" stroke="#9a9a93" stroke-width="1.5" marker-end="url(#arH)"/>
+
+        <rect x="256" y="78" width="150" height="58" rx="10" fill="#faf7ef" stroke="#e4d7b6"/>
+        <text x="331" y="100" text-anchor="middle" class="t-mono" font-size="10" fill="#7c6231">light gate</text>
+        <text x="331" y="116" text-anchor="middle" class="t-mono" font-size="8.5" fill="#9a7b3f">path = author · ids resolve</text>
+        <text x="331" y="128" text-anchor="middle" class="t-mono" font-size="8.5" fill="#9a7b3f">no curation-only flags</text>
+
+        <path d="M406 107 L 448 107" stroke="#5a6a4a" stroke-width="2" marker-end="url(#arF2)"/>
+
+        <rect x="452" y="64" width="200" height="86" rx="12" fill="#edf0e7" stroke="#5a6a4a"/>
+        <text x="552" y="92" text-anchor="middle" class="t-mono" font-size="11" fill="#41502f">THE FIELD</text>
+        <text x="552" y="110" text-anchor="middle" class="t-mono" font-size="9" fill="#41502f">live at /field/&lt;handle&gt;/</text>
+        <text x="552" y="126" text-anchor="middle" class="t-mono" font-size="9" fill="#6b6b66">+ "from the field" strips</text>
+
+        <path d="M652 107 L 694 107" stroke="#9a7b3f" stroke-width="2" marker-end="url(#arP2)"/>
+        <text x="673" y="96" text-anchor="middle" class="t-mono" font-size="9" fill="#7c6231">pull</text>
+
+        <rect x="698" y="64" width="252" height="86" rx="12" fill="#fbfaf6" stroke="#d4d1c7"/>
+        <text x="824" y="90" text-anchor="middle" class="t-mono" font-size="10.5">curator elevates</text>
+        <text x="824" y="107" text-anchor="middle" class="t-mono" font-size="9" fill="#6b6b66">copy + voice + leaf placement</text>
+        <text x="824" y="123" text-anchor="middle" class="t-mono" font-size="9" fill="#6b6b66">source: → provenance both ways</text>
+        <text x="824" y="139" text-anchor="middle" class="t-mono" font-size="9" fill="#7c6231">→ shelves → featured / ◈</text>
+
+        <path d="M824 150 C 824 210, 600 226, 552 226 C 460 226, 420 180, 552 152" fill="none" stroke="#9a9a93" stroke-width="1.2" stroke-dasharray="5 3" marker-end="url(#arH)"/>
+        <text x="650" y="244" text-anchor="middle" class="t-mono" font-size="9" fill="#9a9a93">field note gains "Elevated ↑" (derived) · drops out of the strips</text>
+
+        <defs>
+          <marker id="arH" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto"><path d="M0 0 L9 4.5 L0 9 z" fill="#9a9a93"/></marker>
+          <marker id="arF2" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto"><path d="M0 0 L9 4.5 L0 9 z" fill="#5a6a4a"/></marker>
+          <marker id="arP2" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto"><path d="M0 0 L9 4.5 L0 9 z" fill="#9a7b3f"/></marker>
+        </defs>
+      </svg>
+    </div>
+
+    <h3 class="sub">The light gate, precisely</h3>
+    <ul class="tight">
+      <li><span class="b">Hard (build fails):</span> duplicate id; missing <code>id</code>/<code>title</code>/<code>kind</code>; <code>kind</code> outside <code>lifecycle | enabling</code>; <code>near</code> / technique ids that don't resolve; any curation-only field (<code>featured</code>, <code>endorsed</code>, leaf placement, <code>source</code>) in the Field; a file outside the PR author's namespace.</li>
+      <li><span class="b">Soft (warn only):</span> missing <code>## Goal</code> section; empty body. Rough is allowed — that's the point of the Field.</li>
+      <li><span class="b">Curated side, one addition:</span> <code>source:</code> must resolve to a real field note. Everything else about the curated gate is unchanged.</li>
+    </ul>
+
+    <div class="callout warn">
+      <div class="h">Coordination asks v2 — for the in-flight submission-loop session</div>
+      <ul class="tight" style="margin-bottom:0">
+        <li><span class="b">Intake forks before the issue.</span> The submit modal / CTA offers both doors: "publish to your Field namespace (PR)" and "open an issue, we'll scaffold it." Existing templates survive; their output target changes from "editor writes a curated file" to "a field note in your namespace."</li>
+        <li><span class="b">The curation queue reads the Field, not just the tracker.</span> Issues become an intake detail; the durable queue is "unelevated field notes," which the <code>/field/</code> index already renders in public.</li>
+        <li><span class="b">Status vocabulary gets a rung.</span> <code>field → elevated (curated) → featured / endorsed</code> — shelf-agnostic, exactly one promotion path, the Field rung never wearing curation marks.</li>
+      </ul>
+    </div>
+
+    <p class="footnote">Worth saying out loud: field notes are public web pages, like issues are today — same publicness, better shape. Namespaces are GitHub handles (the merge check depends on it); team namespaces can come later as an alias map, a data edit. And nothing here touches PR #6's spines: the Field points <em>at</em> them but lives beside them.</p>
+  </section>
+
+  <!-- 8 — DECISIONS -->
+  <section id="decisions">
+    <div class="rail"><span class="num">08</span><span class="lab">Your call</span></div>
+    <h2 class="sec">Six decisions</h2>
+    <p class="lede">Pre-set to the recommendation. Override anything, leave notes where you want to steer, then lock it at the bottom.</p>
+
+    <form id="decisions-form">
+
+      <!-- D1 -->
+      <div class="decision" data-q="1" data-title="Where do field notes live in the content store?">
+        <div class="q"><span class="qn">D1</span><span class="qt">Where do field notes live?</span></div>
+        <div class="qd">Is "uncurated" a place or a flag? (§03)</div>
+        <div class="opts">
+          <label class="opt"><input type="radio" name="d1" value="A — Directory-per-user: content/field/<handle>/*.md; owner derived from path; separate loader collection; curated store untouched" checked><span><span class="ol">A · Directory-per-user<span class="rectag">recommended</span></span><div class="od">Leak-proof by construction, path-scoped merge rights, deletable namespaces. One new collection in the loader.</div></span></label>
+          <label class="opt"><input type="radio" name="d1" value="B — One pool with status/owner frontmatter on content/usecases/*.md"><span><span class="ol">B · One pool + status flag</span><div class="od">One folder, but every query must remember the filter and merge rights can't be path-scoped. The flag-forgotten leak is structural.</div></span></label>
+          <label class="opt"><input type="radio" name="d1" value="C — Separate repo or orphan branch for the field"><span><span class="ol">C · Separate repo</span><div class="od">Hardest isolation; breaks the one-build model. The later escape hatch, not the start.</div></span></label>
+        </div>
+        <label class="notes-label" for="n1">Notes / constraints for D1</label>
+        <textarea id="n1" data-note="1" placeholder="e.g. handles must match GitHub usernames exactly; reserve a few (editor, pdlc)…"></textarea>
+      </div>
+
+      <!-- D2 -->
+      <div class="decision" data-q="2" data-title="How light is field-note placement?">
+        <div class="q"><span class="qn">D2</span><span class="qt">How light is placement?</span></div>
+        <div class="qd">The "usecase:lifecycle or usecase:enabling" structure, made precise. (§04)</div>
+        <div class="opts">
+          <label class="opt"><input type="radio" name="d2" value="A — kind: lifecycle|enabling (required) + near: <any spine id at any tier> (optional, validated if present)" checked><span><span class="ol">A · <code>kind</code> + optional <code>near</code><span class="rectag">recommended</span></span><div class="od">One required word; the pointer only when it's obvious. <code>near</code> works at any altitude on either spine and powers the contextual strips.</div></span></label>
+          <label class="opt"><input type="radio" name="d2" value="B — kind only; no placement pointer at all"><span><span class="ol">B · <code>kind</code> only</span><div class="od">Lightest possible — but notes are findable only via the author, and spine pages never benefit.</div></span></label>
+          <label class="opt"><input type="radio" name="d2" value="C — kind + required root (phase or track)"><span><span class="ol">C · <code>kind</code> + required root</span><div class="od">Forces a taxonomy guess at exactly the moment the author is least sure. Friction without payoff.</div></span></label>
+          <label class="opt"><input type="radio" name="d2" value="D — full leaf placement (same fields as curated), just unreviewed"><span><span class="ol">D · Full placement, unreviewed</span><div class="od">Blurs the rungs — the Field becomes "curated minus review" instead of a genuinely lighter register.</div></span></label>
+        </div>
+        <label class="notes-label" for="n2">Notes / constraints for D2</label>
+        <textarea id="n2" data-note="2" placeholder="e.g. allow multiple near: pointers? cap techniques at 3?…"></textarea>
+      </div>
+
+      <!-- D3 -->
+      <div class="decision" data-q="3" data-title="Where do field notes surface on the site?">
+        <div class="q"><span class="qn">D3</span><span class="qt">Where do they surface?</span></div>
+        <div class="qd">How present is the Field on the rendered site? (§05)</div>
+        <div class="opts">
+          <label class="opt"><input type="radio" name="d3" value="A — Namespace pages (/field/, /field/<handle>/, note pages) + 'From the field' strips on spine pages a note is near — distinct lighter register everywhere" checked><span><span class="ol">A · Namespace pages + contextual strips<span class="rectag">recommended</span></span><div class="od">Authors get an address, light placement pays rent, empty activities get a truthful state, the curator's queue is public.</div></span></label>
+          <label class="opt"><input type="radio" name="d3" value="B — Namespace pages only; spine pages never show field content"><span><span class="ol">B · Namespace pages only</span><div class="od">Zero risk to curated reading; <code>near</code> buys nothing. A safe v1 that can grow into A.</div></span></label>
+          <label class="opt"><input type="radio" name="d3" value="C — Mix field notes into the curated practice grids with an 'unreviewed' badge"><span><span class="ol">C · Mixed grids with a badge</span><div class="od">Erodes what the shelf means. Rejected unless the curated promise is being rethought wholesale.</div></span></label>
+          <label class="opt"><input type="radio" name="d3" value="D — No rendering; the field is a repo-only pool feeding the curator"><span><span class="ol">D · Curator-only pool</span><div class="od">Cheapest, but fails the brief — submissions should live somewhere their author can point at.</div></span></label>
+        </div>
+        <label class="notes-label" for="n3">Notes / constraints for D3</label>
+        <textarea id="n3" data-note="3" placeholder="e.g. cap strips at 3 notes; collapse behind a disclosure on phase pages…"></textarea>
+      </div>
+
+      <!-- D4 -->
+      <div class="decision" data-q="4" data-title="Does the Field get a top-nav item?">
+        <div class="q"><span class="qn">D4</span><span class="qt">Top-nav presence?</span></div>
+        <div class="qd">Lifecycle · Enablers · Techniques · (Field?) · About</div>
+        <div class="opts">
+          <label class="opt"><input type="radio" name="d4" value="A — Yes: 'Field' as a top-level nav item (rendered only once field content exists, same as Enablers)" checked><span><span class="ol">A · Top-level "Field"<span class="rectag">recommended</span></span><div class="od">Participation is first-class; the header CTA finally leads somewhere the submitter owns. Appears only when content exists — same conditional pattern as the Enablers item.</div></span></label>
+          <label class="opt"><input type="radio" name="d4" value="B — Quiet access: footer link + submit flow + the contextual strips; no top-nav item"><span><span class="ol">B · Quiet access</span><div class="od">Keeps the header lean and the curated axes dominant; the Field is discovered through use.</div></span></label>
+        </div>
+        <label class="notes-label" for="n4">Notes / constraints for D4</label>
+        <textarea id="n4" data-note="4" placeholder="e.g. start quiet, promote to top-nav at 20 notes…"></textarea>
+      </div>
+
+      <!-- D5 -->
+      <div class="decision" data-q="5" data-title="The elevation mechanic">
+        <div class="q"><span class="qn">D5</span><span class="qt">How does elevation work?</span></div>
+        <div class="qd">The pull itself. (§06)</div>
+        <div class="opts">
+          <label class="opt"><input type="radio" name="d5" value="A — Copy-on-elevate with two-way provenance: curated copy gains validated source:; field note's 'Elevated ↑' banner is the derived reverse join; original stays the author's" checked><span><span class="ol">A · Copy-on-elevate, provenance both ways<span class="rectag">recommended</span></span><div class="od">The curated version is an editorial artifact; the author's record survives; the curator never edits in someone else's namespace. Same join pattern as <code>enabled_by</code>.</div></span></label>
+          <label class="opt"><input type="radio" name="d5" value="B — Move-on-elevate: git mv into the curated pool; user page lists elevated items by link"><span><span class="ol">B · Move-on-elevate</span><div class="od">One instance, no drift — but editing overwrites the author's original, and successful namespaces empty out.</div></span></label>
+          <label class="opt"><input type="radio" name="d5" value="C — Flag-in-place: status flips to curated where the file sits"><span><span class="ol">C · Flag-in-place</span><div class="od">Curator edits inside user namespaces and the status-flag leak risk returns. Cheapest, weakest.</div></span></label>
+        </div>
+        <label class="notes-label" for="n5">Notes / constraints for D5</label>
+        <textarea id="n5" data-note="5" placeholder="e.g. elevation PRs must tag the original author for review…"></textarea>
+      </div>
+
+      <!-- D6 -->
+      <div class="decision" data-q="6" data-title="Intake paths into the field">
+        <div class="q"><span class="qn">D6</span><span class="qt">How do notes get in?</span></div>
+        <div class="qd">Also the naming call — "Field / field note / elevate" — goes in the notes here if you want a different register. (§07)</div>
+        <div class="opts">
+          <label class="opt"><input type="radio" name="d6" value="A — Both paths: self-merge PR into your own namespace (path-scoped check + light gate, auto-merge on green) AND issues that a bot/editor scaffolds into the submitter's namespace" checked><span><span class="ol">A · Both — self-publish + assisted<span class="rectag">recommended</span></span><div class="od">Git-natives skip the queue entirely; drive-bys still get an address. One gate, two doors.</div></span></label>
+          <label class="opt"><input type="radio" name="d6" value="B — PR-only: the field is for people willing to open a pull request"><span><span class="ol">B · PR-only</span><div class="od">Simplest to build; excludes exactly the casual contributors a playbook wants to capture.</div></span></label>
+          <label class="opt"><input type="radio" name="d6" value="C — Issue-only with bot scaffolding; no direct PRs into namespaces"><span><span class="ol">C · Assisted-only</span><div class="od">Keeps one funnel but reintroduces a mediated queue — the bottleneck this proposal exists to remove.</div></span></label>
+        </div>
+        <label class="notes-label" for="n6">Notes / constraints for D6</label>
+        <textarea id="n6" data-note="6" placeholder="e.g. rename 'Field' to 'Commons'; auto-merge off until the path check is battle-tested…"></textarea>
+      </div>
+
+      <!-- overall -->
+      <div class="decision" style="background:var(--bg-elev)">
+        <div class="q"><span class="qn">±</span><span class="qt">Overall verdict &amp; anything else</span></div>
+        <div class="qd">Sequencing, scope cuts, staleness policy for old notes, team namespaces, seed authors, coordination notes for the loop session.</div>
+        <label class="notes-label" for="overall">Owner notes</label>
+        <textarea id="overall" style="min-height:90px" placeholder="e.g. ship D1+D2+light gate first (repo-only), then namespace pages, then strips. Seed with 3 real authors before announcing…"></textarea>
+      </div>
+
+    </form>
+
+    <!-- live preview -->
+    <div class="preview-wrap">
+      <div class="preview-head">
+        <h3 class="sub" style="margin:0">Locked decision — preview</h3>
+        <span class="pill" id="rec-flag">as recommended</span>
+      </div>
+      <pre class="preview" id="preview"></pre>
+    </div>
+  </section>
+
+  <!-- RELATED -->
+  <section id="related">
+    <div class="rail"><span class="num">··</span><span class="lab">Related</span></div>
+    <p class="dim" style="font-size:13px">Companion artifacts: <code>docs/enablers-ia-proposal.html</code> (the second spine — decided &amp; implemented in PR #6) · <code>docs/data-layer-decision.html</code> (the structured-vs-Markdown rule this proposal leans on throughout) · the live <a href="https://dudgeon.org/product-practice-playbook/ia/">IA Proposal</a> and <a href="https://dudgeon.org/product-practice-playbook/prd/">Master PRD</a>.<br>Working artifact, not published site content.</p>
+  </section>
+
+</div>
+
+<!-- STICKY LOCK BAR -->
+<div class="lockbar">
+  <div class="inner">
+    <div class="msg" id="lock-msg">Selections start at the recommendation. Lock when ready.</div>
+    <button type="button" class="btn btn-ghost" id="reset-btn">Reset to recommended</button>
+    <button type="button" class="btn btn-primary" id="copy-btn">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+      Copy decision to Claude
+    </button>
+  </div>
+</div>
+
+<div class="toast" id="toast">Copied — paste it back into chat to lock</div>
+
+<script>
+(function(){
+  var DEFAULTS = { d1:'A', d2:'A', d3:'A', d4:'A', d5:'A', d6:'A' };
+  var form = document.getElementById('decisions-form');
+  var preview = document.getElementById('preview');
+  var recFlag = document.getElementById('rec-flag');
+  var lockMsg = document.getElementById('lock-msg');
+
+  function selected(name){
+    var el = form.querySelector('input[name="'+name+'"]:checked');
+    return el ? el.value : '(none chosen)';
+  }
+  function letter(name){
+    var el = form.querySelector('input[name="'+name+'"]:checked');
+    return el ? el.value.trim().charAt(0) : '?';
+  }
+  function note(n){
+    var el = document.querySelector('textarea[data-note="'+n+'"]');
+    return el ? el.value.trim() : '';
+  }
+  function decisionBlock(n, name){
+    var dec = form.querySelector('.decision[data-q="'+n+'"]');
+    var title = dec ? dec.getAttribute('data-title') : '';
+    var out = '### D'+n+' — '+title+'\n- Choice: '+selected(name)+'\n';
+    var nt = note(n);
+    if(nt) out += '- Notes: '+nt+'\n';
+    return out;
+  }
+  function countOverrides(){
+    var c = 0;
+    for(var k in DEFAULTS){ if(letter(k) !== DEFAULTS[k]) c++; }
+    return c;
+  }
+
+  function buildPrompt(){
+    var overall = document.getElementById('overall').value.trim();
+    var n = countOverrides();
+    var head =
+'Lock the Field (per-user namespace) IA decision and implement it.\n\n' +
+'Context: this is the AI PDLC Playbook static site. The premise, entity ladder, storage/placement/surfacing/elevation options, and the light gate are in `docs/field-ia-proposal.html` (this artifact). It builds on the two-spine model from PR #6. The owner has made the calls below — treat them as the source of truth, override the artifact’s recommendation where they differ, and propose the plan before writing code.\n\n' +
+'## Locked decisions\n\n';
+    var body =
+decisionBlock(1,'d1') + '\n' +
+decisionBlock(2,'d2') + '\n' +
+decisionBlock(3,'d3') + '\n' +
+decisionBlock(4,'d4') + '\n' +
+decisionBlock(5,'d5') + '\n' +
+decisionBlock(6,'d6') + '\n';
+    var tail = '';
+    if(overall) tail += '### Overall verdict & notes\n' + overall + '\n\n';
+    tail +=
+'## What I want from you next\n' +
+'1. Confirm you understand each locked choice (flag any conflicts between them).\n' +
+'2. Coordinate with the in-flight submission/curation-loop session: intake forks before the issue (self-publish + assisted), the curation queue reads the Field, and the status vocabulary gains the field → elevated rung.\n' +
+'3. Give me the seed plan as the smallest reversible steps: the field collection in the loader + light validation gate, namespace/note/index pages, the from-the-field strip, the source: provenance field + derived Elevated state, the path-scoped merge check, and 2–3 seeded field notes from real-ish authors. Say what the first PR contains.\n' +
+'4. Then implement on the current branch, keeping the curated side’s rendered output unchanged until a change is intended.\n\n' +
+'(' + (n===0 ? 'Left at the recommendation: directory namespaces, kind + optional near, namespace pages + strips, top-nav Field, copy-on-elevate with provenance, both intake paths.' : n + ' of 6 decisions overridden from the recommended defaults.') + ')\n';
+    return head + body + tail;
+  }
+
+  function refresh(){
+    preview.textContent = buildPrompt();
+    var n = countOverrides();
+    if(n===0){ recFlag.textContent = 'as recommended'; }
+    else { recFlag.textContent = n + ' overridden'; }
+  }
+
+  form.addEventListener('input', refresh);
+  form.addEventListener('change', refresh);
+
+  var toast = document.getElementById('toast');
+  var toastTimer;
+  function showToast(msg){
+    toast.textContent = msg;
+    toast.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function(){ toast.classList.remove('show'); }, 2600);
+  }
+  function copyText(text){
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(text).then(
+        function(){ showToast('Copied — paste it back into chat to lock'); },
+        function(){ fallbackCopy(text); }
+      );
+    } else { fallbackCopy(text); }
+  }
+  function fallbackCopy(text){
+    var ta = document.createElement('textarea');
+    ta.value = text; ta.style.position='fixed'; ta.style.opacity='0';
+    document.body.appendChild(ta); ta.focus(); ta.select();
+    var ok=false; try{ ok = document.execCommand('copy'); }catch(e){}
+    document.body.removeChild(ta);
+    showToast(ok ? 'Copied — paste it back into chat to lock' : 'Copy failed — select the preview text manually');
+  }
+  document.getElementById('copy-btn').addEventListener('click', function(){
+    copyText(buildPrompt());
+    lockMsg.textContent = 'Decision copied. Paste it into the Claude chat to lock and kick off implementation.';
+  });
+
+  document.getElementById('reset-btn').addEventListener('click', function(){
+    for(var k in DEFAULTS){
+      var el = form.querySelector('input[name="'+k+'"][value^="'+DEFAULTS[k]+' "]');
+      if(el) el.checked = true;
+    }
+    form.querySelectorAll('textarea').forEach(function(t){ t.value=''; });
+    refresh();
+    lockMsg.textContent = 'Reset to the recommended decision.';
+  });
+
+  refresh();
+})();
+</script>
+</body>
+</html>
