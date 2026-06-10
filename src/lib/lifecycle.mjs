@@ -365,7 +365,7 @@ export function validateContent({ phases, tracks = [], usecases, techniques }) {
       const tr = trackById.get(u.placement.track);
       if (!tr) {
         errors.push(`use case "${u.id}": unknown track "${u.placement.track}".`);
-      } else if (!tr.enablers.some((e) => e.id === u.placement.enabler)) {
+      } else if (u.placement.enabler && !tr.enablers.some((e) => e.id === u.placement.enabler)) {
         errors.push(`use case "${u.id}": enabler "${u.placement.enabler}" is not in track "${tr.id}".`);
       }
     } else {

@@ -1,10 +1,12 @@
-// Build content artifacts from the lifecycle definition.
+// Build content artifacts from the spine definitions.
 //
 // Run this after editing content/lifecycle.json (the notional stages + key
-// activities). It compiles the spine (auto numbers, soft tints, slugged ids),
-// writes the generated content/phases.json snapshot, and validates the rest of
-// the content store against it — catching use cases that point at a renamed or
-// removed stage, or unknown technique tags — then prints a coverage report.
+// activities) or content/enablers.json (the enablement tracks + enablers). It
+// compiles both spines (auto numbers, soft tints, slugged ids), writes the
+// generated content/phases.json + content/tracks.json snapshots, and validates
+// the rest of the content store against them — catching use cases that point
+// at a renamed or removed stage/enabler, broken enabled_by references, or
+// unknown technique tags — then prints a coverage report.
 //
 //   npm run build-content
 //
@@ -14,7 +16,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { loadContent } from '../src/lib/content.mjs';
-import { validateContent, validatePhaseProse } from '../src/lib/lifecycle.mjs';
+import { validateContent, validatePhaseProse, validateTrackProse } from '../src/lib/lifecycle.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const CONTENT = path.join(ROOT, 'content');
@@ -29,7 +31,7 @@ const c = {
   bold: (s) => paint('1', s),
 };
 
-console.log(c.bold('AI PDLC Playbook — build content from lifecycle.json') + '\n');
+console.log(c.bold('AI PDLC Playbook — build content from lifecycle.json + enablers.json') + '\n');
 
 // 1. Load the content store: compiles the lifecycle skeleton and merges the
 //    per-phase Markdown prose. Fail clearly on structural problems.
@@ -40,26 +42,40 @@ try {
   console.error(c.red('✗ content store is invalid: ') + err.message);
   process.exit(1);
 }
-const { phases, phaseProse } = db;
+const { phases, phaseProse, tracks, trackProse } = db;
 const subphaseCount = phases.reduce((a, p) => a + p.subphases.filter((s) => !s.implicit).length, 0);
 const activityCount = phases.reduce((a, p) => a + p.activities.length, 0);
 
-// 1b. Validate the per-phase prose (every phase has its file; no stray files or
-//     unknown activity keys) — these would render as silent/blank otherwise.
-const proseErrors = validatePhaseProse(phases, phaseProse);
+// 1b. Validate the per-phase / per-track prose (every root has its file; no
+//     stray files or unknown leaf keys) — these would render silent otherwise.
+const proseErrors = [
+  ...validatePhaseProse(phases, phaseProse),
+  ...(tracks.length ? validateTrackProse(tracks, trackProse) : []),
+];
 if (proseErrors.length) {
-  console.error(c.red(`✗ phase prose — ${proseErrors.length} error(s):`));
+  console.error(c.red(`✗ spine prose — ${proseErrors.length} error(s):`));
   proseErrors.forEach((e) => console.error('  ' + c.red('✗ ') + e));
   process.exit(1);
 }
 
-// 2. Materialize the compiled + merged spine snapshot.
+// 2. Materialize the compiled + merged spine snapshots.
 fs.writeFileSync(path.join(CONTENT, 'phases.json'), JSON.stringify(phases, null, 2) + '\n');
 console.log(
   `Compiled spine: ${c.bold(phases.length + ' phases')}, ${c.bold(subphaseCount + ' subphases')}, ` +
     `${c.bold(activityCount + ' activities')}, ${c.bold(Object.keys(phaseProse).length + ' prose files')} ` +
-    `→ wrote content/phases.json ${c.dim('(generated snapshot)')}\n`
+    `→ wrote content/phases.json ${c.dim('(generated snapshot)')}`
 );
+if (tracks.length) {
+  const areaCount = tracks.reduce((a, t) => a + t.areas.filter((x) => !x.implicit).length, 0);
+  const enablerCount = tracks.reduce((a, t) => a + t.enablers.length, 0);
+  fs.writeFileSync(path.join(CONTENT, 'tracks.json'), JSON.stringify(tracks, null, 2) + '\n');
+  console.log(
+    `Compiled shelf: ${c.bold(tracks.length + ' tracks')}, ${c.bold(areaCount + ' areas')}, ` +
+      `${c.bold(enablerCount + ' enablers')}, ${c.bold(Object.keys(trackProse).length + ' prose files')} ` +
+      `→ wrote content/tracks.json ${c.dim('(generated snapshot · provisional, no endorsements)')}`
+  );
+}
+console.log('');
 
 // 3. Validate placements + technique tags.
 const { errors, warnings } = validateContent(db);
@@ -87,6 +103,14 @@ for (const p of phases) {
       c.dim(`     ${s.n} ${s.name.padEnd(12)} ${String(sTotal).padStart(2)} uc · ${s.activities.length} activities`)
     );
   }
+}
+for (const t of tracks) {
+  const total = db.ucByTrack(t.id).length;
+  const unlocks = t.enablers.reduce((a, e) => a + db.ucEnabledBy(e.id).length, 0);
+  console.log(
+    `  ${t.n} ${t.name.padEnd(12)} ${String(total).padStart(2)} use case(s) across ${t.enablers.length} enabler(s)` +
+      c.dim(`  · cited by ${unlocks} lifecycle use case(s)`)
+  );
 }
 const emptyTechs = db.techniques.filter((t) => db.ucByTechnique(t.id).length === 0).map((t) => '#' + t.name);
 console.log(
