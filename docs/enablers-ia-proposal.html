@@ -1,0 +1,1004 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>AI PDLC Playbook — Enablers IA Proposal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400;1,6..72,500&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#f7f5f0; --bg-elev:#fbfaf6; --bg-card:#fff;
+    --ink:#1a1a1a; --ink-2:#3a3a3a; --ink-3:#6b6b66; --ink-4:#9a9a93;
+    --rule:#e6e3da; --rule-2:#d4d1c7; --muted:#ece9e0;
+    --discover:#2d6a6a; --discover-soft:#ecf2ef;
+    --build:#4a5a8a; --build-soft:#e7e9f1;
+    --grow:#3a7a4a; --grow-soft:#e3ede1;
+    --tr-data:#8a5a3a; --tr-data-soft:#f1ece4;
+    --tr-platform:#3a6f8f; --tr-platform-soft:#e7eef2;
+    --tr-direction:#6a4a8a; --tr-direction-soft:#ece7f1;
+    --seal:#9a7b3f; --seal-2:#7c6231; --seal-soft:#f3ecdb; --seal-line:#e4d7b6; --canon-bg:#faf7ef;
+    --warn:#9a3f3f; --warn-soft:#f6e9e6; --warn-line:#e7c9c2;
+    --accent:#2d6a6a; --accent-2:#1f4d4d;
+    --serif:'Newsreader',Georgia,serif; --sans:'IBM Plex Sans',system-ui,sans-serif; --mono:'IBM Plex Mono',ui-monospace,monospace;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:15px;line-height:1.6;-webkit-font-smoothing:antialiased}
+  a{color:var(--accent)}
+  h1,h2,h3,h4{margin:0;font-weight:500;letter-spacing:-.02em;font-family:var(--serif)}
+  p{margin:0 0 14px;max-width:74ch}
+  .mono{font-family:var(--mono)}
+  .eyebrow{font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.14em;color:var(--ink-3)}
+  .dim{color:var(--ink-3)} .b{font-weight:600;color:var(--ink)}
+  code{font-family:var(--mono);font-size:.88em;background:var(--muted);padding:1px 5px;border-radius:4px}
+
+  .wrap{max-width:980px;margin:0 auto;padding:0 clamp(20px,4vw,40px)}
+  section{padding:48px 0;border-bottom:1px solid var(--rule)}
+  section:last-of-type{border-bottom:0}
+  .rail{display:flex;align-items:baseline;gap:12px;margin-bottom:10px}
+  .rail .num{font-family:var(--mono);font-size:12px;color:#fff;background:var(--ink);border-radius:6px;padding:3px 9px}
+  .rail .lab{font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.12em;color:var(--ink-3)}
+  h2.sec{font-size:clamp(24px,3vw,32px);margin:6px 0 14px;letter-spacing:-.025em}
+  h3.sub{font-size:19px;margin:28px 0 10px}
+  .lede{font-size:18px;line-height:1.55;color:var(--ink-2);max-width:70ch}
+
+  /* masthead */
+  .masthead{padding:64px 0 36px;border-bottom:1px solid var(--rule)}
+  .masthead .kick{font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.16em;color:var(--seal-2);margin-bottom:16px}
+  .masthead h1{font-size:clamp(36px,6vw,58px);line-height:1.03;letter-spacing:-.03em}
+  .masthead .tag{font-size:19px;color:var(--ink-2);margin-top:18px;max-width:64ch}
+  .statline{display:flex;flex-wrap:wrap;gap:0;margin-top:30px;border:1px solid var(--rule);border-radius:12px;overflow:hidden;background:var(--bg-card)}
+  .statline .s{flex:1;min-width:130px;padding:15px 18px;border-right:1px solid var(--rule)}
+  .statline .s:last-child{border-right:0}
+  .statline .v{font-family:var(--serif);font-size:24px;line-height:1.1}
+  .statline .l{font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--ink-3);margin-top:7px}
+
+  .callout{border:1px solid var(--rule);background:var(--bg-card);border-radius:12px;padding:18px 20px;margin:18px 0}
+  .callout.rec{background:var(--seal-soft);border-color:var(--seal-line)}
+  .callout.warn{background:var(--warn-soft);border-color:var(--warn-line)}
+  .callout .h{font-family:var(--mono);font-size:10.5px;text-transform:uppercase;letter-spacing:.1em;color:var(--ink-3);margin-bottom:8px}
+  .callout.rec .h{color:var(--seal-2)} .callout.warn .h{color:var(--warn)}
+  .callout p:last-child{margin-bottom:0}
+
+  /* generic cards / grids */
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+  .grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+  @media(max-width:860px){.grid4{grid-template-columns:repeat(2,1fr)}}
+  @media(max-width:760px){.grid3,.grid2{grid-template-columns:1fr}.grid4{grid-template-columns:1fr}}
+  .card{background:var(--bg-card);border:1px solid var(--rule);border-radius:12px;padding:18px}
+  .card h4{font-family:var(--sans);font-weight:600;font-size:14px;letter-spacing:0;margin-bottom:6px}
+  .card .d{font-size:13px;color:var(--ink-3);line-height:1.5}
+  .pill{display:inline-flex;align-items:center;gap:6px;font-family:var(--mono);font-size:11px;border:1px solid var(--rule-2);background:var(--bg-elev);border-radius:999px;padding:3px 10px;color:var(--ink-2)}
+  .endorsed{display:inline-flex;align-items:center;gap:6px;font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--seal-2);background:var(--seal-soft);border:1px solid var(--seal-line);padding:3px 9px;border-radius:999px}
+
+  /* tables */
+  .tablewrap{overflow-x:auto;border:1px solid var(--rule);border-radius:12px;background:var(--bg-card);margin:18px 0}
+  table.tbl{width:100%;border-collapse:collapse;font-size:13.5px}
+  table.tbl th{font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:.09em;color:var(--ink-3);text-align:left;font-weight:500;padding:12px 14px;border-bottom:1px solid var(--rule-2);background:var(--bg-elev);white-space:nowrap}
+  table.tbl td{padding:12px 14px;border-bottom:1px solid var(--rule);vertical-align:top;line-height:1.5}
+  table.tbl tr:last-child td{border-bottom:0}
+  table.tbl td .fw{font-weight:600;color:var(--ink);display:block}
+  table.tbl td .src{font-family:var(--mono);font-size:11px}
+  .ok{color:var(--grow);font-weight:600} .half{color:var(--seal-2);font-weight:600} .no{color:var(--warn);font-weight:600}
+
+  /* nav mock */
+  .navmock{display:inline-flex;align-items:center;gap:14px;font-family:var(--mono);font-size:12px;border:1px solid var(--rule);background:var(--bg-elev);border-radius:999px;padding:7px 16px;margin:4px 0 12px;flex-wrap:wrap}
+  .navmock .nv{color:var(--ink-3)}
+  .navmock .on{color:var(--ink);font-weight:600}
+  .navmock .new{color:var(--accent-2);font-weight:600;background:var(--discover-soft);border:1px solid var(--accent);border-radius:999px;padding:1px 9px}
+
+  /* option cards */
+  .option{background:var(--bg-card);border:1px solid var(--rule);border-radius:14px;padding:22px;margin:18px 0}
+  .option.rec{border-color:var(--seal-line);box-shadow:0 0 0 3px var(--seal-soft)}
+  .option .oh{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:4px}
+  .option .ok-letter{font-family:var(--mono);font-size:12px;color:#fff;background:var(--ink);border-radius:6px;padding:2px 8px}
+  .option .ot{font-family:var(--serif);font-size:21px;letter-spacing:-.02em}
+  .option .osub{font-size:13.5px;color:var(--ink-3);margin:2px 0 12px}
+  .verdicts{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0 12px}
+  .verdicts .v{font-family:var(--mono);font-size:10.5px;border:1px solid var(--rule);background:var(--bg-elev);border-radius:999px;padding:3px 10px;color:var(--ink-2)}
+  .verdicts .v.good{border-color:#cfe0db;background:var(--grow-soft);color:#2c5a38}
+  .verdicts .v.mid{border-color:var(--seal-line);background:var(--seal-soft);color:var(--seal-2)}
+  .verdicts .v.bad{border-color:var(--warn-line);background:var(--warn-soft);color:var(--warn)}
+  .option .meta{font-size:13px;color:var(--ink-3);line-height:1.55}
+  .option .meta .b{color:var(--ink)}
+
+  /* code snips */
+  pre.snip{background:var(--bg-elev);border:1px solid var(--rule);border-radius:12px;padding:16px 18px;font-family:var(--mono);font-size:12px;line-height:1.6;overflow:auto;margin:0 0 14px;color:var(--ink-2)}
+  pre.snip .c{color:var(--ink-4)}
+  pre.snip .k{color:var(--accent-2)}
+  pre.snip .s{color:var(--seal-2)}
+
+  /* qualities strip */
+  .qualities{display:flex;gap:10px;flex-wrap:wrap;margin:14px 0 6px}
+  .quality{flex:1;min-width:160px;background:var(--bg-card);border:1px solid var(--rule);border-radius:12px;padding:13px 15px}
+  .quality .qn{font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--seal-2);margin-bottom:5px}
+  .quality .qd{font-size:12.5px;color:var(--ink-3);line-height:1.5}
+
+  /* track cards */
+  .track{border-left:4px solid var(--rule-2)}
+  .track.t-data{border-left-color:var(--tr-data);background:linear-gradient(160deg,var(--tr-data-soft),var(--bg-card) 55%)}
+  .track.t-platform{border-left-color:var(--tr-platform);background:linear-gradient(160deg,var(--tr-platform-soft),var(--bg-card) 55%)}
+  .track.t-direction{border-left-color:var(--tr-direction);background:linear-gradient(160deg,var(--tr-direction-soft),var(--bg-card) 55%)}
+  .track .role{font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--ink-3);margin-bottom:4px}
+  .track h4{font-family:var(--serif);font-size:18px;font-weight:500;margin-bottom:8px}
+  .track ul{margin:0;padding-left:18px;font-size:13px;color:var(--ink-2)}
+  .track ul li{margin:5px 0;line-height:1.45}
+  .track .areas{font-family:var(--mono);font-size:10.5px;color:var(--ink-3);margin:8px 0 6px;text-transform:uppercase;letter-spacing:.06em}
+
+  /* diagrams */
+  .diagram{background:var(--bg-card);border:1px solid var(--rule);border-radius:14px;padding:22px 20px;margin:18px 0;overflow-x:auto}
+  .diagram .cap{font-family:var(--mono);font-size:10.5px;text-transform:uppercase;letter-spacing:.1em;color:var(--ink-3);margin-bottom:16px}
+  svg{display:block;max-width:100%;height:auto;font-family:var(--mono)}
+  svg text{fill:var(--ink-2)}
+  svg .t-title{font-family:var(--sans);font-weight:600;fill:var(--ink)}
+  svg .t-sub{fill:var(--ink-3);font-size:11px}
+  svg .t-mono{font-family:var(--mono);font-size:11px}
+
+  /* decision cards */
+  .decision{background:var(--bg-card);border:1px solid var(--rule);border-radius:14px;padding:22px;margin:18px 0}
+  .decision > .q{display:flex;align-items:baseline;gap:10px;margin-bottom:4px}
+  .decision .qn{font-family:var(--mono);font-size:12px;color:#fff;background:var(--accent);border-radius:6px;padding:2px 8px;flex-shrink:0}
+  .decision .qt{font-family:var(--serif);font-size:20px;letter-spacing:-.02em}
+  .decision .qd{font-size:13.5px;color:var(--ink-3);margin:2px 0 16px}
+  .opts{display:grid;gap:10px}
+  .opt{display:flex;gap:12px;align-items:flex-start;border:1px solid var(--rule);border-radius:10px;padding:13px 15px;cursor:pointer;transition:border-color .12s,background .12s}
+  .opt:hover{border-color:var(--rule-2);background:var(--bg-elev)}
+  .opt input{margin-top:3px;accent-color:var(--accent);width:16px;height:16px;flex-shrink:0;cursor:pointer}
+  .opt .ol{font-weight:600;font-size:14px}
+  .opt .od{font-size:13px;color:var(--ink-3);line-height:1.5;margin-top:2px}
+  .opt:has(input:checked){border-color:var(--accent);background:var(--discover-soft);box-shadow:inset 0 0 0 1px var(--accent)}
+  .opt .rectag{font-family:var(--mono);font-size:9.5px;text-transform:uppercase;letter-spacing:.08em;color:var(--seal-2);background:var(--seal-soft);border:1px solid var(--seal-line);padding:1px 7px;border-radius:999px;margin-left:8px;vertical-align:middle}
+  .notes-label{display:block;font-family:var(--mono);font-size:10.5px;text-transform:uppercase;letter-spacing:.1em;color:var(--ink-3);margin:16px 0 6px}
+  textarea{width:100%;font-family:var(--sans);font-size:14px;line-height:1.55;color:var(--ink);background:var(--bg);border:1px solid var(--rule-2);border-radius:9px;padding:11px 13px;resize:vertical;min-height:52px}
+  textarea:focus{outline:none;border-color:var(--accent);background:var(--bg-card)}
+
+  /* lock / copy */
+  .lockbar{position:sticky;bottom:0;z-index:50;background:var(--bg-elev);border-top:1px solid var(--rule);box-shadow:0 -6px 20px rgba(0,0,0,.04)}
+  .lockbar .inner{max-width:980px;margin:0 auto;padding:14px clamp(20px,4vw,40px);display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+  .lockbar .msg{font-size:13px;color:var(--ink-3);flex:1;min-width:200px}
+  .btn{display:inline-flex;align-items:center;gap:9px;font-family:var(--sans);font-weight:600;font-size:14px;border:0;border-radius:9px;padding:11px 20px;cursor:pointer;text-decoration:none;transition:transform .08s,background .12s}
+  .btn:active{transform:translateY(1px)}
+  .btn-primary{background:var(--accent);color:#fff}
+  .btn-primary:hover{background:var(--accent-2)}
+  .btn-ghost{background:transparent;color:var(--ink-2);border:1px solid var(--rule-2)}
+  .btn-ghost:hover{background:var(--muted)}
+  .btn svg{width:15px;height:15px;display:block}
+
+  .preview-wrap{margin-top:18px}
+  .preview-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:8px}
+  pre.preview{background:#1a1a1a;color:#e8e6df;font-family:var(--mono);font-size:12px;line-height:1.6;border-radius:12px;padding:18px 18px;overflow:auto;max-height:420px;margin:0;white-space:pre-wrap;word-break:break-word}
+  .toast{position:fixed;left:50%;bottom:84px;transform:translateX(-50%) translateY(20px);background:var(--ink);color:#fff;font-size:13px;font-family:var(--mono);padding:10px 18px;border-radius:999px;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;z-index:100}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+  .footnote{font-size:12.5px;color:var(--ink-4);margin-top:8px}
+  ul.tight{margin:0 0 14px;padding-left:20px} ul.tight li{margin:4px 0;max-width:72ch}
+  ul.srcs{margin:0;padding-left:20px;font-size:12.5px;color:var(--ink-3)} ul.srcs li{margin:5px 0}
+  ul.srcs a{color:var(--ink-2)}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+  <!-- MASTHEAD -->
+  <header class="masthead">
+    <div class="kick">AI PDLC Playbook · IA proposal · 2026-06-10</div>
+    <h1>Enablers: new expectations, same loop</h1>
+    <p class="tag">Some of the highest-leverage AI work isn't building a feature. It's <span class="b">platform owners, data owners, and product leaders</span> making their corner of the org <span class="b">discoverable, machine-readable, and actionable</span> — so everyone else's agents get traction. This proposal surveys the taxonomies the field already uses, drafts a flexible starting taxonomy, and lays out four IA options. Read 01–06, make the calls in 07, lock it at the bottom.</p>
+    <div class="statline">
+      <div class="s"><div class="v">8</div><div class="l">Frameworks surveyed</div></div>
+      <div class="s"><div class="v">3</div><div class="l">Starting buckets</div></div>
+      <div class="s"><div class="v">4</div><div class="l">IA options</div></div>
+      <div class="s"><div class="v">6</div><div class="l">Decisions for you</div></div>
+      <div class="s"><div class="v">1</div><div class="l">Shared loop</div></div>
+    </div>
+    <div class="callout" style="margin-top:24px">
+      <div class="h">Relationship to the in-flight submission loop</div>
+      <p style="margin-bottom:0">An adjacent session is designing the <span class="b">submission/curation loop</span> for lifecycle ideas. This proposal treats that loop as a <span class="b">shared rail</span>: every option below rides it unchanged except for one fork — <em>placement</em> chooses a shelf. §06 lists the three properties that keep the loop shareable. Nothing here blocks on that work, and nothing in that work should need to be redone for this.</p>
+    </div>
+  </header>
+
+  <!-- 1 — THE PREMISE -->
+  <section id="premise">
+    <div class="rail"><span class="num">01</span><span class="lab">The premise</span></div>
+    <h2 class="sec">A class of work the lifecycle can't hold</h2>
+    <p class="lede">Every use case in the playbook today answers one question: <em>how do I use agents to do my lifecycle work better?</em> Enablers answer a different one: <em>what do I owe everyone else, so that their agents work here?</em></p>
+
+    <div class="grid3">
+      <div class="card track t-data">
+        <div class="role">Data owners</div>
+        <h4>Make the data self-describing</h4>
+        <ul>
+          <li>Data dictionaries published <span class="b">machine-readable</span>, not as PDFs or wiki prose</li>
+          <li>Registered in the catalog so agents (and their humans) can <span class="b">find</span> them</li>
+          <li>Semantics, metrics, lineage and freshness exposed as <span class="b">structured signals</span></li>
+        </ul>
+      </div>
+      <div class="card track t-platform">
+        <div class="role">Platform owners</div>
+        <h4>Make the platform agent-native</h4>
+        <ul>
+          <li>Platform <span class="b">context packs</span> — architecture, processes, support model — discoverable and parseable</li>
+          <li>Interface specs <span class="b">current and complete</span>; golden paths agents can actually follow</li>
+          <li>Agent <span class="b">identity, permissions and sandboxes</span> as first-class access</li>
+        </ul>
+      </div>
+      <div class="card track t-direction">
+        <div class="role">Product leaders</div>
+        <h4>Make direction addressable</h4>
+        <ul>
+          <li>Priorities and strategy at <span class="b">stable, citable</span> locations — not trapped in decks</li>
+          <li>Principles and decision rules published so agents can <span class="b">apply</span> them, not guess them</li>
+          <li>A durable <span class="b">decision log</span> agents can ground on</li>
+        </ul>
+      </div>
+    </div>
+
+    <h3 class="sub">Why these don't place on the lifecycle</h3>
+    <ul class="tight">
+      <li><span class="b">They aren't phase-bound.</span> A machine-readable data dictionary isn't a Discover, Build, or Grow act — it's continuous stewardship of an asset, alive across every effort that touches it. Any phase placement would be a misfile.</li>
+      <li><span class="b">The beneficiary is inverted.</span> A lifecycle use case improves the author's own throughput. An enabler's payoff lands downstream, in <em>other teams'</em> use cases — which is exactly why this work never finds room in the owner's feature backlog, and why the playbook should give it status.</li>
+      <li><span class="b">Expectations need an address.</span> "Here is what's expected of platform owners" has to be a shelf you can point someone at — owned, reviewable, endorsable — not a paragraph buried under Build › Documentation.</li>
+    </ul>
+
+    <div class="callout">
+      <div class="h">Working definitions</div>
+      <p><span class="b">Enabler</span> — a named, owned expectation: <em>make asset X agent-ready, to standard Y.</em> It carries the same three voices as everything else in the playbook: canon (the expectation itself), the editor's note, and practice.</p>
+      <p><span class="b">Enabling use case</span> — a worked example of <em>meeting</em> an enabler, with the same anatomy as any use case (Goal → Approach → Impact): "we published the dictionary as versioned YAML, registered it, wired freshness checks — downstream agent retrieval misses fell 40%."</p>
+      <p style="margin-bottom:0"><span class="b">Not a technique.</span> A technique is <em>how</em> an approach works (subagents, evals, MCP). An enabler is a <em>precondition you owe others</em>. Techniques span both kinds of use case — one shared pool.</p>
+    </div>
+
+    <div class="diagram">
+      <div class="cap">Two questions, two axes — one entity model</div>
+      <svg viewBox="0 0 960 330" role="img" aria-label="Lifecycle axis and enablement axis sharing use cases and techniques">
+        <!-- left: lifecycle -->
+        <rect x="10" y="20" width="450" height="200" rx="12" fill="#fbfaf6" stroke="#d4d1c7"/>
+        <text x="26" y="46" class="t-mono" font-size="10" fill="#6b6b66">THE LIFECYCLE — building the thing</text>
+        <rect x="26" y="62" width="130" height="32" rx="8" fill="#ecf2ef" stroke="#2d6a6a"/>
+        <text x="91" y="82" text-anchor="middle" class="t-mono" font-size="11" fill="#1f4d4d">Discover</text>
+        <rect x="166" y="62" width="130" height="32" rx="8" fill="#e7e9f1" stroke="#4a5a8a"/>
+        <text x="231" y="82" text-anchor="middle" class="t-mono" font-size="11" fill="#39466b">Build</text>
+        <rect x="306" y="62" width="130" height="32" rx="8" fill="#e3ede1" stroke="#3a7a4a"/>
+        <text x="371" y="82" text-anchor="middle" class="t-mono" font-size="11" fill="#2c5a38">Grow</text>
+        <text x="26" y="116" class="t-mono" font-size="9.5" fill="#9a9a93">phase › subphase › activity</text>
+        <rect x="56" y="132" width="170" height="56" rx="9" fill="#fff" stroke="#d4d1c7"/>
+        <text x="68" y="154" class="t-mono" font-size="10.5" fill="#3a3a3a">use case</text>
+        <text x="68" y="170" class="t-mono" font-size="9" fill="#6b6b66">places by activity</text>
+        <path d="M141 132 L 231 96" stroke="#9a9a93" stroke-width="1.2"/>
+
+        <!-- right: enablement -->
+        <rect x="500" y="20" width="450" height="200" rx="12" fill="#fbfaf6" stroke="#d4d1c7"/>
+        <text x="516" y="46" class="t-mono" font-size="10" fill="#6b6b66">ENABLEMENT — making it easier to build here</text>
+        <rect x="516" y="62" width="130" height="32" rx="8" fill="#f1ece4" stroke="#8a5a3a"/>
+        <text x="581" y="82" text-anchor="middle" class="t-mono" font-size="11" fill="#6e4527">Data owners</text>
+        <rect x="656" y="62" width="140" height="32" rx="8" fill="#e7eef2" stroke="#3a6f8f"/>
+        <text x="726" y="82" text-anchor="middle" class="t-mono" font-size="10.5" fill="#2c566f">Platform owners</text>
+        <rect x="806" y="62" width="134" height="32" rx="8" fill="#ece7f1" stroke="#6a4a8a"/>
+        <text x="873" y="82" text-anchor="middle" class="t-mono" font-size="10.5" fill="#533a6b">Product leaders</text>
+        <text x="516" y="116" class="t-mono" font-size="9.5" fill="#9a9a93">track › area › enabler</text>
+        <rect x="700" y="132" width="186" height="56" rx="9" fill="#fff" stroke="#d4d1c7"/>
+        <text x="712" y="154" class="t-mono" font-size="10.5" fill="#3a3a3a">enabling use case</text>
+        <text x="712" y="170" class="t-mono" font-size="9" fill="#6b6b66">places by enabler</text>
+        <path d="M790 132 L 726 96" stroke="#9a9a93" stroke-width="1.2"/>
+
+        <!-- enabled_by edge -->
+        <path d="M226 160 C 400 160, 420 78, 510 78" fill="none" stroke="#9a7b3f" stroke-width="1.6" stroke-dasharray="6 4" marker-end="url(#arB)"/>
+        <text x="350" y="142" class="t-mono" font-size="10" fill="#7c6231">enabled_by: [e-…]</text>
+
+        <!-- techniques bar -->
+        <rect x="10" y="252" width="940" height="50" rx="12" fill="#faf7ef" stroke="#e4d7b6"/>
+        <text x="480" y="276" text-anchor="middle" class="t-mono" font-size="11" fill="#7c6231">techniques — one shared pool</text>
+        <text x="480" y="292" text-anchor="middle" class="t-mono" font-size="9.5" fill="#9a7b3f">t-mcp · t-structured · t-retrieval · t-evals · t-context · …</text>
+        <path d="M141 188 L 141 250" stroke="#cdb98a" stroke-width="1.2" stroke-dasharray="3 3"/>
+        <path d="M793 188 L 793 250" stroke="#cdb98a" stroke-width="1.2" stroke-dasharray="3 3"/>
+
+        <defs>
+          <marker id="arB" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto">
+            <path d="M0 0 L9 4.5 L0 9 z" fill="#9a7b3f"/>
+          </marker>
+        </defs>
+      </svg>
+    </div>
+  </section>
+
+  <!-- 2 — THE RESEARCH -->
+  <section id="research">
+    <div class="rail"><span class="num">02</span><span class="lab">What the field says</span></div>
+    <h2 class="sec">No settled canon — but four recurring dimensions</h2>
+    <p class="lede">There is no agreed "enablement taxonomy" to import. There are eight serious attempts circling the same territory, and they disagree in instructive ways.</p>
+
+    <div class="tablewrap">
+      <table class="tbl">
+        <thead><tr><th style="min-width:190px">Framework</th><th style="min-width:260px">Shape</th><th style="min-width:240px">What we borrow</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><span class="fw">FAIR principles (2016)</span><span class="src"><a href="https://www.go-fair.org/fair-principles/">go-fair.org</a></span></td>
+            <td>Four qualities of research data — <span class="b">Findable, Accessible, Interoperable, Reusable</span> — with 15 sub-principles; explicitly "for machines as well as people."</td>
+            <td>The original move: readiness expressed as <span class="b">qualities of an asset</span>. Its vocabulary survives in every successor.</td>
+          </tr>
+          <tr>
+            <td><span class="fw">Data mesh · data-as-a-product</span><span class="src"><a href="https://martinfowler.com/articles/data-mesh-principles.html">martinfowler.com</a> (Dehghani)</span></td>
+            <td>A data product must be <span class="b">discoverable, addressable, trustworthy, self-describing, interoperable, secure</span> (DATSIS) — under federated computational governance.</td>
+            <td>Expectations attach to an <span class="b">owned product</span>, not a central function. Closest to the federated "you own it, you serve it" language the org already speaks.</td>
+          </tr>
+          <tr>
+            <td><span class="fw">Gartner — AI-ready data</span><span class="src"><a href="https://www.gartner.com/en/articles/ai-ready-data">gartner.com</a></span></td>
+            <td>Readiness = <span class="b">metadata management + data quality + observability</span>; metadata moves "from passive documentation to active intelligence"; readiness is always relative to the use.</td>
+            <td>The data-owner bucket's core canon: <span class="b">machine-navigable metadata</span>, not human-only docs. BI-ready ≠ AI-ready.</td>
+          </tr>
+          <tr>
+            <td><span class="fw">CNCF — Platform Engineering Maturity Model</span><span class="src"><a href="https://tag-app-delivery.cncf.io/whitepapers/platform-eng-maturity-model/">tag-app-delivery.cncf.io</a></span></td>
+            <td>Five aspects — <span class="b">Investment, Adoption, Interfaces, Operations, Measurement</span> — by four maturity levels; platform-as-a-product throughout.</td>
+            <td>"Interfaces" is where agent-grade specs and golden paths live. The <span class="b">levels</span> are the part we defer.</td>
+          </tr>
+          <tr>
+            <td><span class="fw">Microsoft — Agent Readiness Framework</span><span class="src"><a href="https://learn.microsoft.com/en-us/agents/adoption-maturity-model/">learn.microsoft.com</a></span></td>
+            <td>Five pillars — <span class="b">Business &amp; AI strategy, Process mapping, Technology &amp; data, Org readiness &amp; culture, Security &amp; governance</span> — by five maturity levels.</td>
+            <td>Proof the field is converging on <span class="b">pillars × levels</span>. Right shape for an executive roll-up later; too coarse for a playbook shelf.</td>
+          </tr>
+          <tr>
+            <td><span class="fw">Cloudflare — Agent Readiness score (2026)</span><span class="src"><a href="https://blog.cloudflare.com/agent-readiness/">blog.cloudflare.com</a></span></td>
+            <td>Five web-surface layers — <span class="b">Discoverability, Content, Bot access control, Capabilities, Commerce</span> — scored by concrete checks: robots.txt, llms.txt, Markdown content negotiation, <code>.well-known/api-catalog</code>, MCP server card, OAuth discovery.</td>
+            <td>The most use-case-shaped: readiness as <span class="b">checkable behaviors per surface</span>. Every check has an internal analog — what's your platform's <code>.well-known</code>?</td>
+          </tr>
+          <tr>
+            <td><span class="fw">The AX movement</span><span class="src"><a href="https://agentexperience.ax/">agentexperience.ax</a> · <a href="https://llmstxt.org/">llms.txt</a> · <a href="https://agents.md/">AGENTS.md</a></span></td>
+            <td>Conventions, not a model: llms.txt reading lists, AGENTS.md operating manuals, MCP servers, OpenAPI-first design, errors an agent can self-correct from.</td>
+            <td>The <span class="b">artifact layer</span>. Many enabling use cases will literally be "we shipped the llms.txt / AGENTS.md / MCP card equivalent for our platform."</td>
+          </tr>
+          <tr>
+            <td><span class="fw">McKinsey — the agentic organization</span><span class="src"><a href="https://www.mckinsey.com/capabilities/people-and-organizational-performance/our-insights/the-agentic-organization-contours-of-the-next-paradigm-for-the-ai-era">mckinsey.com</a></span></td>
+            <td>Six organizational shifts; named enablers: workforce upskilling, infrastructure adaptation, <span class="b">data productization</span>, agent-specific governance.</td>
+            <td>The leadership-bucket vocabulary — and confirmation that <span class="b">"enabler" is the field's own word</span> for this work.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="footnote">Adjacent and compatible: the <a href="https://www.salesforce.com/blog/semantic-layer-ai-agents-data-360/">semantic-layer / metadata-layer-for-AI</a> work (including the multi-vendor Open Semantic Interchange spec) for machine-readable business definitions; data contracts as enforceable expectations; <a href="https://diataxis.fr/">Diátaxis</a> for structuring the prose humans still write.</p>
+
+    <h3 class="sub">The synthesis — four dimensions, three usable now</h3>
+    <div class="grid4">
+      <div class="card"><h4>The steward · <span class="dim">who</span></h4><div class="d">Anchor expectations to a role that owns the asset. Data mesh and McKinsey both land here. <span class="b">Use as the spine.</span></div></div>
+      <div class="card"><h4>The surface · <span class="dim">what</span></h4><div class="d">The asset being made agent-ready: data, interfaces, context, direction. Cloudflare's layers, Gartner's data, CNCF's interfaces. <span class="b">Use as the grouping tier.</span></div></div>
+      <div class="card"><h4>The qualities · <span class="dim">to what standard</span></h4><div class="d">FAIR and DATSIS distill what "ready" means, asset by asset. <span class="b">Use as shared vocabulary</span>, not structure.</div></div>
+      <div class="card"><h4>The maturity · <span class="dim">how far</span></h4><div class="d">Levels and scores — the rigid part every big framework adds last. <span class="b">Defer</span> until the taxonomy has settled.</div></div>
+    </div>
+
+    <div class="callout rec" style="margin-top:18px">
+      <div class="h">The working definition this survey yields</div>
+      <p style="font-family:var(--serif);font-size:20px;line-height:1.45;color:var(--ink);margin-bottom:10px">An enabler is an <em>owned asset</em>, made <em>agent-legible</em> to a nameable standard, demonstrated by <em>checkable behaviors</em>.</p>
+      <p style="margin-bottom:0">Steward + surface + qualities give the taxonomy its three tiers. Maturity levels are real but premature — the seal already provides a binary rung (<span class="b">expected / not yet</span>), which is all the rigidity the content can currently support.</p>
+    </div>
+
+    <div class="callout">
+      <div class="h">The org context — no rigid taxonomy yet, by design</div>
+      <p style="margin-bottom:0">Unlike the PDLC, the org hasn't standardized an enablement taxonomy. What exists is softer: durable <span class="b">role buckets — platform owners, data owners, product leaders</span> — and an established federated-data-ownership vocabulary. So the starting taxonomy anchors on those roles, keeps areas and enablers cheap to rename and regroup (the <code>lifecycle.json</code> machinery already proved renames are a data edit, not a redesign), and lets the real taxonomy emerge from what gets submitted.</p>
+    </div>
+  </section>
+
+  <!-- 3 — THE STARTING TAXONOMY -->
+  <section id="taxonomy">
+    <div class="rail"><span class="num">03</span><span class="lab">The starting taxonomy</span></div>
+    <h2 class="sec">Track › area › enabler — the spine shape, reused</h2>
+    <p class="lede">Three tiers, mirroring <span class="b">phase › subphase › activity</span> — so the compiler, the validator, the generated CSS, and the editor's mental model all transfer unchanged.</p>
+
+    <div class="grid3">
+      <div class="card track t-data">
+        <div class="role">Track · data owners</div>
+        <h4>Make your data legible to agents you'll never meet</h4>
+        <div class="areas">Describe</div>
+        <ul><li>Machine-readable data dictionary</li><li>Published semantics &amp; metric definitions</li></ul>
+        <div class="areas">Expose</div>
+        <ul><li>Catalog registration &amp; discoverability</li><li>Agent-grade access paths &amp; contracts</li></ul>
+        <div class="areas">Assure</div>
+        <ul><li>Quality, lineage &amp; freshness signals</li></ul>
+      </div>
+      <div class="card track t-platform">
+        <div class="role">Track · platform owners</div>
+        <h4>Run the platform as a product whose newest user is an agent</h4>
+        <div class="areas">Context</div>
+        <ul><li>Platform context pack — architecture, processes, support model</li><li>Machine-actionable runbooks</li></ul>
+        <div class="areas">Interfaces</div>
+        <ul><li>Current, complete interface specs</li><li>Golden paths &amp; scaffolds agents can follow</li></ul>
+        <div class="areas">Access</div>
+        <ul><li>Agent identity, permissions &amp; sandboxes</li></ul>
+      </div>
+      <div class="card track t-direction">
+        <div class="role">Track · product leaders</div>
+        <h4>Make direction something an agent can cite, not guess</h4>
+        <div class="areas">Direction</div>
+        <ul><li>Addressable priorities &amp; strategy</li><li>Published principles &amp; decision rules</li></ul>
+        <div class="areas">Rationale</div>
+        <ul><li>Durable decision log</li><li>Shared product glossary</li></ul>
+      </div>
+    </div>
+    <p class="footnote">A scaffold, not a standard — same status as the lifecycle's first-draft subphases. Roles ≈ surfaces at this stage (each role stewards a characteristic surface), which is what lets one tier carry both. New tracks (API owners, process owners, risk partners) are an array entry, not a redesign.</p>
+
+    <h3 class="sub">The quality vocabulary — what "agent-ready" means, asset by asset</h3>
+    <p>Distilled from FAIR, DATSIS, and Cloudflare's checks. Used editorially — each enabler's canon line names the qualities it confers (see D6 for whether this ever becomes structured).</p>
+    <div class="qualities">
+      <div class="quality"><div class="qn">Discoverable</div><div class="qd">An agent — or its human — can find it without asking around.</div></div>
+      <div class="quality"><div class="qn">Machine-readable</div><div class="qd">Parseable structure: schemas, YAML, Markdown. Not screenshot-shaped.</div></div>
+      <div class="quality"><div class="qn">Addressable</div><div class="qd">A stable URL or id an agent can be pointed at — and cite.</div></div>
+      <div class="quality"><div class="qn">Current</div><div class="qd">Updated inside the owner's definition of done, with freshness signals.</div></div>
+      <div class="quality"><div class="qn">Permissioned</div><div class="qd">Safe agent access by default: identity, scopes, audit.</div></div>
+    </div>
+
+    <h3 class="sub">What the files would look like</h3>
+    <div class="grid2">
+      <div>
+        <div class="eyebrow" style="margin-bottom:8px">content/enablers.json — the second skeleton</div>
+<pre class="snip">{
+  <span class="c">"_note": "The enablement spine: tracks → areas →
+   enablers. Same rules as lifecycle.json — stable ids,
+   optional hue, prose in content/tracks/&lt;id&gt;.md."</span>,
+  "tracks": [
+    {
+      "id": "data",
+      "name": "Data owners",
+      "tagline": "Make your data legible to agents
+                  you'll never meet.",
+      "areas": [
+        {
+          "id": "describe",
+          "name": "Describe",
+          "enablers": [
+            { "id": "e-data-dictionary",
+              "name": "Machine-readable data dictionary" },
+            { "id": "e-semantics",
+              "name": "Published semantics &amp; metrics" }
+          ]
+        }
+        <span class="c">// … expose, assure</span>
+      ]
+    }
+    <span class="c">// … platform, direction</span>
+  ]
+}</pre>
+      </div>
+      <div>
+        <div class="eyebrow" style="margin-bottom:8px">content/usecases/u-dictionary-yaml.md — an enabling use case</div>
+<pre class="snip">---
+id: u-dictionary-yaml
+title: 'Data dictionary as versioned YAML:
+        agents stop guessing column semantics'
+<span class="k">track: data</span>
+<span class="k">enabler: e-data-dictionary</span>   <span class="c"># area derived, like subphase</span>
+techniques: [t-structured, t-retrieval]
+tools: [GitHub, MCP]
+author: Deposits Data Team
+metric: { label: "Agent retrieval misses", value: "−40%" }
+---
+## Goal
+Every team pointing an agent at our tables
+re-derived what the columns meant — or worse, didn't.
+
+## Approach
+Published the dictionary as YAML in the owning repo,
+registered it in the catalog, made updating it part
+of the schema-change definition of done.
+
+## Impact
+Downstream agents cite the dictionary instead of
+hallucinating semantics. Misses fell 40%.</pre>
+      </div>
+    </div>
+
+    <div class="callout">
+      <div class="h">Invariant — techniques stay one pool</div>
+      <p style="margin-bottom:0">Enabling use cases tag from the same <code>techniques.json</code> as lifecycle use cases — no parallel technique list. <code>t-mcp</code>, <code>t-structured</code>, and <code>t-retrieval</code> are the obvious workhorses on this side, and a technique page simply aggregates practice from both axes. This is the "same IA layer" the owner asked for — and it's what makes the two halves feel like one playbook.</p>
+    </div>
+  </section>
+
+  <!-- 4 — THE IA OPTIONS -->
+  <section id="options">
+    <div class="rail"><span class="num">04</span><span class="lab">The IA options</span></div>
+    <h2 class="sec">Four ways to shelve the same content</h2>
+    <p class="lede">All four keep the invariants: one use-case anatomy (Goal → Approach → Impact), one technique pool, one submission loop, one endorsement seal, one build gate. They differ only in <em>how much structure enablers themselves get</em>.</p>
+
+    <!-- OPTION A -->
+    <div class="option rec">
+      <div class="oh"><span class="ok-letter">A</span><span class="ot">The second spine</span><span class="endorsed">✦ recommended</span></div>
+      <div class="osub">Enablers become a peer browse axis: <code>enablers.json</code> beside <code>lifecycle.json</code>, compiled, validated, and rendered by the same machinery.</div>
+      <div class="navmock"><span class="nv">Lifecycle</span><span class="new">Enablers</span><span class="nv">Techniques</span><span class="nv">About</span></div>
+      <ul class="tight">
+        <li><span class="b">Track pages mirror phase pages</span> — canon + editor's note + areas as anchored sections; <span class="b">enabler pages mirror activity pages</span> — the expectation, its practice, and what it unlocks.</li>
+        <li><span class="b">Enabling use cases are the same entity</span>, placed by <code>track + enabler</code> instead of <code>phase + activity</code> (area derived, like subphase).</li>
+        <li>Track prose lives in <code>content/tracks/&lt;id&gt;.md</code>, exactly as phase prose lives in <code>content/phases/&lt;id&gt;.md</code>.</li>
+      </ul>
+      <div class="verdicts">
+        <span class="v good">stands alone ✓✓</span><span class="v good">addressable per enabler ✓</span><span class="v good">links from lifecycle ✓</span><span class="v good">validated ✓</span><span class="v mid">cost: highest of the four</span>
+      </div>
+      <div class="meta"><span class="b">Cost, concretely:</span> generalize the spine compiler in <code>src/lib/lifecycle.mjs</code> to take a taxonomy (it's already 90% id-plumbing, not lifecycle semantics), add <code>trackPage</code>/<code>enablerPage</code> by analogy in <code>src/pages.mjs</code>, routes in <code>src/lib/links.mjs</code> + <code>src/build.mjs</code>, one nav item. The generated hue CSS already derives from taxonomy data. <span class="b">When it wins:</span> when enablers are truly first-class expectations — which is the stated requirement.</div>
+    </div>
+
+    <!-- OPTION B -->
+    <div class="option">
+      <div class="oh"><span class="ok-letter">B</span><span class="ot">Role hubs</span></div>
+      <div class="osub">No new structure — three hand-curated pages ("For platform owners", "For data owners", "For product leaders"), enablers as prose checklists.</div>
+      <div class="navmock"><span class="nv">Lifecycle</span><span class="nv">Techniques</span><span class="new">For owners</span><span class="nv">About</span></div>
+      <div class="verdicts">
+        <span class="v mid">stands alone ◐ visible, not addressable</span><span class="v bad">links from lifecycle ✗ nothing to reference</span><span class="v bad">validated ✗</span><span class="v good">cost: near zero</span>
+      </div>
+      <div class="meta"><span class="b">When it wins:</span> while the content is a dozen bullets — an interim landing that ships this week. <span class="b">Where it breaks:</span> the moment a second enabling use case wants to attach to the same enabler, or a lifecycle use case wants to say <em>which</em> enabler it leans on. <span class="b">Not wasted either way:</span> its prose is exactly the canon + editor voice option A's track pages need.</div>
+    </div>
+
+    <!-- OPTION C -->
+    <div class="option">
+      <div class="oh"><span class="ok-letter">C</span><span class="ot">The tag layer</span></div>
+      <div class="osub">Enablers ride like techniques: a flat tag list with aggregation pages. Lifecycle use cases declare <code>enabled_by</code>; an enabler page shows the use cases it unlocks.</div>
+      <div class="navmock"><span class="nv">Lifecycle</span><span class="nv">Techniques</span><span class="new">Enablers <span style="font-weight:400">(tags)</span></span><span class="nv">About</span></div>
+      <div class="verdicts">
+        <span class="v bad">stands alone ✗ defined by consumers, not owners</span><span class="v good">links from lifecycle ✓✓ this is the linkage, born</span><span class="v good">validated ✓ tags resolve</span><span class="v good">cost: low — technique machinery exists</span>
+      </div>
+      <div class="meta"><span class="b">Where it breaks:</span> an enabler nobody has tagged yet is an empty page — backwards for an <em>expectation</em>, which exists before (and regardless of) adoption. There's also nowhere for enabling use cases to live: tags aren't placement. <span class="b">The key move:</span> option A subsumes C — adopt C's <code>enabled_by</code> edge <em>inside</em> A (§05) and you get the linkage without the inversion.</div>
+    </div>
+
+    <!-- OPTION D -->
+    <div class="option">
+      <div class="oh"><span class="ok-letter">D</span><span class="ot">The readiness scorecard</span></div>
+      <div class="osub">Tracks become assessment pillars with leveled rubrics (the CNCF/Microsoft shape). Teams self-assess; enabling use cases attach to rubric cells.</div>
+      <div class="navmock"><span class="nv">Lifecycle</span><span class="new">Readiness</span><span class="nv">Techniques</span><span class="nv">About</span></div>
+      <div class="verdicts">
+        <span class="v good">stands alone ✓✓ an expectation with teeth</span><span class="v mid">links from lifecycle ◐</span><span class="v bad">loop fit ✗ assessment is a different motion</span><span class="v bad">cost: highest + needs the rigid taxonomy we don't have</span>
+      </div>
+      <div class="meta"><span class="b">Where it breaks now:</span> levels demand exactly the settled, org-blessed taxonomy that doesn't exist yet — premature standardization, and rubrics invite gaming before the vocabulary stabilizes. <span class="b">When it wins:</span> later, as a roll-up <em>view over</em> a settled spine. Until then the seal is the scorecard: <span class="b">expected / not yet</span>.</div>
+    </div>
+
+    <h3 class="sub">Side by side</h3>
+    <div class="tablewrap">
+      <table class="tbl">
+        <thead><tr><th></th><th>A · Second spine</th><th>B · Role hubs</th><th>C · Tag layer</th><th>D · Scorecard</th></tr></thead>
+        <tbody>
+          <tr><td class="b">Stands alone as expectations</td><td><span class="ok">✓✓</span> first-class shelf</td><td><span class="half">◐</span> visible only</td><td><span class="no">✗</span> consumer-defined</td><td><span class="ok">✓✓</span> with teeth</td></tr>
+          <tr><td class="b">Each enabler addressable</td><td><span class="ok">✓</span> own page + anchor</td><td><span class="no">✗</span></td><td><span class="ok">✓</span> tag page</td><td><span class="half">◐</span> rubric cell</td></tr>
+          <tr><td class="b">Places enabling use cases</td><td><span class="ok">✓</span> same entity</td><td><span class="no">✗</span></td><td><span class="no">✗</span> tags aren't placement</td><td><span class="half">◐</span> attach to cells</td></tr>
+          <tr><td class="b"><code>enabled_by</code> from lifecycle</td><td><span class="ok">✓</span> folded in from C</td><td><span class="no">✗</span></td><td><span class="ok">✓✓</span> native</td><td><span class="half">◐</span></td></tr>
+          <tr><td class="b">Gated by <code>build-content</code></td><td><span class="ok">✓</span> full FK checks</td><td><span class="no">✗</span></td><td><span class="ok">✓</span> tag resolution</td><td><span class="ok">✓</span> heavier</td></tr>
+          <tr><td class="b">New machinery</td><td>spine compiler generalized + ~3 templates</td><td>none</td><td>tag machinery reused</td><td>rubric data + assessment UI</td></tr>
+          <tr><td class="b">Submission loop fit</td><td>1 new template + placement fork</td><td>issues become page edits</td><td>technique-style template</td><td>different motion entirely</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="footnote">✓✓ strong · ✓ yes · ◐ partial · ✗ no</p>
+
+    <div class="callout rec">
+      <div class="h">Recommendation — a composite, not a winner-take-all</div>
+      <p style="margin-bottom:0"><span class="b">Take A, fold in C, write B, defer D.</span> Ship the second spine with C's <code>enabled_by</code> edge as part of it; write the track pages in B's voice (that prose is needed anyway); revisit D once enough enablers carry the seal that levels would mean something. The four options were never rivals — B is A's prose, C is A's edges, D is A's executive view, later.</p>
+    </div>
+  </section>
+
+  <!-- 5 — THE LINKAGE MODEL -->
+  <section id="linkage">
+    <div class="rail"><span class="num">05</span><span class="lab">The linkage model</span></div>
+    <h2 class="sec">"Use case × technique, enabled by [a, b, c]"</h2>
+    <p class="lede">The owner's sentence, made literal in frontmatter. Three small field changes — every join the pages need falls out of <code>loadContent()</code>'s existing reverse-index pattern.</p>
+
+    <div class="tablewrap">
+      <table class="tbl">
+        <thead><tr><th>Where</th><th>Field</th><th>Meaning</th><th>Validated by build-content</th></tr></thead>
+        <tbody>
+          <tr><td><code>usecases/*.md</code> <span class="dim">(lifecycle)</span></td><td><code>enabled_by: [e-…]</code> <span class="dim">optional</span></td><td>The preconditions this approach leans on</td><td>every id resolves to an enabler</td></tr>
+          <tr><td><code>usecases/*.md</code> <span class="dim">(enabling)</span></td><td><code>track:</code> + <code>enabler:</code></td><td>Placement on the enablement spine (area derived, like subphase)</td><td>placement resolves; exactly one spine per use case</td></tr>
+          <tr><td>both</td><td><code>techniques: [t-…]</code></td><td>Same shared pool — unchanged</td><td>unchanged</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="diagram">
+      <div class="cap">The join graph — two spines, one entity model, one technique pool</div>
+      <svg viewBox="0 0 960 310" role="img" aria-label="Join graph between lifecycle, use cases, enablers, and techniques">
+        <!-- lifecycle spine -->
+        <rect x="10" y="30" width="220" height="74" rx="10" fill="#ecf2ef" stroke="#2d6a6a"/>
+        <text x="120" y="58" text-anchor="middle" class="t-mono" font-size="11" fill="#1f4d4d">lifecycle spine</text>
+        <text x="120" y="76" text-anchor="middle" class="t-mono" font-size="9.5" fill="#2d6a6a">phase › subphase › activity</text>
+        <text x="120" y="92" text-anchor="middle" class="t-mono" font-size="9" fill="#6b6b66">lifecycle.json</text>
+
+        <!-- lifecycle use case -->
+        <rect x="320" y="30" width="220" height="74" rx="10" fill="#fff" stroke="#d4d1c7"/>
+        <text x="430" y="58" text-anchor="middle" class="t-mono" font-size="11" fill="#1a1a1a">use case (lifecycle)</text>
+        <text x="430" y="76" text-anchor="middle" class="t-mono" font-size="9.5" fill="#6b6b66">phase: build · activity: b-review</text>
+        <text x="430" y="92" text-anchor="middle" class="t-mono" font-size="9.5" fill="#7c6231">enabled_by: [e-data-dictionary]</text>
+        <path d="M320 67 L 234 67" stroke="#9a9a93" stroke-width="1.5" marker-end="url(#arC)"/>
+        <text x="277" y="58" text-anchor="middle" class="t-mono" font-size="9" fill="#9a9a93">places</text>
+
+        <!-- enabler -->
+        <rect x="630" y="30" width="220" height="74" rx="10" fill="#f1ece4" stroke="#8a5a3a"/>
+        <text x="740" y="52" text-anchor="middle" class="t-mono" font-size="11" fill="#6e4527">enabler · e-data-dictionary</text>
+        <text x="740" y="70" text-anchor="middle" class="t-mono" font-size="9.5" fill="#8a5a3a">the expectation (canon + editor)</text>
+        <text x="740" y="88" text-anchor="middle" class="t-mono" font-size="9" fill="#6b6b66">data › describe — enablers.json</text>
+        <path d="M540 67 L 626 67" stroke="#9a7b3f" stroke-width="1.6" stroke-dasharray="6 4" marker-end="url(#arD)"/>
+        <text x="583" y="58" text-anchor="middle" class="t-mono" font-size="9" fill="#7c6231">enabled_by</text>
+
+        <!-- enabling use case -->
+        <rect x="630" y="150" width="220" height="74" rx="10" fill="#fff" stroke="#d4d1c7"/>
+        <text x="740" y="178" text-anchor="middle" class="t-mono" font-size="11" fill="#1a1a1a">use case (enabling)</text>
+        <text x="740" y="196" text-anchor="middle" class="t-mono" font-size="9.5" fill="#6b6b66">track: data · enabler: e-data-dictionary</text>
+        <text x="740" y="212" text-anchor="middle" class="t-mono" font-size="9.5" fill="#6b6b66">same Goal → Approach → Impact</text>
+        <path d="M740 150 L 740 108" stroke="#9a9a93" stroke-width="1.5" marker-end="url(#arC)"/>
+        <text x="755" y="133" class="t-mono" font-size="9" fill="#9a9a93">places</text>
+
+        <!-- technique pool -->
+        <rect x="320" y="150" width="220" height="74" rx="10" fill="#faf7ef" stroke="#e4d7b6"/>
+        <text x="430" y="178" text-anchor="middle" class="t-mono" font-size="11" fill="#7c6231">technique pool</text>
+        <text x="430" y="196" text-anchor="middle" class="t-mono" font-size="9.5" fill="#9a7b3f">techniques.json — one list</text>
+        <text x="430" y="212" text-anchor="middle" class="t-mono" font-size="9.5" fill="#9a7b3f">aggregates across both spines</text>
+        <path d="M430 150 L 430 108" stroke="#cdb98a" stroke-width="1.3" stroke-dasharray="3 3"/>
+        <path d="M540 187 L 626 187" stroke="#cdb98a" stroke-width="1.3" stroke-dasharray="3 3"/>
+
+        <text x="20" y="280" class="t-mono" font-size="9.5" fill="#9a9a93">reverse joins, for free: enabler → its practice (enabling use cases) · enabler → what it unlocks (lifecycle use cases) · technique → practice on both spines</text>
+
+        <defs>
+          <marker id="arC" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto"><path d="M0 0 L9 4.5 L0 9 z" fill="#9a9a93"/></marker>
+          <marker id="arD" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto"><path d="M0 0 L9 4.5 L0 9 z" fill="#9a7b3f"/></marker>
+        </defs>
+      </svg>
+    </div>
+
+    <h3 class="sub">What each page gains</h3>
+    <div class="grid3">
+      <div class="card"><h4>The enabler page</h4><div class="d">Four blocks: <span class="b">the expectation</span> (canon), <span class="b">the editor's note</span>, <span class="b">practice</span> (enabling use cases placed here), and <span class="b">unlocks</span> — every lifecycle use case that declares it in <code>enabled_by</code>. The unlocks list is the demand evidence.</div></div>
+      <div class="card"><h4>The use-case page</h4><div class="d">The sidebar grows an <span class="b">"Enabled by"</span> chip row beside techniques and tools — each chip linking to the enabler it leans on. The owner's sentence, rendered.</div></div>
+      <div class="card"><h4>The technique page</h4><div class="d">Now aggregates practice from <span class="b">both spines</span> — one <code>#structured-output</code> page shows the lifecycle use cases and the enabling use cases that use it. No change to the technique model.</div></div>
+    </div>
+
+    <div class="callout">
+      <div class="h">A curation signal, free of charge</div>
+      <p style="margin-bottom:0"><code>enabled_by</code> counts tell the editor which expectations the org is actually leaning on. An enabler that many lifecycle use cases cite is earning its seal; an enabler nothing cites is either ahead of its time or wrongly framed. Endorsement stops being a taste call and starts being evidenced.</p>
+    </div>
+  </section>
+
+  <!-- 6 — THE SHARED LOOP -->
+  <section id="loop">
+    <div class="rail"><span class="num">06</span><span class="lab">The shared loop</span></div>
+    <h2 class="sec">One loop, two shelves</h2>
+    <p class="lede">The submission/curation loop being built for lifecycle ideas needs exactly one new fork to carry enablers: <span class="b">placement chooses a shelf</span>. Everything else — intake, triage, voices, the seal, the build gate — is shared rail.</p>
+
+    <div class="diagram">
+      <div class="cap">The loop — the fork at "place it" is the only new step</div>
+      <svg viewBox="0 0 960 280" role="img" aria-label="Submission and curation loop with a placement fork">
+        <rect x="10" y="100" width="150" height="64" rx="10" fill="#fff" stroke="#d4d1c7"/>
+        <text x="85" y="126" text-anchor="middle" class="t-mono" font-size="10.5">GitHub issue</text>
+        <text x="85" y="143" text-anchor="middle" class="t-mono" font-size="9" fill="#6b6b66">scoped template</text>
+        <path d="M160 132 L 200 132" stroke="#9a9a93" stroke-width="1.5" marker-end="url(#arE)"/>
+
+        <rect x="204" y="100" width="130" height="64" rx="10" fill="#fff" stroke="#d4d1c7"/>
+        <text x="269" y="126" text-anchor="middle" class="t-mono" font-size="10.5">editor triage</text>
+        <text x="269" y="143" text-anchor="middle" class="t-mono" font-size="9" fill="#6b6b66">real? specific?</text>
+        <path d="M334 132 L 374 132" stroke="#9a9a93" stroke-width="1.5" marker-end="url(#arE)"/>
+
+        <!-- fork -->
+        <rect x="378" y="96" width="120" height="72" rx="12" fill="#f3ecdb" stroke="#9a7b3f" stroke-width="1.5"/>
+        <text x="438" y="124" text-anchor="middle" class="t-mono" font-size="11" fill="#7c6231">place it</text>
+        <text x="438" y="141" text-anchor="middle" class="t-mono" font-size="9" fill="#9a7b3f">the new fork</text>
+        <path d="M498 116 C 530 100, 540 72, 568 64" fill="none" stroke="#2d6a6a" stroke-width="1.5" marker-end="url(#arF)"/>
+        <path d="M498 148 C 530 164, 540 192, 568 200" fill="none" stroke="#8a5a3a" stroke-width="1.5" marker-end="url(#arG)"/>
+
+        <rect x="572" y="34" width="180" height="58" rx="10" fill="#ecf2ef" stroke="#2d6a6a"/>
+        <text x="662" y="58" text-anchor="middle" class="t-mono" font-size="10" fill="#1f4d4d">lifecycle shelf</text>
+        <text x="662" y="76" text-anchor="middle" class="t-mono" font-size="9" fill="#2d6a6a">phase › activity</text>
+
+        <rect x="572" y="172" width="180" height="58" rx="10" fill="#f1ece4" stroke="#8a5a3a"/>
+        <text x="662" y="196" text-anchor="middle" class="t-mono" font-size="10" fill="#6e4527">enablement shelf</text>
+        <text x="662" y="214" text-anchor="middle" class="t-mono" font-size="9" fill="#8a5a3a">track › enabler</text>
+
+        <path d="M752 63 C 790 63, 790 120, 806 126" fill="none" stroke="#9a9a93" stroke-width="1.5"/>
+        <path d="M752 201 C 790 201, 790 145, 806 139" fill="none" stroke="#9a9a93" stroke-width="1.5" marker-end="url(#arE)"/>
+
+        <rect x="810" y="100" width="140" height="64" rx="10" fill="#fff" stroke="#d4d1c7"/>
+        <text x="880" y="120" text-anchor="middle" class="t-mono" font-size="9.5">tag techniques ·</text>
+        <text x="880" y="135" text-anchor="middle" class="t-mono" font-size="9.5">editor's note ·</text>
+        <text x="880" y="151" text-anchor="middle" class="t-mono" font-size="9.5" fill="#7c6231">endorse? ◈ seal</text>
+
+        <text x="480" y="262" text-anchor="middle" class="t-mono" font-size="9.5" fill="#9a9a93">… then PR → build-content validates placements + tags + edges → site. Same gate, both shelves.</text>
+
+        <defs>
+          <marker id="arE" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto"><path d="M0 0 L9 4.5 L0 9 z" fill="#9a9a93"/></marker>
+          <marker id="arF" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto"><path d="M0 0 L9 4.5 L0 9 z" fill="#2d6a6a"/></marker>
+          <marker id="arG" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto"><path d="M0 0 L9 4.5 L0 9 z" fill="#8a5a3a"/></marker>
+        </defs>
+      </svg>
+    </div>
+
+    <div class="callout warn">
+      <div class="h">Three asks of the in-flight loop work — what keeps the rail shareable</div>
+      <ul class="tight" style="margin-bottom:0">
+        <li><span class="b">Placement is a curation step, not a submission field.</span> Submitters describe the work; the editor decides the shelf. Intake stays spine-agnostic.</li>
+        <li><span class="b">Placement targets come from a registry, not a hardcoded list.</span> Anything id-keyed and compiled (today <code>lifecycle.json</code>, tomorrow <code>enablers.json</code>) is a valid shelf.</li>
+        <li><span class="b">Status and endorsement are shelf-agnostic.</span> One label vocabulary (<code>use-case</code>, <code>enabler</code>, …), one promotion path to the seal.</li>
+      </ul>
+    </div>
+
+    <h3 class="sub">The intake template — a sketch</h3>
+    <div class="grid2">
+      <div>
+<pre class="snip"><span class="c"># .github/ISSUE_TEMPLATE/enabler.yml — abbreviated</span>
+name: New enabler / enabling use case
+description: Propose an expectation that makes the org
+  easier to build in — or share how you met one.
+labels: ["enabler"]
+body:
+  - <span class="k">Expectation</span>      <span class="c"># one line — what should be true:
+                     # "our data dictionary is machine-
+                     #  readable and registered"</span>
+  - <span class="k">Who owes it</span>      <span class="c"># platform owner · data owner ·
+                     # product leader · other</span>
+  - <span class="k">The asset</span>        <span class="c"># the dataset / platform / process /
+                     # doc being made agent-ready</span>
+  - <span class="k">Why now</span>          <span class="c"># what broke, or what it unlocks</span>
+  - <span class="k">How you met it</span>   <span class="c"># if practice: approach + links
+                     # to the artifact itself</span>
+  - <span class="k">Unlocks</span>          <span class="c"># lifecycle use cases it accelerates</span>
+  - <span class="k">Techniques</span>       <span class="c"># same shared tags</span></pre>
+      </div>
+      <div>
+        <p style="font-size:14px">Mirrors <code>use-case.yml</code>'s shape — title, substance, optional placement hint, tags — with two deliberate differences: it asks for the <span class="b">asset</span> and the <span class="b">owing role</span> (the two anchors of the taxonomy), and it asks what the work <span class="b">unlocks</span>, which seeds the <code>enabled_by</code> edges at intake time.</p>
+        <p style="font-size:14px;margin-bottom:0">One template can serve both a <em>proposed expectation</em> (no "how you met it" yet) and a <em>practice report</em> (all fields). The editor's triage separates them — exactly as it separates a use case from a technique suggestion today.</p>
+      </div>
+    </div>
+
+    <h3 class="sub">What the seal means over here</h3>
+    <p>The brass seal already carries promotion semantics: <em>proven practice, adopted into the protocol's recommendations</em>. On the enablement spine the same seal reads one notch stronger: an endorsed enabler is a <span class="b">formal expectation of the role</span> — "the protocol now expects platform owners to do this." Same mark, same promotion motion, same curation bar; the shelf supplies the strength of the verb. (That's D5 — including whether "expectation" deserves a distinct visual status instead.)</p>
+  </section>
+
+  <!-- 7 — DECISIONS -->
+  <section id="decisions">
+    <div class="rail"><span class="num">07</span><span class="lab">Your call</span></div>
+    <h2 class="sec">Six decisions</h2>
+    <p class="lede">Pre-set to the recommendation. Override anything, leave notes where you want to steer, then lock it at the bottom.</p>
+
+    <form id="decisions-form">
+
+      <!-- D1 -->
+      <div class="decision" data-q="1" data-title="Which IA do enablers get?">
+        <div class="q"><span class="qn">D1</span><span class="qt">Which IA do enablers get?</span></div>
+        <div class="qd">The §04 options. This is the structural call everything else hangs off.</div>
+        <div class="opts">
+          <label class="opt"><input type="radio" name="d1" value="A — The second spine: enablers.json (track › area › enabler) as a peer browse axis; enabling use cases are the same entity placed by enabler; fold in C's enabled_by edge; write track pages in B's voice; defer D" checked><span><span class="ol">A · The second spine — take A, fold in C, write B, defer D<span class="rectag">recommended</span></span><div class="od">First-class shelf, full validation, same machinery. The composite from §04: C's edges inside it, B's prose on its track pages, D revisited once seals accumulate.</div></span></label>
+          <label class="opt"><input type="radio" name="d1" value="B — Role hubs only: three curated pages (for platform owners / data owners / product leaders), no structured taxonomy yet"><span><span class="ol">B · Role hubs only, for now</span><div class="od">Ships this week, reads well, costs nothing — and is outgrown the moment use cases want to attach or link. A deliberate interim.</div></span></label>
+          <label class="opt"><input type="radio" name="d1" value="C — Tag layer only: enablers as cross-cutting tags with aggregation pages; enabled_by on lifecycle use cases; no standalone enabler shelf"><span><span class="ol">C · Tag layer only</span><div class="od">Cheapest structured option; gets the linkage but inverts the framing — expectations defined by their consumers, empty until adopted.</div></span></label>
+          <label class="opt"><input type="radio" name="d1" value="D — Readiness scorecard: tracks as assessment pillars with leveled rubrics, CNCF/Microsoft-shaped"><span><span class="ol">D · Readiness scorecard</span><div class="od">The expectation with teeth — but it demands a rigid, org-blessed taxonomy that doesn't exist yet, and assessment is a different motion than submission.</div></span></label>
+        </div>
+        <label class="notes-label" for="n1">Notes / constraints for D1</label>
+        <textarea id="n1" data-note="1" placeholder="e.g. start with two tracks, not three — data owners and platform owners first…"></textarea>
+      </div>
+
+      <!-- D2 -->
+      <div class="decision" data-q="2" data-title="What names the top tier of the enabler taxonomy?">
+        <div class="q"><span class="qn">D2</span><span class="qt">What names the top tier?</span></div>
+        <div class="qd">The §02 synthesis: steward, surface, or quality could each anchor the spine. The org's durable buckets are roles.</div>
+        <div class="opts">
+          <label class="opt"><input type="radio" name="d2" value="A — Stewardship roles: data owners / platform owners / product leaders — the org's existing buckets; surfaces become the area tier" checked><span><span class="ol">A · Stewardship roles<span class="rectag">recommended</span></span><div class="od">Matches the buckets the org already recognizes, makes accountability legible ("what's expected of <em>you</em>"), and roles ≈ surfaces today anyway. Extensible by adding a track.</div></span></label>
+          <label class="opt"><input type="radio" name="d2" value="B — Asset surfaces: data / platform / direction (or similar) as tracks; roles mentioned within"><span><span class="ol">B · Asset surfaces</span><div class="od">Cleaner when one asset has several stewards — but loses the "expectations of a role" framing that makes enablers land as new norms.</div></span></label>
+          <label class="opt"><input type="radio" name="d2" value="C — Readiness qualities: discoverable / machine-readable / addressable / current / permissioned as the top-level sections"><span><span class="ol">C · Readiness qualities</span><div class="od">Elegant and framework-faithful, but nobody owns "discoverable" — accountability evaporates. Keep qualities as vocabulary (D6), not structure.</div></span></label>
+        </div>
+        <label class="notes-label" for="n2">Notes / constraints for D2</label>
+        <textarea id="n2" data-note="2" placeholder="e.g. rename 'product leaders' to 'product & strategy leaders'; add an API-owners track in v2…"></textarea>
+      </div>
+
+      <!-- D3 -->
+      <div class="decision" data-q="3" data-title="Is an enabling use case the same entity as a lifecycle use case?">
+        <div class="q"><span class="qn">D3</span><span class="qt">Is an enabling use case the same entity?</span></div>
+        <div class="qd">The owner's instinct: "enabling use cases are likely analogous to lifecycle use cases."</div>
+        <div class="opts">
+          <label class="opt"><input type="radio" name="d3" value="A — Same entity: one usecases/*.md pool; placement is a union — either phase+activity or track+enabler; same Goal/Approach/Impact, techniques, seal, featured" checked><span><span class="ol">A · Same entity, placement union<span class="rectag">recommended</span></span><div class="od">One file shape, one card component, one validation path, one intake. A use case places on exactly one spine; everything else about it is identical.</div></span></label>
+          <label class="opt"><input type="radio" name="d3" value="B — Separate entity type (enablings/*.md) with its own schema and components"><span><span class="ol">B · Separate entity type</span><div class="od">Lets the schemas drift apart later — at the cost of duplicating components, validation, and intake now, before any divergence has earned it.</div></span></label>
+          <label class="opt"><input type="radio" name="d3" value="C — No use cases on enablers: enabler pages carry prose-only guidance (technique-style detail)"><span><span class="ol">C · Prose-only enablers</span><div class="od">Simpler, but forfeits the playbook's core mechanic — practice cards as evidence — exactly where adoption needs the most proof.</div></span></label>
+        </div>
+        <label class="notes-label" for="n3">Notes / constraints for D3</label>
+        <textarea id="n3" data-note="3" placeholder="e.g. enabling use cases may also want a 'maintained by' field…"></textarea>
+      </div>
+
+      <!-- D4 -->
+      <div class="decision" data-q="4" data-title="How do lifecycle use cases reference enablers?">
+        <div class="q"><span class="qn">D4</span><span class="qt">How do lifecycle use cases reference enablers?</span></div>
+        <div class="qd">The "use case × technique, enabled by [a, b, c]" linkage from §05.</div>
+        <div class="opts">
+          <label class="opt"><input type="radio" name="d4" value="A — Validated enabled_by frontmatter: optional array of enabler ids; build-content fails on unknown ids; pages render chips + reverse 'unlocks' lists" checked><span><span class="ol">A · Validated <code>enabled_by</code> frontmatter<span class="rectag">recommended</span></span><div class="od">A real foreign key: chips on the use-case page, an "unlocks" list on the enabler page, and demand-evidence for endorsement — all from one optional field.</div></span></label>
+          <label class="opt"><input type="radio" name="d4" value="B — Freeform resource links only (links: [{label, url}]) — no validated edge"><span><span class="ol">B · Freeform links only</span><div class="od">Zero schema change, but no reverse join, no validation, no demand signal — the linkage the owner asked for never becomes queryable.</div></span></label>
+          <label class="opt"><input type="radio" name="d4" value="C — Defer the edge: ship the enabler shelf first, add enabled_by once a dozen enablers exist"><span><span class="ol">C · Defer the edge</span><div class="od">Defensible sequencing — but the field is optional anyway, so deferring buys little and forfeits early demand data.</div></span></label>
+        </div>
+        <label class="notes-label" for="n4">Notes / constraints for D4</label>
+        <textarea id="n4" data-note="4" placeholder="e.g. also allow enabled_by between enablers? (probably not yet)…"></textarea>
+      </div>
+
+      <!-- D5 -->
+      <div class="decision" data-q="5" data-title="What does endorsement mean on an enabler?">
+        <div class="q"><span class="qn">D5</span><span class="qt">What does the seal mean on an enabler?</span></div>
+        <div class="qd">On the lifecycle, the brass seal = "adopted into the protocol's recommendations." Enablers are expectations, so the seal reads stronger.</div>
+        <div class="opts">
+          <label class="opt"><input type="radio" name="d5" value="A — Same seal, stronger reading: an endorsed enabler is a formal expectation of the role; same promotion motion and curation bar" checked><span><span class="ol">A · Same seal, stronger reading<span class="rectag">recommended</span></span><div class="od">One mark, one motion; the shelf supplies the verb's strength. "Expected of platform owners" needs no new chrome — and keeps endorsement scarce and legible.</div></span></label>
+          <label class="opt"><input type="radio" name="d5" value="B — Distinct status: a separate 'expected' state with its own visual treatment, above or beside the seal"><span><span class="ol">B · A distinct "expected" status</span><div class="od">Honest about the semantic difference — at the cost of a second promotion vocabulary to govern and explain.</div></span></label>
+          <label class="opt"><input type="radio" name="d5" value="C — No endorsement on enablers yet: all enablers are provisional until the taxonomy settles"><span><span class="ol">C · No endorsement yet</span><div class="od">Cautious, but it removes the very mechanism that turns an enabler from a suggestion into an expectation — the stated point of elevating them.</div></span></label>
+        </div>
+        <label class="notes-label" for="n5">Notes / constraints for D5</label>
+        <textarea id="n5" data-note="5" placeholder="e.g. endorsing an enabler requires a named exec sponsor…"></textarea>
+      </div>
+
+      <!-- D6 -->
+      <div class="decision" data-q="6" data-title="The quality vocabulary — editorial or structured?">
+        <div class="q"><span class="qn">D6</span><span class="qt">The quality vocabulary — editorial or structured?</span></div>
+        <div class="qd">Discoverable · machine-readable · addressable · current · permissioned (§03). Structured-if-you'd-query-it says: not until something queries it.</div>
+        <div class="opts">
+          <label class="opt"><input type="radio" name="d6" value="A — Editorial now: canon lines name the qualities an enabler confers; promote to structured frontmatter badges only when something needs to filter on them" checked><span><span class="ol">A · Editorial now, structured when earned<span class="rectag">recommended</span></span><div class="od">Consistent with the data-layer rule. The words appear in canon from day one; the schema waits for a real query (a filter, a badge row, a scorecard).</div></span></label>
+          <label class="opt"><input type="radio" name="d6" value="B — Structured now: qualities: [discoverable, machine-readable, …] in enabler frontmatter, rendered as badges"><span><span class="ol">B · Structured badges now</span><div class="od">Nice chrome and future-proof for a scorecard — but it's schema ahead of need, and five-word taxonomies are exactly the ones that churn.</div></span></label>
+          <label class="opt"><input type="radio" name="d6" value="C — Drop the quality vocabulary; let each enabler describe readiness in its own words"><span><span class="ol">C · Drop it</span><div class="od">Maximum flexibility, but forfeits the one piece of shared language the research actually converged on.</div></span></label>
+        </div>
+        <label class="notes-label" for="n6">Notes / constraints for D6</label>
+        <textarea id="n6" data-note="6" placeholder="e.g. add 'testable' as a sixth quality…"></textarea>
+      </div>
+
+      <!-- overall -->
+      <div class="decision" style="background:var(--bg-elev)">
+        <div class="q"><span class="qn">±</span><span class="qt">Overall verdict &amp; anything else</span></div>
+        <div class="qd">Sequencing, scope cuts, naming ("Enablers" vs "Readiness" vs "Expectations" in the nav), seed content priorities, coordination notes for the submission-loop session.</div>
+        <label class="notes-label" for="overall">Owner notes</label>
+        <textarea id="overall" style="min-height:90px" placeholder="e.g. seed with three enablers (one per track), each with one real enabling use case, before announcing the shelf. Nav label: 'Enablers'. Coordinate the issue-template wording with the loop session…"></textarea>
+      </div>
+
+    </form>
+
+    <!-- live preview -->
+    <div class="preview-wrap">
+      <div class="preview-head">
+        <h3 class="sub" style="margin:0">Locked decision — preview</h3>
+        <span class="pill" id="rec-flag">as recommended</span>
+      </div>
+      <pre class="preview" id="preview"></pre>
+    </div>
+  </section>
+
+  <!-- SOURCES -->
+  <section id="sources">
+    <div class="rail"><span class="num">··</span><span class="lab">Sources</span></div>
+    <h3 class="sub" style="margin-top:0">The survey's sources</h3>
+    <ul class="srcs">
+      <li>FAIR Guiding Principles — <a href="https://www.go-fair.org/fair-principles/">go-fair.org/fair-principles</a></li>
+      <li>Zhamak Dehghani, Data Mesh principles (data-as-a-product, DATSIS) — <a href="https://martinfowler.com/articles/data-mesh-principles.html">martinfowler.com/articles/data-mesh-principles</a></li>
+      <li>Gartner, AI-Ready Data essentials — <a href="https://www.gartner.com/en/articles/ai-ready-data">gartner.com/en/articles/ai-ready-data</a> · press release, <a href="https://www.gartner.com/en/newsroom/press-releases/2025-02-26-lack-of-ai-ready-data-puts-ai-projects-at-risk">Lack of AI-ready data puts AI projects at risk</a> (2025)</li>
+      <li>CNCF TAG App Delivery, Platform Engineering Maturity Model — <a href="https://tag-app-delivery.cncf.io/whitepapers/platform-eng-maturity-model/">tag-app-delivery.cncf.io</a></li>
+      <li>Microsoft, Agentic AI adoption maturity model / Agent Readiness Framework — <a href="https://learn.microsoft.com/en-us/agents/adoption-maturity-model/">learn.microsoft.com/en-us/agents/adoption-maturity-model</a> · <a href="https://adoption.microsoft.com/files/agents/AgenticReadinessFrameworkOverview.pdf">framework overview (PDF)</a></li>
+      <li>Cloudflare, Introducing the Agent Readiness score — <a href="https://blog.cloudflare.com/agent-readiness/">blog.cloudflare.com/agent-readiness</a></li>
+      <li>Agent Experience (AX) — <a href="https://agentexperience.ax/">agentexperience.ax</a> · llms.txt — <a href="https://llmstxt.org/">llmstxt.org</a> · AGENTS.md — <a href="https://agents.md/">agents.md</a></li>
+      <li>McKinsey, The agentic organization — <a href="https://www.mckinsey.com/capabilities/people-and-organizational-performance/our-insights/the-agentic-organization-contours-of-the-next-paradigm-for-the-ai-era">contours of the next paradigm</a> · <a href="https://www.mckinsey.com/capabilities/mckinsey-technology/our-insights/building-the-foundations-for-agentic-ai-at-scale">building the foundations for agentic AI at scale</a></li>
+      <li>Salesforce et al., semantic layers for AI agents / Open Semantic Interchange — <a href="https://www.salesforce.com/blog/semantic-layer-ai-agents-data-360/">salesforce.com/blog</a></li>
+      <li>Diátaxis documentation framework — <a href="https://diataxis.fr/">diataxis.fr</a></li>
+    </ul>
+    <p class="dim" style="font-size:13px;margin-top:22px">Working artifact, not published site content — same family as <code>docs/data-layer-decision.html</code>. Companion to the live <a href="https://dudgeon.org/product-practice-playbook/ia/">IA Proposal</a> and <a href="https://dudgeon.org/product-practice-playbook/prd/">Master PRD</a>.</p>
+  </section>
+
+</div>
+
+<!-- STICKY LOCK BAR -->
+<div class="lockbar">
+  <div class="inner">
+    <div class="msg" id="lock-msg">Selections start at the recommendation. Lock when ready.</div>
+    <button type="button" class="btn btn-ghost" id="reset-btn">Reset to recommended</button>
+    <button type="button" class="btn btn-primary" id="copy-btn">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+      Copy decision to Claude
+    </button>
+  </div>
+</div>
+
+<div class="toast" id="toast">Copied — paste it back into chat to lock</div>
+
+<script>
+(function(){
+  var DEFAULTS = { d1:'A', d2:'A', d3:'A', d4:'A', d5:'A', d6:'A' };
+  var form = document.getElementById('decisions-form');
+  var preview = document.getElementById('preview');
+  var recFlag = document.getElementById('rec-flag');
+  var lockMsg = document.getElementById('lock-msg');
+
+  function selected(name){
+    var el = form.querySelector('input[name="'+name+'"]:checked');
+    return el ? el.value : '(none chosen)';
+  }
+  function letter(name){
+    var el = form.querySelector('input[name="'+name+'"]:checked');
+    return el ? el.value.trim().charAt(0) : '?';
+  }
+  function note(n){
+    var el = document.querySelector('textarea[data-note="'+n+'"]');
+    return el ? el.value.trim() : '';
+  }
+  function decisionBlock(n, name){
+    var dec = form.querySelector('.decision[data-q="'+n+'"]');
+    var title = dec ? dec.getAttribute('data-title') : '';
+    var out = '### D'+n+' — '+title+'\n- Choice: '+selected(name)+'\n';
+    var nt = note(n);
+    if(nt) out += '- Notes: '+nt+'\n';
+    return out;
+  }
+  function countOverrides(){
+    var c = 0;
+    for(var k in DEFAULTS){ if(letter(k) !== DEFAULTS[k]) c++; }
+    return c;
+  }
+
+  function buildPrompt(){
+    var overall = document.getElementById('overall').value.trim();
+    var n = countOverrides();
+    var head =
+'Lock the enablers IA decision and implement it.\n\n' +
+'Context: this is the AI PDLC Playbook static site. The research survey, starting taxonomy, IA options, linkage model, and shared submission loop are in `docs/enablers-ia-proposal.html` (this artifact). The owner has made the calls below — treat them as the source of truth, override the artifact’s recommendation where they differ, and propose the plan before writing code.\n\n' +
+'## Locked decisions\n\n';
+    var body =
+decisionBlock(1,'d1') + '\n' +
+decisionBlock(2,'d2') + '\n' +
+decisionBlock(3,'d3') + '\n' +
+decisionBlock(4,'d4') + '\n' +
+decisionBlock(5,'d5') + '\n' +
+decisionBlock(6,'d6') + '\n';
+    var tail = '';
+    if(overall) tail += '### Overall verdict & notes\n' + overall + '\n\n';
+    tail +=
+'## What I want from you next\n' +
+'1. Confirm you understand each locked choice (flag any conflicts between them).\n' +
+'2. Coordinate with the in-flight submission/curation-loop work: confirm intake stays spine-agnostic (placement as a curation step, registry-driven targets, shelf-agnostic endorsement) before building overlapping parts.\n' +
+'3. Give me the seed plan as the smallest reversible steps: starter `enablers.json`, compiler/validator generalization, track + enabler pages, the intake template, three seeded enablers (one per track) each with one real enabling use case, and `enabled_by` backfill on existing use cases where honest. Say what the first PR contains.\n' +
+'4. Then implement on the current branch, keeping the lifecycle side’s rendered output unchanged until a change is intended.\n\n' +
+'(' + (n===0 ? 'Left at the recommendation: the composite — second spine, role-named tracks, one use-case entity, validated enabled_by, same seal, editorial qualities.' : n + ' of 6 decisions overridden from the recommended defaults.') + ')\n';
+    return head + body + tail;
+  }
+
+  function refresh(){
+    preview.textContent = buildPrompt();
+    var n = countOverrides();
+    if(n===0){ recFlag.textContent = 'as recommended'; }
+    else { recFlag.textContent = n + ' overridden'; }
+  }
+
+  form.addEventListener('input', refresh);
+  form.addEventListener('change', refresh);
+
+  // copy
+  var toast = document.getElementById('toast');
+  var toastTimer;
+  function showToast(msg){
+    toast.textContent = msg;
+    toast.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function(){ toast.classList.remove('show'); }, 2600);
+  }
+  function copyText(text){
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(text).then(
+        function(){ showToast('Copied — paste it back into chat to lock'); },
+        function(){ fallbackCopy(text); }
+      );
+    } else { fallbackCopy(text); }
+  }
+  function fallbackCopy(text){
+    var ta = document.createElement('textarea');
+    ta.value = text; ta.style.position='fixed'; ta.style.opacity='0';
+    document.body.appendChild(ta); ta.focus(); ta.select();
+    var ok=false; try{ ok = document.execCommand('copy'); }catch(e){}
+    document.body.removeChild(ta);
+    showToast(ok ? 'Copied — paste it back into chat to lock' : 'Copy failed — select the preview text manually');
+  }
+  document.getElementById('copy-btn').addEventListener('click', function(){
+    copyText(buildPrompt());
+    lockMsg.textContent = 'Decision copied. Paste it into the Claude chat to lock and kick off implementation.';
+  });
+
+  // reset
+  document.getElementById('reset-btn').addEventListener('click', function(){
+    for(var k in DEFAULTS){
+      var el = form.querySelector('input[name="'+k+'"][value^="'+DEFAULTS[k]+' "]');
+      if(el) el.checked = true;
+    }
+    form.querySelectorAll('textarea').forEach(function(t){ t.value=''; });
+    refresh();
+    lockMsg.textContent = 'Reset to the recommended decision.';
+  });
+
+  refresh();
+})();
+</script>
+</body>
+</html>

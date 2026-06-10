@@ -35,6 +35,12 @@ render it into static HTML at build time.
   recommendations with a brass *PDLC‑endorsed* seal.
 - **Contribution via GitHub issues.** The header CTA and every contextual
   "+ Add" link deep‑link to a scoped [issue template](.github/ISSUE_TEMPLATE).
+- **Proposed — Enablers, a second axis.** Agent‑readiness expectations for
+  platform owners, data owners, and product leaders (make your data, platform
+  context, and priorities discoverable + machine‑readable), standing alone as
+  expectations and linked from lifecycle use cases via `enabled_by`. Research
+  survey, a flexible starting taxonomy, four IA options, and the open
+  decisions: [`docs/enablers-ia-proposal.html`](docs/enablers-ia-proposal.html).
 
 ## How it's built
 
