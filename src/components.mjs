@@ -52,15 +52,22 @@ export const endorsed = ({ lg = false } = {}) =>
 // ------------------------------------------------------ the three voices ----
 
 // CANON — "what the PDLC says". Brass/official. Renders a silent state when
-// no text is supplied.
-export function canon({ text, seal: withSeal = false } = {}) {
+// no text is supplied. The enablement spine reuses the block under a softened
+// label ("The expectation · proposed") and no Protocol seal — there are no
+// endorsed expectations on that spine yet, by decision.
+export function canon({
+  text,
+  seal: withSeal = false,
+  label = 'What the PDLC says',
+  silent: silentText = 'The protocol is silent here — this activity is yours to define.',
+} = {}) {
   const silent = !text;
   return (
     `<div class="canon">` +
-    `<div class="voice-label"><span class="vmark"></span> What the PDLC says</div>` +
+    `<div class="voice-label"><span class="vmark"></span> ${esc(label)}</div>` +
     when(withSeal, () => `<span class="canon-seal">${seal(12)} Protocol</span>`) +
     `<div class="${cx('canon-text', silent && 'silent')}">` +
-    (silent ? 'The protocol is silent here — this activity is yours to define.' : esc(text)) +
+    (silent ? esc(silentText) : esc(text)) +
     `</div></div>`
   );
 }
@@ -107,17 +114,46 @@ export function practiceHead({ title = 'In practice', count, right = '' } = {}) 
 }
 
 // ----------------------------------------------------------- tags / author --
+
+// Resolve a use case's spot on whichever spine it sits on: lifecycle
+// (phase › activity) or enablement (track › enabler). `root` carries the hue;
+// `key` is the root id (drives the p-<id> card classes, generated per spine).
+export function resolvePlace(uc) {
+  if (uc.placement.track) {
+    return {
+      root: DB.track(uc.placement.track),
+      leaf: DB.enabler(uc.placement.enabler),
+      key: uc.placement.track,
+      rootRoute: routes.track(uc.placement.track),
+    };
+  }
+  return {
+    root: DB.phase(uc.placement.phase),
+    leaf: DB.activity(uc.placement.activity),
+    key: uc.placement.phase,
+    rootRoute: routes.phase(uc.placement.phase),
+  };
+}
+
 export function placeTag(uc, withActivity = false) {
-  const ph = DB.phase(uc.placement.phase);
-  const act = DB.activity(uc.placement.activity);
-  const label = ph.name + (withActivity && act ? ' · ' + act.name : '');
-  return `<a href="${routes.phase(ph.id)}" class="tag lc" style="--phase:${ph.hue}">${esc(label)}</a>`;
+  const { root, leaf, rootRoute } = resolvePlace(uc);
+  const label = root.name + (withActivity && leaf ? ' · ' + leaf.name : '');
+  return `<a href="${rootRoute}" class="tag lc" style="--phase:${root.hue}">${esc(label)}</a>`;
 }
 
 export function techTag(id) {
   const t = DB.technique(id);
   if (!t) return '';
   return `<a href="${routes.technique(id)}" class="tag tech">${esc(t.name)}</a>`;
+}
+
+// An enabler chip — colored by its track, links to the enabler page. Used for
+// a use case's optional `enabled_by` list (soft by design: rendered only when
+// the author declared it, never demanded).
+export function enablerTag(id) {
+  const e = DB.enabler(id);
+  if (!e) return '';
+  return `<a href="${routes.enabler(id)}" class="tag lc" style="--phase:${e.track.hue}">${esc(e.name)}</a>`;
 }
 
 export function author(name, role = 'Contributor') {
@@ -129,11 +165,10 @@ export function author(name, role = 'Contributor') {
 
 // ----------------------------------------------------------------- cards ----
 export function useCaseCard(uc, showProblem = true) {
-  const ph = DB.phase(uc.placement.phase);
-  const act = DB.activity(uc.placement.activity);
+  const { root, leaf, key } = resolvePlace(uc);
   return (
-    `<a class="uc-card p-${uc.placement.phase}" style="--phase:${ph.hue}" href="${routes.usecase(uc.id)}">` +
-    `<div class="place"><span class="swatch"></span>${esc(ph.name)} · ${esc(act.name)}` +
+    `<a class="uc-card p-${key}" style="--phase:${root.hue}" href="${routes.usecase(uc.id)}">` +
+    `<div class="place"><span class="swatch"></span>${esc(root.name)} · ${esc(leaf.name)}` +
     when(uc.endorsed, () => `<span class="spacer"></span>${endorsed()}`) +
     `</div>` +
     `<div class="uc-title">${esc(uc.title)}</div>` +
@@ -149,12 +184,11 @@ export function useCaseCard(uc, showProblem = true) {
 }
 
 export function featCard(uc, big = false) {
-  const ph = DB.phase(uc.placement.phase);
-  const act = DB.activity(uc.placement.activity);
+  const { root, leaf, key } = resolvePlace(uc);
   return (
-    `<a class="feat-card p-${uc.placement.phase}" style="--phase:${ph.hue};min-height:${big ? 250 : 180}px" href="${routes.usecase(uc.id)}">` +
+    `<a class="feat-card p-${key}" style="--phase:${root.hue};min-height:${big ? 250 : 180}px" href="${routes.usecase(uc.id)}">` +
     `<div class="row" style="gap:8px;flex-wrap:wrap">` +
-    `<span class="tag lc" style="--phase:${ph.hue}">${esc(ph.name)} · ${esc(act.name)}</span>` +
+    `<span class="tag lc" style="--phase:${root.hue}">${esc(root.name)} · ${esc(leaf.name)}</span>` +
     when(uc.endorsed, () => endorsed()) +
     `</div>` +
     `<div class="f-title" style="font-size:${big ? 25 : 18}px">${esc(uc.title)}</div>` +
@@ -220,6 +254,48 @@ export function spineBoard() {
   );
 }
 
+// ------------------------------------------------------ the enabler board ---
+
+// The enablement spine's home board — same bones as the spine board (the CSS
+// is id-keyed and generated per track), tracks for phases, enablers for
+// activities. No endorse dots: this spine carries no endorsements yet.
+export function trackBoard() {
+  const rail = DB.tracks.map((t) => t.hue).join(', ');
+  return (
+    `<div class="spine spine-board"><div class="spine-rail" style="background:linear-gradient(90deg, ${rail})"></div>` +
+    DB.tracks
+      .map(
+        (t) =>
+          `<div class="phase-col pc-${t.id}" style="--phase:${t.hue}">` +
+          `<div class="phase-node"><span class="phase-dot"></span><span class="phase-num">TRACK ${esc(t.n)}</span></div>` +
+          `<a class="phase-head-link" href="${routes.track(t.id)}"><div class="phase-name">${esc(t.name)}</div></a>` +
+          `<div class="phase-tag">${esc(t.tagline)}</div>` +
+          `<div class="activity-list">` +
+          t.areas
+            .map((ar) => {
+              const rows = ar.enablers
+                .map((e) => {
+                  const n = DB.ucByEnabler(e.id).length;
+                  return (
+                    `<a class="${cx('activity-row', n === 0 && 'empty')}" href="${routes.enabler(e.id)}">` +
+                    `<span class="a-name">${esc(e.name)}</span>` +
+                    `<span class="a-count">${n || '—'}</span></a>`
+                  );
+                })
+                .join('');
+              // Implicit areas (a flat track — the emergent default) carry no label.
+              return ar.implicit
+                ? rows
+                : `<a class="subphase-head" href="${routes.area(t.id, ar.id)}">${esc(ar.name)}</a>${rows}`;
+            })
+            .join('') +
+          `</div></div>`
+      )
+      .join('') +
+    `</div>`
+  );
+}
+
 // --------------------------------------------------------- breadcrumbs ------
 export function crumbs(items) {
   return (
@@ -242,23 +318,38 @@ export function crumbs(items) {
 // --------------------------------------------- GitHub-issue submit flow -----
 
 /** Deep link to the repo's new-issue form, with the scope prefilled. */
-export function issueUrl({ field = 'placement', value = '' } = {}) {
+export function issueUrl({
+  field = 'placement',
+  value = '',
+  template = 'use-case.yml',
+  labels = 'use-case',
+} = {}) {
   const u = new URL(`${DB.site.repoUrl}/issues/new`);
-  u.searchParams.set('template', 'use-case.yml');
-  u.searchParams.set('labels', 'use-case');
+  u.searchParams.set('template', template);
+  u.searchParams.set('labels', labels);
   if (value) u.searchParams.set(field, value);
   return u.toString();
 }
 
 // A contextual "+ Add …" affordance. Without JS it links straight to the
 // scoped GitHub issue; with JS it opens the submit modal (see assets/js/app.js).
-export function addLink({ label = null, scopeField = 'placement', children } = {}) {
-  const href = issueUrl({ field: scopeField, value: label || '' });
-  const title = label ? `Add to “${label}”` : 'Submit a use case';
-  const scope = label || 'phase › activity';
+// Intake stays spine-agnostic: the template/labels only pick the issue form —
+// placement is the editor's curation step, not the submitter's burden.
+export function addLink({
+  label = null,
+  scopeField = 'placement',
+  children,
+  template = 'use-case.yml',
+  labels = 'use-case',
+  scope = 'phase › activity',
+  verb = 'Submit a use case',
+} = {}) {
+  const href = issueUrl({ field: scopeField, value: label || '', template, labels });
+  const title = label ? `Add to “${label}”` : verb;
+  const scopeText = label || scope;
   return (
     `<a class="add-link" href="${esc(href)}" target="_blank" rel="noopener"` +
-    ` data-submit data-submit-title="${esc(title)}" data-submit-scope="${esc(scope)}">` +
+    ` data-submit data-submit-title="${esc(title)}" data-submit-scope="${esc(scopeText)}">` +
     `${gh(13)} ${esc(children || '+ Add a use case to this section')}</a>`
   );
 }
@@ -267,6 +358,10 @@ export function addLink({ label = null, scopeField = 'placement', children } = {
 export function header(active = 'lifecycle') {
   const nav = [
     ['Lifecycle', routes.home(), active === 'lifecycle'],
+    // The second axis appears only once the enablement spine has content.
+    ...(DB.tracks && DB.tracks.length
+      ? [['Enablers', routes.enablers(), active === 'enablers']]
+      : []),
     ['Techniques', routes.techniques(), active === 'techniques'],
     ['About', routes.about('pdlc'), active === 'about'],
   ];

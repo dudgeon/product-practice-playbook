@@ -25,6 +25,9 @@ const TARGET = {
   usecase: (id) => `use-case/${id}/index.html`,
   technique: (id) => `technique/${id}/index.html`,
   techniques: 'techniques/index.html',
+  enablers: 'enablers/index.html',
+  track: (id) => `track/${id}/index.html`,
+  enabler: (id) => `enabler/${id}/index.html`,
   about: (which) => `about/${which}/index.html`,
   gallery: 'gallery/index.html',
   prd: 'prd/index.html',
@@ -52,6 +55,12 @@ export const routes = {
   usecase: (id) => rel(TARGET.usecase(id)),
   technique: (id) => rel(TARGET.technique(id)),
   techniques: () => rel(TARGET.techniques),
+  enablers: () => rel(TARGET.enablers),
+  track: (id) => rel(TARGET.track(id)),
+  // Areas mirror subphases: not standalone pages, but deep-linkable anchored
+  // sections on their track page (e.g. track/data/#describe).
+  area: (trackId, areaId) => `${rel(TARGET.track(trackId))}#${areaId}`,
+  enabler: (id) => rel(TARGET.enabler(id)),
   about: (which) => rel(TARGET.about(which)),
   gallery: () => rel(TARGET.gallery),
   prd: () => rel(TARGET.prd),

@@ -9,7 +9,12 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import matter from 'gray-matter';
-import { compileLifecycle, parseSpineProse, mergePhaseProse } from './lifecycle.mjs';
+import {
+  compileLifecycle,
+  compileEnablement,
+  parseSpineProse,
+  mergeSpineProse,
+} from './lifecycle.mjs';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(here, '..', '..');
@@ -35,18 +40,28 @@ function splitSections(body) {
 const sectionBody = (sections, heading) =>
   sections.find((s) => s.heading.toLowerCase() === heading.toLowerCase())?.body || '';
 
-// Read the per-phase editorial prose (content/phases/<id>.md) into a map keyed
-// by phase id: { canon, editor, activities: { <activityId>: { canon, editor } } }.
-export function loadPhaseProse() {
-  const dir = path.join(CONTENT, 'phases');
+// Read a spine's per-root editorial prose (content/<dirName>/<id>.md) into a
+// map keyed by root id: { canon, editor, <leafKey>: { <leafId>: { canon, editor } } }.
+function loadSpineProse(dirName, leafKey) {
+  const dir = path.join(CONTENT, dirName);
   if (!fs.existsSync(dir)) return {};
   const out = {};
-  for (const file of readDir('phases')) {
+  for (const file of readDir(dirName)) {
     const { data, content } = matter(fs.readFileSync(file, 'utf8'));
     const id = data.id || path.basename(file, '.md');
-    out[id] = { id, ...parseSpineProse(content), activities: data.activities || {} };
+    out[id] = { id, ...parseSpineProse(content), [leafKey]: data[leafKey] || {} };
   }
   return out;
+}
+
+/** Per-phase prose: { canon, editor, activities: { <activityId>: {…} } }. */
+export function loadPhaseProse() {
+  return loadSpineProse('phases', 'activities');
+}
+
+/** Per-track prose: { canon, editor, enablers: { <enablerId>: {…} } }. */
+export function loadTrackProse() {
+  return loadSpineProse('tracks', 'enablers');
 }
 
 export function loadContent() {
@@ -55,7 +70,17 @@ export function loadContent() {
   // content/phases/<id>.md (so canon + the editor's note are authored as Markdown).
   const { phases } = compileLifecycle(readJSON('lifecycle.json'));
   const phaseProse = loadPhaseProse();
-  mergePhaseProse(phases, phaseProse);
+  mergeSpineProse(phases, phaseProse, 'activities');
+
+  // The enablement spine (the second axis): tracks → areas → enablers, compiled
+  // from enablers.json with prose merged from content/tracks/<id>.md. The whole
+  // shelf is optional — no file, no tracks, and the site renders lifecycle-only.
+  const enablersFile = path.join(CONTENT, 'enablers.json');
+  const { tracks } = fs.existsSync(enablersFile)
+    ? compileEnablement(readJSON('enablers.json'))
+    : { tracks: [] };
+  const trackProse = loadTrackProse();
+  mergeSpineProse(tracks, trackProse, 'enablers');
 
   // Techniques are a lean JSON tag list; a technique graduates to its own
   // Markdown file (content/techniques/<id>.md) when it needs real explanation —
@@ -68,12 +93,19 @@ export function loadContent() {
     return { ...t, ...data, ...(detail ? { detail } : {}) };
   });
 
+  // Placement is a union: a use case sits on exactly one spine — lifecycle
+  // (phase + activity) or enablement (track + enabler). Validation enforces it.
   const usecases = readDir('usecases').map((file) => {
     const { data, content } = matter(fs.readFileSync(file, 'utf8'));
     const sections = splitSections(content);
     return {
       ...data,
-      placement: { phase: data.phase, activity: data.activity },
+      placement: {
+        phase: data.phase,
+        activity: data.activity,
+        track: data.track,
+        enabler: data.enabler,
+      },
       goal: sectionBody(sections, 'Goal'),
       approach: sectionBody(sections, 'Approach'),
       impact: sectionBody(sections, 'Impact'),
@@ -112,6 +144,28 @@ export function loadContent() {
   const usecase = (id) => usecases.find((u) => u.id === id);
   const aboutPage = (which) => about.find((a) => a.which === which);
 
+  // ---- Enablement-spine lookups (mirrors of the lifecycle helpers) ----
+  const track = (id) => tracks.find((t) => t.id === id);
+  // Walk track → area → enabler so a resolved enabler carries both its track
+  // and the area it sits in (the area is derived from the enabler, never
+  // stored on the use case). Returns null if the id resolves to no enabler.
+  const enabler = (id) => {
+    for (const t of tracks) {
+      for (const ar of t.areas) {
+        const e = ar.enablers.find((x) => x.id === id);
+        if (e) return { ...e, track: t, area: ar };
+      }
+    }
+    return null;
+  };
+  const area = (id) => {
+    for (const t of tracks) {
+      const ar = t.areas.find((x) => x.id === id);
+      if (ar) return { ...ar, track: t };
+    }
+    return null;
+  };
+
   const ucByPhase = (pid) => usecases.filter((u) => u.placement.phase === pid);
   const ucByActivity = (aid) => usecases.filter((u) => u.placement.activity === aid);
   const ucBySubphase = (sid) => {
@@ -123,10 +177,21 @@ export function loadContent() {
   const ucByTechnique = (tid) => usecases.filter((u) => u.techniques.includes(tid));
   const techCount = (tid) => ucByTechnique(tid).length;
 
+  const ucByTrack = (tid) => usecases.filter((u) => u.placement.track === tid);
+  const ucByEnabler = (eid) => usecases.filter((u) => u.placement.enabler === eid);
+  // The reverse edge of `enabled_by`: lifecycle use cases that declare this
+  // enabler as a precondition — the "unlocks" list, and the demand signal.
+  const ucEnabledBy = (eid) =>
+    usecases.filter((u) => Array.isArray(u.enabled_by) && u.enabled_by.includes(eid));
+
   const techniquesInPhase = (pid) =>
     [...new Set(ucByPhase(pid).flatMap((u) => u.techniques))].map(technique).filter(Boolean);
   const techniquesInActivity = (aid) =>
     [...new Set(ucByActivity(aid).flatMap((u) => u.techniques))].map(technique).filter(Boolean);
+  const techniquesInTrack = (tid) =>
+    [...new Set(ucByTrack(tid).flatMap((u) => u.techniques))].map(technique).filter(Boolean);
+  const techniquesInEnabler = (eid) =>
+    [...new Set(ucByEnabler(eid).flatMap((u) => u.techniques))].map(technique).filter(Boolean);
 
   const featured = () => usecases.filter((u) => u.featured);
 
@@ -141,22 +206,32 @@ export function loadContent() {
     site,
     phases,
     phaseProse,
+    tracks,
+    trackProse,
     techniques,
     usecases,
     about,
     phase,
     activity,
     subphase,
+    track,
+    area,
+    enabler,
     technique,
     usecase,
     aboutPage,
     ucByPhase,
     ucByActivity,
     ucBySubphase,
+    ucByTrack,
+    ucByEnabler,
+    ucEnabledBy,
     ucByTechnique,
     techCount,
     techniquesInPhase,
     techniquesInActivity,
+    techniquesInTrack,
+    techniquesInEnabler,
     featured,
     activityEndorsed,
   };

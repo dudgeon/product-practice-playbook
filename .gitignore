@@ -3,5 +3,6 @@ dist/
 .DS_Store
 *.log
 
-# Generated from content/lifecycle.json by scripts/build-content.mjs
+# Generated from content/lifecycle.json + content/enablers.json by scripts/build-content.mjs
 content/phases.json
+content/tracks.json

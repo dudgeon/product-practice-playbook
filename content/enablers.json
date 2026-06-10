@@ -1,0 +1,32 @@
+{
+  "_note": "The enablement spine: tracks → areas → enablers — the SKELETON of the second axis (ids, names, order, hue, tagline). Same rules as lifecycle.json: editorial PROSE (canon + the editor's note) lives in content/tracks/<id>.md, keyed by enabler id for leaf-level lines; edit either, then run build-content to recompile + validate. ids are stable references: enabling use cases place by track + enabler id, and lifecycle use cases may cite enabler ids in enabled_by — keep them stable when renaming. UNLIKE the lifecycle, this taxonomy is EMERGENT by design: tracks are currently FLAT (no areas tier) and each compiles as one implicit area; introduce \"areas\" arrays (the surfaces tier) only when enablers actually cluster — it's a data edit, not a redesign. Everything here is provisional: no endorsements on this spine yet (locked decision D5).",
+  "tracks": [
+    {
+      "id": "data",
+      "name": "Data owners",
+      "hue": "#8a5a3a",
+      "tagline": "Make your data legible to agents you'll never meet.",
+      "enablers": [
+        { "id": "e-data-dictionary", "name": "Machine-readable data dictionary" }
+      ]
+    },
+    {
+      "id": "platform",
+      "name": "Platform & process owners",
+      "hue": "#3a6f8f",
+      "tagline": "Run the platform as a product whose newest user is an agent.",
+      "enablers": [
+        { "id": "e-context-pack", "name": "Platform context pack" }
+      ]
+    },
+    {
+      "id": "direction",
+      "name": "Product leaders",
+      "hue": "#6a4a8a",
+      "tagline": "Make direction something an agent can cite, not guess.",
+      "enablers": [
+        { "id": "e-priorities", "name": "Addressable priorities & principles" }
+      ]
+    }
+  ]
+}
