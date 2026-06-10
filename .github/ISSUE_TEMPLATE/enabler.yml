@@ -1,0 +1,61 @@
+name: New enabler
+description: Propose an expectation that makes the org easier to build in — or show how you met one.
+title: "[Enabler]: "
+labels: ["enabler"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for contributing to the **AI PDLC Playbook**. Enablers are agent-readiness
+        expectations — work by platform, process, data, and product owners that makes
+        *everyone else's* agents get traction. The editor reviews each submission, places
+        it on the enablement spine (a track + enabler), tags techniques, and writes the
+        editor's note. A bare proposal and a worked example are both welcome here.
+  - type: input
+    id: expectation
+    attributes:
+      label: The expectation
+      description: One line — what should be true.
+      placeholder: "Our data dictionary is machine-readable and registered in the catalog"
+    validations:
+      required: true
+  - type: input
+    id: owner
+    attributes:
+      label: Who owes it
+      description: The stewarding role — or one we're missing.
+      placeholder: "Data owner · Platform & process owner · Product leader"
+  - type: input
+    id: asset
+    attributes:
+      label: The asset
+      description: The dataset / platform / process / document being made agent-ready.
+  - type: textarea
+    id: why
+    attributes:
+      label: Why now · what it unlocks
+      description: What broke without it, or what downstream work it would accelerate.
+    validations:
+      required: true
+  - type: textarea
+    id: how
+    attributes:
+      label: How you met it (optional)
+      description: If this is practice and not just a proposal — what you published or changed, with links to the artifact itself.
+  - type: input
+    id: unlocks
+    attributes:
+      label: Unlocks (optional)
+      description: Lifecycle use cases this enables, if any come to mind. No need to dig — most authors won't know, and that's fine.
+  - type: input
+    id: techniques
+    attributes:
+      label: Techniques
+      description: Comma-separated cross-cutting tags.
+      placeholder: "Structured output, Retrieval, MCP & tools"
+  - type: input
+    id: placement
+    attributes:
+      label: Shelf placement (optional)
+      description: Track › enabler, if you know where it belongs. The editor will finalize.
+      placeholder: "Data owners · Machine-readable data dictionary"

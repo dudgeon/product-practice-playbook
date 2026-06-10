@@ -24,23 +24,31 @@ render it into static HTML at build time.
 
 ## What's here
 
-- **Two entities, two browse axes.** A **use case** sits on the lifecycle
-  (Goal → Approach → Impact, where the approach = instructions + an optional
-  prompt + optional resource links). A **technique** is a cross‑cutting tag with
-  one aggregation page. There is no standalone "Resource" entity. Top nav:
-  **Lifecycle · Techniques · About**.
+- **Two entities, three browse axes.** A **use case** (Goal → Approach →
+  Impact, where the approach = instructions + an optional prompt + optional
+  resource links) sits on exactly one of two spines: the **lifecycle**
+  (phase › activity) or the **enablement shelf** (track › enabler). A
+  **technique** is a cross‑cutting tag with one aggregation page, pooled across
+  both spines. There is no standalone "Resource" entity. Top nav:
+  **Lifecycle · Enablers · Techniques · About**.
 - **The three voices**, kept unmistakably distinct by labeling + treatment — no
   literal on‑screen legend.
 - **Endorsement.** Proven practice can be promoted into the protocol's
   recommendations with a brass *PDLC‑endorsed* seal.
 - **Contribution via GitHub issues.** The header CTA and every contextual
-  "+ Add" link deep‑link to a scoped [issue template](.github/ISSUE_TEMPLATE).
-- **Proposed — Enablers, a second axis.** Agent‑readiness expectations for
-  platform owners, data owners, and product leaders (make your data, platform
-  context, and priorities discoverable + machine‑readable), standing alone as
-  expectations and linked from lifecycle use cases via `enabled_by`. Research
-  survey, a flexible starting taxonomy, four IA options, and the open
-  decisions: [`docs/enablers-ia-proposal.html`](docs/enablers-ia-proposal.html).
+  "+ Add" link deep‑link to a scoped [issue template](.github/ISSUE_TEMPLATE) —
+  `use-case.yml` for lifecycle practice, `enabler.yml` for the enablement
+  shelf. One loop, two shelves: placement is the editor's curation step.
+- **Enablers — the second axis.** Agent‑readiness expectations owned by **data
+  owners, platform & process owners, and product leaders** (make your data,
+  platform context, and priorities discoverable + machine‑readable). Enablers
+  stand alone as proposed expectations (**provisional — no endorsements on
+  this spine yet**), collect their own *enabling use cases*, and are cited
+  from lifecycle use cases via the optional, validated `enabled_by`
+  frontmatter (soft by design — declare it only when you know it). The
+  taxonomy is **emergent**: tracks are flat until enablers cluster into areas.
+  Research survey + IA decision record:
+  [`docs/enablers-ia-proposal.html`](docs/enablers-ia-proposal.html).
 
 ## How it's built
 
@@ -49,14 +57,17 @@ A small zero‑framework static‑site generator (plain Node ESM):
 ```
 content/                 ← the source of truth (edit these)
   site.json                site config + home copy
-  lifecycle.json           the spine SKELETON: phases → subphases → key activities (ids, names, order, hue, tagline)
+  lifecycle.json           the lifecycle SKELETON: phases → subphases → key activities (ids, names, order, hue, tagline)
+  enablers.json            the enablement SKELETON: tracks → areas → enablers (same shape; flat tracks compile as one implicit area)
   phases/*.md              per-phase editorial prose: canon + the editor's note (merged into the spine)
-  techniques.json          the horizontal technique tags
+  tracks/*.md              per-track editorial prose: the proposed expectation + the editor's note (merged the same way)
+  techniques.json          the horizontal technique tags (one pool across both spines)
   techniques/*.md          optional: a technique's long-form explanation (overrides the tag)
-  usecases/*.md            one use case per file: YAML frontmatter + prose
+  usecases/*.md            one use case per file: YAML frontmatter + prose (placed on exactly one spine)
   about/*.md               the three About pages
   pages/*.html             self-contained ancillary docs (Master PRD, IA Proposal)
   phases.json              GENERATED from lifecycle.json + phases/*.md (git-ignored snapshot)
+  tracks.json              GENERATED from enablers.json + tracks/*.md (git-ignored snapshot)
 src/
   lib/                     content loader, lifecycle compiler, markdown, links, html
   components.mjs           the design system as reusable template functions
@@ -143,12 +154,17 @@ A **technique** stays a one‑line tag in `techniques.json` until it needs real
 explanation; then add `content/techniques/<id>.md` — its frontmatter overrides
 the tag's fields and its Markdown body renders as the technique's detail.
 
-## The lifecycle is data — changing the stages
+## The spines are data — changing the stages (or the tracks)
 
 The product‑development lifecycle (the **stages**, their **subphases**, and the
 **key activities** within each) is notional and lives entirely in
-**`content/lifecycle.json`** — the single source of truth for the spine. When
-the structure changes, you don't touch templates or CSS:
+**`content/lifecycle.json`** — the single source of truth for the spine. The
+enablement shelf works identically from **`content/enablers.json`**
+(**tracks › areas › enablers**, prose in `content/tracks/<id>.md`), with two
+deliberate differences: the taxonomy is *emergent* (tracks stay flat — no
+`areas[]` — until enablers cluster; a flat track compiles as one implicit
+area), and it is *provisional* (no endorsements on that spine yet). When
+either structure changes, you don't touch templates or CSS:
 
 1. Edit `content/lifecycle.json` for **structure** (add / rename / reorder /
    recolor phases, subphases, and activities — each phase holds `subphases[]`,
@@ -160,11 +176,13 @@ the structure changes, you don't touch templates or CSS:
    matching `content/phases/<id>.md`. (A phase may still use a flat `activities[]`
    instead of `subphases[]`; it compiles as one implicit subphase.)
 2. Run **`npm run build-content`** (or the **`/build-content`** skill). It
-   compiles the spine, merges the per‑phase prose, writes the generated
-   `content/phases.json` snapshot, and **validates** the content store —
-   catching a use case that points at a renamed/removed stage, an unknown
-   technique tag, a duplicate or under‑specified use case, or a phase missing
-   its prose file — then prints a coverage report.
+   compiles both spines, merges the per‑phase / per‑track prose, writes the
+   generated `content/phases.json` + `content/tracks.json` snapshots, and
+   **validates** the content store — catching a use case that points at a
+   renamed/removed stage or enabler (or at both spines at once), a broken
+   `enabled_by` reference, an unknown technique tag, a duplicate or
+   under‑specified use case, or a phase/track missing its prose file — then
+   prints a coverage report.
 3. Run **`npm run build`** (or the **`/build-site`** skill) to render. The build
    also generates the phase‑keyed CSS (hue tokens, the featured‑card tints, and
    the spine‑rail gradient) from the lifecycle, so new stages render correctly
@@ -219,6 +237,14 @@ The how — instructions, and optionally a prompt block and resource links.
 ## Impact
 What changed (optional).
 ```
+
+A use case sits on exactly **one** spine: `phase` + `activity` (lifecycle) *or*
+`track` + `enabler` (enablement shelf) — the mid tier (subphase / area) is
+always derived. Any lifecycle use case may optionally declare
+`enabled_by: [e-…]` — the enablers it leans on; ids are validated, chips render
+on the use‑case page, and the enabler page lists it under "unlocks". It is
+deliberately optional: most authors won't know their preconditions, and absence
+is never flagged.
 
 ## Deployment
 

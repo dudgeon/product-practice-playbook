@@ -10,6 +10,8 @@ endorsed: false
 techniques:
   - t-prompt
   - t-context
+enabled_by:
+  - e-context-pack
 tools:
   - Claude Code
 author: Ember Onboarding
